@@ -1,0 +1,44 @@
+{
+    "referencedTypes":{
+        "Guid" : {
+            "name":"Guid",
+            "import": "../../types/Guid"
+        },
+        "Entity" : {
+            "name":"IEntity",
+            "import": "../../types/IEntity"
+        },
+        "EntityReference" : {
+            "name":"EntityReference",
+            "import": "../../types/EntityReference"
+        },
+        "ActivityParty" : {
+            "name":"ActivityParty",
+            "import": "../../types/ActivityParty"
+        },
+        "StructuralProperty" :{
+            "name": "StructuralProperty",
+            "import": "../../types/StructuralProperty"
+        },
+        "WebApiExecuteRequest": {
+            "name":"WebApiExecuteRequest",
+            "import": "../../types/WebApiExecuteRequest"
+        },
+        "OperationType": {
+            "name":"OperationType",
+            "import": "../../types/OperationType"
+        },
+        "enums": {
+            "import": "../enums/"
+        },
+        "complexTypes": {
+            "import": "../complextypes/"
+        },
+        "entityTypes": {
+            "import": "../entities/"
+        }
+    },
+    "entities":["account"],
+    "actions":["WinOpportunity"],
+    "functions":["CalculateTotalTimeIncident"]
+}

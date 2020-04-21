@@ -1,0 +1,42 @@
+{
+  "name": "cdsify",
+  "version": "1.0.0",
+  "description": "Easily call the CDS WebApi using SDK style types. Works with 'npx cds-gen' to create early bound classes.",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc & jest",
+    "prepublish": "npm run build"
+  },
+  "author": "Scott Durow",
+  "license": "MIT",
+  "dependencies": {
+    "adal-node": "^0.2.1",
+    "config": "^3.3.1",
+    "cryptr": "^6.0.2",
+    "fs": "0.0.1-security",
+    "node-fetch": "^2.6.0",
+    "os": "^0.1.1",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "@types/config": "0.0.36",
+    "@types/cryptr": "^4.0.0",
+    "@types/jest": "^24.9.1",
+    "@types/node-fetch": "^2.5.6",
+    "@types/request": "^2.48.4",
+    "@types/xrm": "^9.0.23",
+    "@typescript-eslint/eslint-plugin": "^2.28.0",
+    "@typescript-eslint/parser": "^2.28.0",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.19.0",
+    "jest": "^24.9.0",
+    "jest-environment-jsdom-fourteen": "^0.1.0",
+    "prettier": "^1.18.2",
+    "syswide-cas": "^5.3.0",
+    "ts-jest": "^24.3.0",
+    "typescript": "^3.8.3"
+  }
+}

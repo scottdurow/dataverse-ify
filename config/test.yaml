@@ -1,0 +1,11 @@
+﻿# Configuration file for the XrmNode Unit tests
+nodecds:
+ logging: verbose
+ runIntegrationTests: false
+ proxy:
+  useproxy: false
+  httpProxy: http://127.0.0.1:8888
+  httpsProxy: http://127.0.0.1:8888
+ server:
+  host: https://develop1v9demo.crm11.dynamics.com
+  version: 9.1
