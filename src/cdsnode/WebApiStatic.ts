@@ -327,7 +327,7 @@ export class WebApiStatic {
         resolve(responseJson);
       });
       const responseTextPromise = new Promise<string>((_resolve, _reject) => {
-        return responseJson;
+        _resolve(responseString);
       });
       const executeResponse = {
         ok: true,
