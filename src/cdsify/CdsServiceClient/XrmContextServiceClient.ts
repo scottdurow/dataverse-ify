@@ -156,8 +156,10 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
   async execute(request: WebApiExecuteRequest): Promise<unknown> {
     const requestWebApi = await odataify("Action", request);
     const response = await this._webApi.online.execute(requestWebApi);
-    const responseJson = await response.json();
-
-    return responseJson;
+    const responseText = await response.text();
+    if (responseText && responseText.length > 0) {
+      return JSON.parse(responseText);
+    }
+    return undefined;
   }
 }
