@@ -11,3 +11,4 @@ The TypeScript library that allows you to use the CDS/Xrm WebApi using IOrganiza
 Works with [cdsify-gen](https://www.npmjs.com/package/cdsify-gen) and [node-cds-auth](https://www.npmjs.com/package/node-cds-auth) to create early bound classes.
 
 - [Introduction to cdsify](https://github.com/scottdurow/cdsify/wiki)
+- [Quick Start](https://github.com/scottdurow/cdsify/wiki/Quick-start)
