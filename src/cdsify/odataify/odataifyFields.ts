@@ -9,6 +9,7 @@ import { Dictionary } from "../../types/Dictionary";
 import { getNavigationPathForEntityReference } from "../../types/IEntityReference";
 import { EntityCollection } from "../../types/EntityCollection";
 import { odataify } from "./odataify";
+import { AttributeTypeCode } from "../../cds-generated/enums/AttributeTypeCode";
 export async function odataifyFields(
   action: "Create" | "Update" | "Action",
   output: IEntity,
@@ -18,6 +19,15 @@ export async function odataifyFields(
   for (const field of Object.keys(output)) {
     const fieldType = Object.prototype.toString.call(output[field]);
     const fieldValue = output[field] as unknown;
+    const fieldAttributeType = metadata.attributeTypes[field];
+
+    // Convert primitive types
+    switch (fieldAttributeType) {
+      case AttributeTypeCode.Integer:
+        output[field] = fieldValue && parseInt(fieldValue as string);
+        break;
+    }
+
     switch (fieldType) {
       case "[object Array]":
         // Array of Activity Parties or enums
