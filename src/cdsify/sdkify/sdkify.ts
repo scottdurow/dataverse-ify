@@ -16,7 +16,7 @@ import { getEntityMetadataFromRecord } from "../../metadata/getEntityMetadataFro
 function removeNonSdkFields(entityRecord: IEntity): void {
   for (const field of Object.keys(entityRecord)) {
     if (field.startsWith("_") || field.indexOf("@") > -1) {
-      delete entityRecord["field"];
+      delete entityRecord[field];
     }
   }
 }
