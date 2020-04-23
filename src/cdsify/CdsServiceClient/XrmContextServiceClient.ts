@@ -28,7 +28,7 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
     // If there is no primary id attribute set, but the id is set then use that
     if (!id && entity.id) {
       id = entity.id;
-    } else {
+    } else if (!id) {
       throw new Error("Either id or the primary id attribute must be set to update the record");
     }
 
