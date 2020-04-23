@@ -125,6 +125,6 @@ export async function odataify(
   }
 
   if (!valueSet) {
-    throw new Error("Cannot odataify - no metadata found");
+    throw new Error(`Cannot odataify - no metadata found for ${logicalName}`);
   }
 }
