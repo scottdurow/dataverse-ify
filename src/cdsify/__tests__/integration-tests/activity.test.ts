@@ -3,10 +3,10 @@ import { XrmContextCdsServiceClient } from "../..";
 import { ActivityParty, activitypartyMetadata } from "../../../types/ActivityParty";
 import { Entity } from "../../../types/Entity";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
-import { accountMetadata, Account } from "../../../cds-metadata/account";
-import { letterMetadata, Letter } from "../../../cds-metadata/letter";
 import * as config from "config";
 import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
+import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
+import { letterMetadata, Letter } from "../../../cds-generated/entities/Letter";
 describe("activity", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {

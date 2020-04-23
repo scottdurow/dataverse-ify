@@ -2,11 +2,13 @@ import { SetupGlobalContext } from "../../../cdsnode/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { XrmContextCdsServiceClient } from "../..";
 import { Entity } from "../../../types/Entity";
-import { Account } from "../../../cds-metadata/account";
-import { accountMetadata } from "../../../cds-metadata/account";
-import { calculaterollupfieldMetadata, CalculateRollupField } from "../../../cds-metadata/calculaterollupfield";
 import * as config from "config";
 import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
+import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
+import {
+  CalculateRollupFieldMetadata,
+  CalculateRollupFieldRequest,
+} from "../../../cds-generated/functions/CalculateRollupField";
 describe("calculaterollpfield", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {
@@ -25,7 +27,7 @@ describe("calculaterollpfield", () => {
     if (!configFile.runIntegrationTests) return;
     setMetadataCache({
       entities: { account: accountMetadata },
-      actions: { CalculateRollupField: calculaterollupfieldMetadata },
+      actions: { CalculateRollupField: CalculateRollupFieldMetadata },
     });
 
     const account1 = {
@@ -40,10 +42,10 @@ describe("calculaterollpfield", () => {
 
       // Calculate Rollup field openddeals
       const request = {
-        logicalName: calculaterollupfieldMetadata.operationName,
+        logicalName: CalculateRollupFieldMetadata.operationName,
         FieldName: "opendeals",
         Target: Entity.toEntityReference(account1),
-      } as CalculateRollupField;
+      } as CalculateRollupFieldRequest;
 
       const response = await cdsServiceClient.execute(request);
       console.log(response);

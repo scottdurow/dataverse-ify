@@ -1,12 +1,12 @@
 import { SetupGlobalContext } from "../../../cdsnode/SetupGlobalContext";
-import { opportunityMetadata, Opportunity } from "../../../cds-metadata/opportunity";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
-import { accountMetadata, Account } from "../../../cds-metadata/account";
+import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
 import { XrmContextCdsServiceClient } from "../..";
 import { Entity } from "../../../types/Entity";
-import { Contact, contactMetadata } from "../../../cds-metadata/contact";
 import * as config from "config";
 import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
+import { contactMetadata, Contact } from "../../../cds-generated/entities/Contact";
+import { opportunityMetadata, Opportunity } from "../../../cds-generated/entities/Opportunity";
 describe("customer", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {

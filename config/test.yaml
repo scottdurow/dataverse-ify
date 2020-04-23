@@ -1,7 +1,7 @@
 ﻿# Configuration file for the XrmNode Unit tests
 nodecds:
  logging: verbose
- runIntegrationTests: false
+ runIntegrationTests: true
  proxy:
   useproxy: false
   httpProxy: http://127.0.0.1:8888

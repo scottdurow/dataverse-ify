@@ -1,13 +1,14 @@
 import { SetupGlobalContext } from "../../../cdsnode/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { Entity } from "../../../types/Entity";
-import { Queue, queueMetadata } from "../../../cds-metadata/queue";
-import { queueitemMetadata } from "../../../cds-metadata/queueitem";
-import { addtoqueueMetadata, AddToQueueRequest, AddToQueueResponse } from "../../../cds-metadata/addtoqueue";
-import { Letter, letterMetadata } from "../../../cds-metadata/letter";
 import { XrmContextCdsServiceClient } from "../..";
 import * as config from "config";
 import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
+import { letterMetadata, Letter } from "../../../cds-generated/entities/Letter";
+import { queueMetadata, Queue } from "../../../cds-generated/entities/Queue";
+import { queueitemMetadata } from "../../../cds-generated/entities/QueueItem";
+import { AddToQueueMetadata, AddToQueueRequest } from "../../../cds-generated/actions/AddToQueue";
+import { AddToQueueResponse } from "../../../cds-generated/complextypes/AddToQueueResponse";
 describe("addtoqueue", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {
@@ -30,7 +31,7 @@ describe("addtoqueue", () => {
         queue: queueMetadata,
         queueitem: queueitemMetadata,
       },
-      actions: { AddToQueue: addtoqueueMetadata },
+      actions: { AddToQueue: AddToQueueMetadata },
     });
 
     const queue = {
@@ -53,7 +54,7 @@ describe("addtoqueue", () => {
 
       // Add letter to queue
       const request = {
-        logicalName: addtoqueueMetadata.operationName,
+        logicalName: AddToQueueMetadata.operationName,
         entity: Entity.toEntityReference(queue),
         Target: Entity.toEntityReference(letter),
       } as AddToQueueRequest;

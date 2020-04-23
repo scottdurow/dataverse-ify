@@ -1,13 +1,13 @@
 import { SetupGlobalContext } from "../../../cdsnode/SetupGlobalContext";
-import { opportunityMetadata, Opportunity } from "../../../cds-metadata/opportunity";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
-import { accountMetadata, Account } from "../../../cds-metadata/account";
+import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
 import { XrmContextCdsServiceClient } from "../..";
 import { Entity } from "../../../types/Entity";
-import { WinOpportunityRequest, winopportunityMetadata } from "../../../cds-metadata/winopportunity";
-import { opportunitycloseMetadata } from "../../../cds-metadata/opportunityclose";
 import * as config from "config";
 import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
+import { opportunityMetadata, Opportunity } from "../../../cds-generated/entities/Opportunity";
+import { opportunitycloseMetadata } from "../../../cds-generated/entities/OpportunityClose";
+import { WinOpportunityMetadata, WinOpportunityRequest } from "../../../cds-generated/actions/WinOpportunity";
 describe("winopportunity", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {
@@ -30,7 +30,7 @@ describe("winopportunity", () => {
         opportunity: opportunityMetadata,
         opportunityclose: opportunitycloseMetadata,
       },
-      actions: { WinOpportunity: winopportunityMetadata },
+      actions: { WinOpportunity: WinOpportunityMetadata },
     });
 
     const account1 = {
