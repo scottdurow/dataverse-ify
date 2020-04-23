@@ -11,6 +11,12 @@ export interface MetadataCache {
 }
 export function setMetadataCache(metadataCache: MetadataCache): void {
   _metadataCache = { ..._metadataCache, ...metadataCache };
+
+  // Add any EntitySetNames
+  _metadataCache.entitySetNames = _metadataCache.entitySetNames || {};
+  for (const logicalName in metadataCache.entities) {
+    _metadataCache.entitySetNames[logicalName] = metadataCache.entities[logicalName].collectionName;
+  }
 }
 export function getMetadataCache(): MetadataCache {
   if (_metadataCache == null) {
@@ -52,9 +58,15 @@ export async function getEntitySetName(entityLogicalName: string): Promise<strin
   }
   // Lookup the entity set name from the logical name
   // We only lookup the entityset names automatically at the moment
-  const entityMetadata = await Xrm.Utility.getEntityMetadata(entityLogicalName, ["EntitySetName"]);
-  entitySetNames[entityLogicalName] = entityMetadata.EntitySetName;
-  return entityMetadata.EntitySetName;
+  try {
+    const entityMetadata = await Xrm.Utility.getEntityMetadata(entityLogicalName, ["EntitySetName"]);
+    entitySetNames[entityLogicalName] = entityMetadata.EntitySetName;
+    return entityMetadata.EntitySetName;
+  } catch (ex) {
+    throw new Error(
+      `Just-In-Time retreival of EntitySetName for '${entityLogicalName}' failed: ${ex}\nIdeally you should use setMetadataCache`,
+    );
+  }
   //throw new Error(`Cannot find entity metadata for ${entityLogicalName}. Please generate early bound types`);
 }
 export function getMetadata(entity: IEntity): EntityWebApiMetadata {
