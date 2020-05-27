@@ -12,3 +12,4 @@ Works with [cdsify-gen](https://www.npmjs.com/package/cdsify-gen) and [node-cds-
 
 - [Introduction to cdsify](https://github.com/scottdurow/cdsify/wiki)
 - [Quick Start](https://github.com/scottdurow/cdsify/wiki/Quick-start)
+- [Integration tests with cdsify](https://github.com/scottdurow/cdsify/wiki/Integration-testing-the-Xrm.WebApi-implementation)
