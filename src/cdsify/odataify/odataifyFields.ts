@@ -29,6 +29,10 @@ export async function odataifyFields(
     }
 
     switch (fieldType) {
+      case "[object Undefined]":
+        // When setting a value to undefined it must be null when sent to the WebApi
+        output[field] = null;
+        break;
       case "[object Array]":
         // Array of Activity Parties or enums
         // TODO: Add unit test for empty arrays

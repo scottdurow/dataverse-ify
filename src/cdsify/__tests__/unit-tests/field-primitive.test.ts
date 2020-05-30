@@ -43,11 +43,11 @@ test("Empty String, Integer, Double, Money, Date Attributes", async () => {
   const accountOdata = await odataify("Create", accountSdk);
   expect(accountOdata).toBeDefined();
   const expectedOdata = {
-    name: undefined,
-    address1_utcoffset: undefined, // Int should be truncated
-    address1_latitude: undefined,
-    revenue: undefined,
-    lastonholdtime: undefined,
+    name: null,
+    address1_utcoffset: null, // Int should be truncated
+    address1_latitude: null,
+    revenue: null,
+    lastonholdtime: null,
     "@odata.type": "Microsoft.Dynamics.CRM.account",
   };
   expect(JSON.stringify(accountOdata)).toBe(JSON.stringify(expectedOdata));

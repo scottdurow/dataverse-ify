@@ -3,9 +3,9 @@ import { Guid } from "./Guid";
 import { getMetadata } from "../metadata/MetadataCache";
 
 export class EntityReference {
-  constructor(logicalName?: string, id?: Guid, name?: string) {
+  constructor(logicalName?: string, id?: Guid | null, name?: string) {
     this.entityType = logicalName;
-    this.id = id;
+    this.id = id as string | undefined;
     this.name = name;
   }
   entityType?: string;

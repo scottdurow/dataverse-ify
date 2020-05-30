@@ -40,6 +40,7 @@ describe("create", () => {
     const account1 = {
       logicalName: accountMetadata.logicalName,
       name: "Account 1",
+      description: "Description",
       // Optionset
       accountcategorycode: account_account_accountcategorycode.PreferredCustomer,
       // Money
@@ -59,15 +60,10 @@ describe("create", () => {
     // Create
     const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
     account1.accountid = await cdsServiceClient.create(account1);
-    expect(account1.accountid).toBeDefined();
-
-    if (!account1.accountid) {
-      fail();
-    }
 
     // Retrieve
     const account1Retreived = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
-    expect(account1Retreived.name).toBe(account1.name);
+    expect(account1Retreived.description).toBe(account1.description);
     expect(account1Retreived.accountcategorycode).toBe(account1.accountcategorycode);
     expect(account1Retreived.creditlimit).toBe(account1.creditlimit);
     expect(account1Retreived.address1_latitude).toBe(account1.address1_latitude);
@@ -75,16 +71,22 @@ describe("create", () => {
     expect(account1Retreived.preferredsystemuserid?.id).toBe(account1.preferredsystemuserid?.id);
     expect(account1Retreived.preferredsystemuserid?.entityType).toBe(account1.preferredsystemuserid?.entityType);
     expect(account1Retreived.preferredsystemuserid?.name).toBeDefined();
+    expect(account1Retreived.telephone1).toBeNull();
+    try {
+      // Null values
+      account1.description = null;
+      account1.preferredsystemuserid = null; // The cdsServiceClient has special functionality to delete the lookups
+      await cdsServiceClient.update(account1);
 
-    // Update
-    account1.name = "Updated Name";
-    await cdsServiceClient.update(account1);
-
-    // Retrieve Updated
-    const account1Retreived2 = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
-    expect(account1Retreived2.name).toBe("Updated Name");
-
-    // Delete
-    await cdsServiceClient.delete("account", account1.accountid);
+      // Retrieve Updated
+      const account1Retreived2 = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
+      expect(account1Retreived2.description).toBeNull();
+      // Because a lookup value comes in as null we can't figure out the entity reference lookup type
+      // so we get an undefined value not null
+      expect(account1Retreived2.preferredsystemuserid).toBeUndefined();
+    } finally {
+      // Delete
+      await cdsServiceClient.delete("account", account1.accountid);
+    }
   }, 10000);
 });

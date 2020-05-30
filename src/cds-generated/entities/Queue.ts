@@ -110,123 +110,123 @@ export enum QueueAttributes {
 // Early Bound Interface
 export interface Queue extends IEntity {
   //  StringType
-  transactioncurrencyidname?: string;
+  transactioncurrencyidname?: string | null;
   // Queue UniqueidentifierType Unique identifier of the queue.
-  queueid?: import("../../types/Guid").Guid;
+  queueid?: import("../../types/Guid").Guid | null;
   // Import Sequence Number IntegerType Unique identifier of the data import or data migration that created this record.
-  importsequencenumber?: number;
+  importsequencenumber?: number | null;
   // Convert Incoming Email To Activities queue_queue_incomingemailfilteringmethod Convert Incoming Email To Activities
-  incomingemailfilteringmethod?: import("../enums/queue_queue_incomingemailfilteringmethod").queue_queue_incomingemailfilteringmethod;
+  incomingemailfilteringmethod?: import("../enums/queue_queue_incomingemailfilteringmethod").queue_queue_incomingemailfilteringmethod | null;
   //  StringType
-  owneridname?: string;
+  owneridname?: string | null;
   //  StringType
-  createdonbehalfbyyominame?: string;
+  createdonbehalfbyyominame?: string | null;
   // Owning Business Unit LookupType Unique identifier of the business unit that owns the queue.
-  owningbusinessunit?: import("../../types/EntityReference").EntityReference;
+  owningbusinessunit?: import("../../types/EntityReference").EntityReference | null;
   // Status Reason queue_queue_statuscode Reason for the status of the queue.
-  statuscode?: import("../enums/queue_queue_statuscode").queue_queue_statuscode;
+  statuscode?: import("../enums/queue_queue_statuscode").queue_queue_statuscode | null;
   // Created On DateTimeType Date and time when the queue was created. DateAndTime:UserLocal
-  createdon?: Date;
+  createdon?: Date | null;
   // Owner OwnerType Unique identifier of the user or team who owns the queue.
-  ownerid?: import("../../types/EntityReference").EntityReference;
+  ownerid?: import("../../types/EntityReference").EntityReference | null;
   // No. of Members IntegerType Number of Members associated with the queue.
-  numberofmembers?: number;
+  numberofmembers?: number | null;
   // Incoming Email Delivery Method queue_queue_incomingemaildeliverymethod Incoming email delivery method for the queue.
-  incomingemaildeliverymethod?: import("../enums/queue_queue_incomingemaildeliverymethod").queue_queue_incomingemaildeliverymethod;
+  incomingemaildeliverymethod?: import("../enums/queue_queue_incomingemaildeliverymethod").queue_queue_incomingemaildeliverymethod | null;
   // Created By (Delegate) LookupType Unique identifier of the delegate user who created the queue.
-  createdonbehalfby?: import("../../types/EntityReference").EntityReference;
+  createdonbehalfby?: import("../../types/EntityReference").EntityReference | null;
   // Currency LookupType Unique identifier of the currency associated with the queue.
-  transactioncurrencyid?: import("../../types/EntityReference").EntityReference;
+  transactioncurrencyid?: import("../../types/EntityReference").EntityReference | null;
   // Entity Image Id UniqueidentifierType For internal use only.
-  entityimageid?: import("../../types/Guid").Guid;
+  entityimageid?: import("../../types/Guid").Guid | null;
   // Name [Required] StringType Name of the queue.
   name?: string;
   // Modified By LookupType Unique identifier of the user who last modified the queue.
-  modifiedby?: import("../../types/EntityReference").EntityReference;
+  modifiedby?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  modifiedbyyominame?: string;
+  modifiedbyyominame?: string | null;
   //  StringType
-  createdonbehalfbyname?: string;
+  createdonbehalfbyname?: string | null;
   // Record Created On DateTimeType Date and time that the record was migrated. DateOnly:UserLocal
-  overriddencreatedon?: Date;
+  overriddencreatedon?: Date | null;
   //  StringType
-  modifiedbyname?: string;
+  modifiedbyname?: string | null;
   // Type queue_queue_queueviewtype Select whether the queue is public or private. A public queue can be viewed by all. A private queue can be viewed only by the members added to the queue.
-  queueviewtype?: import("../enums/queue_queue_queueviewtype").queue_queue_queueviewtype;
+  queueviewtype?: import("../enums/queue_queue_queueviewtype").queue_queue_queueviewtype | null;
   // Description MemoType Description of the queue.
-  description?: string;
+  description?: string | null;
   // Primary Email Status queue_queue_emailrouteraccessapproval Shows the status of the primary email address.
-  emailrouteraccessapproval?: import("../enums/queue_queue_emailrouteraccessapproval").queue_queue_emailrouteraccessapproval;
+  emailrouteraccessapproval?: import("../enums/queue_queue_emailrouteraccessapproval").queue_queue_emailrouteraccessapproval | null;
   // Modified By (Delegate) LookupType Unique identifier of the delegate user who last modified the queue.
-  modifiedonbehalfby?: import("../../types/EntityReference").EntityReference;
+  modifiedonbehalfby?: import("../../types/EntityReference").EntityReference | null;
   // Version Number BigIntType Version number of the queue.
-  versionnumber?: number;
+  versionnumber?: number | null;
   //  StringType
-  owneridyominame?: string;
+  owneridyominame?: string | null;
   // Queue Items IntegerType Number of Queue items associated with the queue.
-  numberofitems?: number;
+  numberofitems?: number | null;
   // Owning User LookupType Unique identifier of the user who owns the queue.
-  owninguser?: import("../../types/EntityReference").EntityReference;
+  owninguser?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  createdbyname?: string;
+  createdbyname?: string | null;
   // Queue Type queue_queue_queuetypecode Type of queue that is automatically assigned when a user or queue is created. The type can be public, private, or work in process.
-  queuetypecode?: import("../enums/queue_queue_queuetypecode").queue_queue_queuetypecode;
+  queuetypecode?: import("../enums/queue_queue_queuetypecode").queue_queue_queuetypecode | null;
   //  BigIntType
-  entityimage_timestamp?: number;
+  entityimage_timestamp?: number | null;
   // Created By LookupType Unique identifier of the user who created the queue record.
-  createdby?: import("../../types/EntityReference").EntityReference;
+  createdby?: import("../../types/EntityReference").EntityReference | null;
   // Password (Obsolete) StringType This attribute is no longer used. The data is now in the Mailbox.Password attribute.
-  emailpassword?: string;
+  emailpassword?: string | null;
   // Exchange Rate DecimalType Exchange rate for the currency associated with the queue with respect to the base currency.
-  exchangerate?: number;
+  exchangerate?: number | null;
   // Email Address O365 Admin Approval Status BooleanType Shows the status of approval of the email address by O365 Admin.
-  isemailaddressapprovedbyo365admin?: boolean;
+  isemailaddressapprovedbyo365admin?: boolean | null;
   //  StringType
-  createdbyyominame?: string;
+  createdbyyominame?: string | null;
   //  StringType
-  primaryuseridyominame?: string;
+  primaryuseridyominame?: string | null;
   //  StringType
-  modifiedonbehalfbyname?: string;
+  modifiedonbehalfbyname?: string | null;
   // Entity Image ImageType The default image for the entity.
-  entityimage?: string;
+  entityimage?: string | null;
   //  StringType
-  defaultmailboxname?: string;
+  defaultmailboxname?: string | null;
   // Modified On DateTimeType Date and time when the queue was last modified. DateAndTime:UserLocal
-  modifiedon?: Date;
+  modifiedon?: Date | null;
   // Business Unit LookupType Unique identifier of the business unit with which the queue is associated.
-  businessunitid?: import("../../types/EntityReference").EntityReference;
+  businessunitid?: import("../../types/EntityReference").EntityReference | null;
   // Incoming Email StringType Email address that is associated with the queue.
-  emailaddress?: string;
+  emailaddress?: string | null;
   // Organization LookupType Unique identifier of the organization associated with the queue.
-  organizationid?: import("../../types/EntityReference").EntityReference;
+  organizationid?: import("../../types/EntityReference").EntityReference | null;
   // User Name (Obsolete) StringType This attribute is no longer used. The data is now in the Mailbox.UserName attribute.
-  emailusername?: string;
+  emailusername?: string | null;
   //  EntityNameType
-  owneridtype?: string;
+  owneridtype?: string | null;
   //  StringType
-  businessunitidname?: string;
+  businessunitidname?: string | null;
   // Mailbox LookupType Select the mailbox associated with this queue.
-  defaultmailbox?: import("../../types/EntityReference").EntityReference;
+  defaultmailbox?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  primaryuseridname?: string;
+  primaryuseridname?: string | null;
   // Convert To Email Activities BooleanType Information that specifies whether a queue is to ignore unsolicited email (deprecated).
-  ignoreunsolicitedemail?: boolean;
+  ignoreunsolicitedemail?: boolean | null;
   // Fax Queue BooleanType Indication of whether a queue is the fax delivery queue.
-  isfaxqueue?: boolean;
+  isfaxqueue?: boolean | null;
   // Owning Team LookupType Unique identifier of the team who owns the queue.
-  owningteam?: import("../../types/EntityReference").EntityReference;
+  owningteam?: import("../../types/EntityReference").EntityReference | null;
   // Outgoing Email Delivery Method queue_queue_outgoingemaildeliverymethod Outgoing email delivery method for the queue.
-  outgoingemaildeliverymethod?: import("../enums/queue_queue_outgoingemaildeliverymethod").queue_queue_outgoingemaildeliverymethod;
+  outgoingemaildeliverymethod?: import("../enums/queue_queue_outgoingemaildeliverymethod").queue_queue_outgoingemaildeliverymethod | null;
   // Allow to Use Credentials for Email Processing (Obsolete) BooleanType This attribute is no longer used. The data is now in the Mailbox.AllowEmailConnectorToUseCredentials attribute.
-  allowemailcredentials?: boolean;
+  allowemailcredentials?: boolean | null;
   //  StringType
-  entityimage_url?: string;
+  entityimage_url?: string | null;
   // Owner (deprecated) LookupType Unique identifier of the owner of the queue.
-  primaryuserid?: import("../../types/EntityReference").EntityReference;
+  primaryuserid?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  organizationidname?: string;
+  organizationidname?: string | null;
   // Status queue_queue_statecode Status of the queue.
-  statecode?: import("../enums/queue_queue_statecode").queue_queue_statecode;
+  statecode?: import("../enums/queue_queue_statecode").queue_queue_statecode | null;
   //  StringType
-  modifiedonbehalfbyyominame?: string;
+  modifiedonbehalfbyyominame?: string | null;
 }

@@ -1,0 +1,43 @@
+/* eslint-disable*/
+import { <%-referencedTypes["Entity"].name%> } from "<%-referencedTypes["Entity"].import%>";
+// Entity <%- locals.SchemaName %>
+export const <%- Name %>Metadata = {
+  typeName: "mscrm.<%- Name %>",
+  logicalName: "<%- Name %>",
+  collectionName: "<%- EntitySetName %>",
+  primaryIdAttribute: "<%- KeyName %>",
+  attributeTypes: {
+    // Numeric Types
+    <%_ Properties.filter(p=>p.TypescriptType.name=="number").forEach(function(attribute){ _%>
+    <%-attribute.Name%>: "<%-attribute.Type.replace("Type","")-%>",
+    <%_})_%>
+    // Optionsets
+    <%_ Properties.filter(p=>p.IsEnum).forEach(function(attribute){ _%>
+    <%-attribute.Name%>: "<%-attribute.IsMultiSelect ? "MultiSelect" : "Optionset"%>",
+    <%_})_%>
+    // Date Formats
+    <%_ Properties.filter(p=>p.TypescriptType.name == "Date").forEach(function(attribute){ _%>
+    <%-attribute.Name%>: "<%-attribute.Format-%>",
+    <%_})_%>
+  },
+  navigation: {
+    <%_ NavigationProperties.filter(n=>!n.IsCollection).forEach(function(navProp){ _%>
+    <%-navProp.Name%>: [<%-navProp.Type.split(",").map(function(a){return '"' + a + '"'}).join(",")%>],
+    <%_})_%>
+  },
+};
+
+// Attribute constants
+export enum <%- locals.SchemaName %>Attributes {
+<%locals.Properties && locals.Properties.forEach(function(property){ _%>
+  <%- property.SchemaName %> = "<%- property.Name %>",
+<%})_%>
+}
+
+// Early Bound Interface
+export interface <%- locals.SchemaName ? locals.SchemaName : Name %> extends <%-referencedTypes["Entity"].name%> {
+<%locals.Properties && locals.Properties.forEach(function(property){ _%>
+  // <%- property.DisplayName ? property.DisplayName : "" %><%- property.IsRequired == true ? " [Required]" : "" %><%- property.Type ? (" " + property.Type) : "" %><%- property.Description ? (" " + property.Description) :"" %><%- property.Format ? (" " + property.Format) : "" %>
+  <%- property.Name %>?: <%-property.TypescriptType.importLocation && `import("${property.TypescriptType.importLocation}").`%><%- property.TypescriptType.name %><%- property.IsRequired == true ? "" : " | null" %>;
+<%})_%>
+}

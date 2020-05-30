@@ -21,10 +21,20 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
   }
 
   async update(entity: IEntity): Promise<void> {
-    const record = await odataify("Update", entity);
     // Get the primary key attribute
-    const entityMetadat = getMetadataByLogicalName(entity.logicalName);
-    let id = entity[entityMetadat.primaryIdAttribute] as string | undefined;
+    const entityMetadata = getMetadataByLogicalName(entity.logicalName);
+    // Convert null lookups to EntityReferences with null guid so we can run a delete association
+    for (const attribute in entity) {
+      const navigation = entityMetadata.navigation && entityMetadata.navigation[attribute];
+      if (navigation && entity[attribute] == null) {
+        // We don't support just nulling a pollymorphic lookup because we don't know which relationship
+        // to null.
+        entity[attribute] = new EntityReference(navigation[0].replace("mscrm.", ""), null);
+      }
+    }
+    const record = await odataify("Update", entity);
+
+    let id = entity[entityMetadata.primaryIdAttribute] as string | undefined;
     // If there is no primary id attribute set, but the id is set then use that
     if (!id && entity.id) {
       id = entity.id;

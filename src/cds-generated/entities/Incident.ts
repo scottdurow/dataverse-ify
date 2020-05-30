@@ -231,291 +231,291 @@ export enum IncidentAttributes {
 // Early Bound Interface
 export interface Incident extends IEntity {
   // UTC Conversion Time Zone Code IntegerType Time zone code that was in use when the record was created.
-  utcconversiontimezonecode?: number;
+  utcconversiontimezonecode?: number | null;
   // Contract Line LookupType Choose the contract line that the case should be logged under to make sure the customer is charged correctly.
-  contractdetailid?: import("../../types/EntityReference").EntityReference;
+  contractdetailid?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  createdbyexternalpartyyominame?: string;
+  createdbyexternalpartyyominame?: string | null;
   //  StringType
-  slaname?: string;
+  slaname?: string | null;
   // Created By IP Address StringType
-  adx_createdbyipaddress?: string;
+  adx_createdbyipaddress?: string | null;
   // Owning User LookupType Unique identifier for the user that owns the record.
-  owninguser?: import("../../types/EntityReference").EntityReference;
+  owninguser?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  createdonbehalfbyyominame?: string;
+  createdonbehalfbyyominame?: string | null;
   // Incident Type LookupType Unique identifier for Incident Type associated with Case.
-  msdyn_incidenttype?: import("../../types/EntityReference").EntityReference;
+  msdyn_incidenttype?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  socialprofileidname?: string;
+  socialprofileidname?: string | null;
   // Publish to Web BooleanType If set to Yes, the case will be visible and searchable on portals connected to this organization.
-  adx_publishtoweb?: boolean;
+  adx_publishtoweb?: boolean | null;
   // Partner LookupType Creates a Relationship between a Partner (account) and a case for indirect service arrangements.
-  msa_partnerid?: import("../../types/EntityReference").EntityReference;
+  msa_partnerid?: import("../../types/EntityReference").EntityReference | null;
   //  UniqueidentifierType
-  entityimageid?: import("../../types/Guid").Guid;
+  entityimageid?: import("../../types/Guid").Guid | null;
   // Follow Up By DateTimeType Enter the date by which a customer service representative has to follow up with the customer on this case. DateOnly:UserLocal
-  followupby?: Date;
+  followupby?: Date | null;
   //  StringType
-  parentcaseidname?: string;
+  parentcaseidname?: string | null;
   // Resolve By DateTimeType Enter the date by when the case must be resolved. DateAndTime:UserLocal
-  resolveby?: Date;
+  resolveby?: Date | null;
   // Influence Score DoubleType Will contain the Influencer score coming from NetBreeze.
-  influencescore?: number;
+  influencescore?: number | null;
   // Modified By IP Address StringType
-  adx_modifiedbyipaddress?: string;
+  adx_modifiedbyipaddress?: string | null;
   // Subject LookupType Choose the subject for the case, such as catalog request or product complaint, so customer service managers can identify frequent requests or problem areas. Administrators can configure subjects under Business Management in the Settings area.
-  subjectid?: import("../../types/EntityReference").EntityReference;
+  subjectid?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  msa_partneridname?: string;
+  msa_partneridname?: string | null;
   // Case Type incident_incident_casetypecode Select the type of case to identify the incident for use in case routing and analysis.
-  casetypecode?: import("../enums/incident_incident_casetypecode").incident_incident_casetypecode;
+  casetypecode?: import("../enums/incident_incident_casetypecode").incident_incident_casetypecode | null;
   // Case Number StringType Shows the case number for customer reference and searching capabilities. This cannot be modified.
-  ticketnumber?: string;
+  ticketnumber?: string | null;
   // IoT Alert LookupType The iot alert that initiated this case
-  msdyn_iotalert?: import("../../types/EntityReference").EntityReference;
+  msdyn_iotalert?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  msa_partneridyominame?: string;
+  msa_partneridyominame?: string | null;
   // Billed Service Units IntegerType Type the number of service units that were billed to the customer for the case.
-  billedserviceunits?: number;
+  billedserviceunits?: number | null;
   // First Response SLA Status incident_incident_firstresponseslastatus Shows the status of the initial response time for the case according to the terms of the SLA.
-  firstresponseslastatus?: import("../enums/incident_incident_firstresponseslastatus").incident_incident_firstresponseslastatus;
+  firstresponseslastatus?: import("../enums/incident_incident_firstresponseslastatus").incident_incident_firstresponseslastatus | null;
   // Last SLA applied LookupType Last SLA that was applied to this case. This field is for internal use only.
-  slainvokedid?: import("../../types/EntityReference").EntityReference;
+  slainvokedid?: import("../../types/EntityReference").EntityReference | null;
   //  BigIntType
-  entityimage_timestamp?: number;
+  entityimage_timestamp?: number | null;
   // Customer CustomerType Select the customer account or contact to provide a quick link to additional customer details, such as account information, activities, and opportunities.
-  customerid?: import("../../types/EntityReference").EntityReference;
+  customerid?: import("../../types/EntityReference").EntityReference | null;
   // Process Id UniqueidentifierType Contains the id of the process associated with the entity.
-  processid?: import("../../types/Guid").Guid;
+  processid?: import("../../types/Guid").Guid | null;
   //  StringType
-  msdyn_incidenttypename?: string;
+  msdyn_incidenttypename?: string | null;
   // Modified By (External Party) LookupType Shows the external party who modified the record.
-  modifiedbyexternalparty?: import("../../types/EntityReference").EntityReference;
+  modifiedbyexternalparty?: import("../../types/EntityReference").EntityReference | null;
   // Sentiment Value DoubleType Value derived after assessing words commonly associated with a negative, neutral, or positive sentiment that occurs in a social post. Sentiment information can also be reported as numeric values.
-  sentimentvalue?: number;
+  sentimentvalue?: number | null;
   //  StringType
-  modifiedbyexternalpartyyominame?: string;
+  modifiedbyexternalpartyyominame?: string | null;
   //  StringType
-  accountidname?: string;
+  accountidname?: string | null;
   // Received As socialactivity_postmessagetype Shows whether the post originated as a public or private message.
-  messagetypecode?: import("../enums/socialactivity_postmessagetype").socialactivity_postmessagetype;
+  messagetypecode?: import("../enums/socialactivity_postmessagetype").socialactivity_postmessagetype | null;
   // Route Case BooleanType Tells whether the incident has been routed to queue or not.
-  routecase?: boolean;
+  routecase?: boolean | null;
   // Service Stage servicestage Select the stage, in the case resolution process, that the case is in.
-  servicestage?: import("../enums/servicestage").servicestage;
+  servicestage?: import("../enums/servicestage").servicestage | null;
   // Is Escalated BooleanType Indicates if the case has been escalated.
-  isescalated?: boolean;
+  isescalated?: boolean | null;
   //  StringType
-  contactidyominame?: string;
+  contactidyominame?: string | null;
   // Email Address StringType The primary email address for the entity.
-  emailaddress?: string;
+  emailaddress?: string | null;
   // Partner Contact LookupType Allows a partner contact to be assigned to a specific case.
-  msa_partnercontactid?: import("../../types/EntityReference").EntityReference;
+  msa_partnercontactid?: import("../../types/EntityReference").EntityReference | null;
   // Escalated On DateTimeType Indicates the date and time when the case was escalated. DateAndTime:UserLocal
-  escalatedon?: Date;
+  escalatedon?: Date | null;
   // Status incident_incident_statecode Shows whether the case is active, resolved, or canceled. Resolved and canceled cases are read-only and can't be edited unless they are reactivated.
-  statecode?: import("../enums/incident_incident_statecode").incident_incident_statecode;
+  statecode?: import("../enums/incident_incident_statecode").incident_incident_statecode | null;
   //  StringType
-  msdyn_iotalertname?: string;
+  msdyn_iotalertname?: string | null;
   // Internal Use Only BooleanType Tells whether the incident has been merged with another incident.
-  merged?: boolean;
+  merged?: boolean | null;
   // Exchange Rate DecimalType Shows the conversion rate of the record's currency. The exchange rate is used to convert all money fields in the record from the local currency to the system's default currency.
-  exchangerate?: number;
+  exchangerate?: number | null;
   //  StringType Yomi name of the owner
-  owneridyominame?: string;
+  owneridyominame?: string | null;
   //  StringType
-  entityimage_url?: string;
+  entityimage_url?: string | null;
   // Steps to Reproduce MemoType
-  adx_stepstoreproduce?: string;
+  adx_stepstoreproduce?: string | null;
   // Existing Case LookupType Select an existing case for the customer that has been populated. For internal use only.
-  existingcase?: import("../../types/EntityReference").EntityReference;
+  existingcase?: import("../../types/EntityReference").EntityReference | null;
   // Responsible Contact LookupType Choose an additional customer contact who can also help resolve the case.
-  responsiblecontactid?: import("../../types/EntityReference").EntityReference;
+  responsiblecontactid?: import("../../types/EntityReference").EntityReference | null;
   // Version Number BigIntType Version Number
-  versionnumber?: number;
+  versionnumber?: number | null;
   //  StringType
-  createdbyyominame?: string;
+  createdbyyominame?: string | null;
   //  StringType
-  subjectidname?: string;
+  subjectidname?: string | null;
   //  StringType
-  transactioncurrencyidname?: string;
+  transactioncurrencyidname?: string | null;
   // Entity Image ImageType The default image for the entity.
-  entityimage?: string;
+  entityimage?: string | null;
   // Check Email BooleanType This attribute is used for Sample Service Business Processes.
-  checkemail?: boolean;
+  checkemail?: boolean | null;
   // Owning Business Unit LookupType Unique identifier for the business unit that owns the record
-  owningbusinessunit?: import("../../types/EntityReference").EntityReference;
+  owningbusinessunit?: import("../../types/EntityReference").EntityReference | null;
   // Actual Service Units IntegerType Type the number of service units that were actually required to resolve the case.
-  actualserviceunits?: number;
+  actualserviceunits?: number | null;
   // Origin incident_caseorigincode Select how contact about the case was originated, such as email, phone, or web, for use in reporting and analysis.
-  caseorigincode?: import("../enums/incident_caseorigincode").incident_caseorigincode;
+  caseorigincode?: import("../enums/incident_caseorigincode").incident_caseorigincode | null;
   //  StringType
-  primarycontactidyominame?: string;
+  primarycontactidyominame?: string | null;
   //  [Required] StringType
   customeridname?: string;
   // Description MemoType Type additional information to describe the case to assist the service team in reaching a resolution.
-  description?: string;
+  description?: string | null;
   //  StringType
-  msa_partnercontactidname?: string;
+  msa_partnercontactidname?: string | null;
   // Modified By LookupType Shows who last updated the record.
-  modifiedby?: import("../../types/EntityReference").EntityReference;
+  modifiedby?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  entitlementidname?: string;
+  entitlementidname?: string | null;
   //  StringType
-  firstresponsebykpiidname?: string;
+  firstresponsebykpiidname?: string | null;
   //  StringType
-  contractidname?: string;
+  contractidname?: string | null;
   // Follow up Task Created BooleanType This attribute is used for Sample Service Business Processes.
-  followuptaskcreated?: boolean;
+  followuptaskcreated?: boolean | null;
   // Master Case LookupType Choose the primary case the current case was merged into.
-  masterid?: import("../../types/EntityReference").EntityReference;
+  masterid?: import("../../types/EntityReference").EntityReference | null;
   // Modified On DateTimeType Date and time when the record was modified. DateAndTime:UserLocal
-  modifiedon?: Date;
+  modifiedon?: Date | null;
   //  StringType
-  productidname?: string;
+  productidname?: string | null;
   // Social Profile LookupType Unique identifier of the social profile with which the case is associated.
-  socialprofileid?: import("../../types/EntityReference").EntityReference;
+  socialprofileid?: import("../../types/EntityReference").EntityReference | null;
   // Owner OwnerType Owner Id
-  ownerid?: import("../../types/EntityReference").EntityReference;
+  ownerid?: import("../../types/EntityReference").EntityReference | null;
   // Created By (External Party) LookupType Shows the external party who created the record.
-  createdbyexternalparty?: import("../../types/EntityReference").EntityReference;
+  createdbyexternalparty?: import("../../types/EntityReference").EntityReference | null;
   // Child Cases IntegerType Number of child incidents associated with the incident.
-  numberofchildincidents?: number;
+  numberofchildincidents?: number | null;
   // Parent Case LookupType Choose the parent case for a case.
-  parentcaseid?: import("../../types/EntityReference").EntityReference;
+  parentcaseid?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  resolvebykpiidname?: string;
+  resolvebykpiidname?: string | null;
   //  StringType
-  modifiedbyyominame?: string;
+  modifiedbyyominame?: string | null;
   // Entitlement LookupType Choose the entitlement that is applicable for the case.
-  entitlementid?: import("../../types/EntityReference").EntityReference;
+  entitlementid?: import("../../types/EntityReference").EntityReference | null;
   // Stage Id UniqueidentifierType Contains the id of the stage where the entity is located.
-  stageid?: import("../../types/Guid").Guid;
+  stageid?: import("../../types/Guid").Guid | null;
   // Currency LookupType Choose the local currency for the record to make sure budgets are reported in the correct currency.
-  transactioncurrencyid?: import("../../types/EntityReference").EntityReference;
+  transactioncurrencyid?: import("../../types/EntityReference").EntityReference | null;
   // Satisfaction incident_incident_customersatisfactioncode Select the customer's level of satisfaction with the handling and resolution of the case.
-  customersatisfactioncode?: import("../enums/incident_incident_customersatisfactioncode").incident_incident_customersatisfactioncode;
+  customersatisfactioncode?: import("../enums/incident_incident_customersatisfactioncode").incident_incident_customersatisfactioncode | null;
   // Activities Complete BooleanType This attribute is used for Sample Service Business Processes.
-  activitiescomplete?: boolean;
+  activitiescomplete?: boolean | null;
   //  StringType
-  modifiedonbehalfbyyominame?: string;
+  modifiedonbehalfbyyominame?: string | null;
   //  StringType
-  createdbyname?: string;
+  createdbyname?: string | null;
   // Resolution MemoType
-  adx_resolution?: string;
+  adx_resolution?: string | null;
   //  StringType Name of the owner
-  owneridname?: string;
+  owneridname?: string | null;
   // Decrement Entitlement Terms BooleanType Shows whether terms of the associated entitlement should be decremented or not.
-  decremententitlementterm?: boolean;
+  decremententitlementterm?: boolean | null;
   //  StringType
-  createdonbehalfbyname?: string;
+  createdonbehalfbyname?: string | null;
   // Status Reason incident_incident_statuscode Select the case's status.
-  statuscode?: import("../enums/incident_incident_statuscode").incident_incident_statuscode;
+  statuscode?: import("../enums/incident_incident_statuscode").incident_incident_statuscode | null;
   //  StringType
-  msa_partnercontactidyominame?: string;
+  msa_partnercontactidyominame?: string | null;
   // SLA LookupType Choose the service level agreement (SLA) that you want to apply to the case record.
-  slaid?: import("../../types/EntityReference").EntityReference;
+  slaid?: import("../../types/EntityReference").EntityReference | null;
   // Case UniqueidentifierType Unique identifier of the case.
-  incidentid?: import("../../types/Guid").Guid;
+  incidentid?: import("../../types/Guid").Guid | null;
   // Last On Hold Time DateTimeType Contains the date time stamp of the last on hold time. DateAndTime:UserLocal
-  lastonholdtime?: Date;
+  lastonholdtime?: Date | null;
   //  StringType
-  responsiblecontactidyominame?: string;
+  responsiblecontactidyominame?: string | null;
   // Resolve By SLA Status incident_incident_resolvebyslastatus Shows the status of the resolution time for the case according to the terms of the SLA.
-  resolvebyslastatus?: import("../enums/incident_incident_resolvebyslastatus").incident_incident_resolvebyslastatus;
+  resolvebyslastatus?: import("../enums/incident_incident_resolvebyslastatus").incident_incident_resolvebyslastatus | null;
   //  StringType
-  kbarticleidname?: string;
+  kbarticleidname?: string | null;
   // Customer Contacted BooleanType Tells whether customer service representative has contacted the customer or not.
-  customercontacted?: boolean;
+  customercontacted?: boolean | null;
   //  StringType
-  responsiblecontactidname?: string;
+  responsiblecontactidname?: string | null;
   // Resolution Date DateTimeType DateAndTime:UserLocal
-  adx_resolutiondate?: Date;
+  adx_resolutiondate?: Date | null;
   // Severity incident_incident_severitycode Select the severity of this case to indicate the incident's impact on the customer's business.
-  severitycode?: import("../enums/incident_incident_severitycode").incident_incident_severitycode;
+  severitycode?: import("../enums/incident_incident_severitycode").incident_incident_severitycode | null;
   // First Response Sent BooleanType Indicates if the first response has been sent.
-  firstresponsesent?: boolean;
+  firstresponsesent?: boolean | null;
   //  StringType
-  primarycontactidname?: string;
+  primarycontactidname?: string | null;
   // Customer Type [Required] EntityNameType
   customeridtype?: string;
   // Account LookupType Unique identifier of the account with which the case is associated.
-  accountid?: import("../../types/EntityReference").EntityReference;
+  accountid?: import("../../types/EntityReference").EntityReference | null;
   // First Response By KPI LookupType For internal use only.
-  firstresponsebykpiid?: import("../../types/EntityReference").EntityReference;
+  firstresponsebykpiid?: import("../../types/EntityReference").EntityReference | null;
   // Created On DateTimeType Date and time when the record was created. DateAndTime:UserLocal
-  createdon?: Date;
+  createdon?: Date | null;
   // Contact LookupType Unique identifier of the contact associated with the case.
-  contactid?: import("../../types/EntityReference").EntityReference;
+  contactid?: import("../../types/EntityReference").EntityReference | null;
   // Case Stage incident_incident_incidentstagecode Select the current stage of the service process for the case to assist service team members when they review or transfer a case.
-  incidentstagecode?: import("../enums/incident_incident_incidentstagecode").incident_incident_incidentstagecode;
+  incidentstagecode?: import("../enums/incident_incident_incidentstagecode").incident_incident_incidentstagecode | null;
   // Contact LookupType Select a primary contact for this case.
-  primarycontactid?: import("../../types/EntityReference").EntityReference;
+  primarycontactid?: import("../../types/EntityReference").EntityReference | null;
   // Import Sequence Number IntegerType Sequence number of the import that created this record.
-  importsequencenumber?: number;
+  importsequencenumber?: number | null;
   // Created By Username StringType
-  adx_createdbyusername?: string;
+  adx_createdbyusername?: string | null;
   // Blocked Profile BooleanType Details whether the profile is blocked or not.
-  blockedprofile?: boolean;
+  blockedprofile?: boolean | null;
   //  StringType
-  modifiedbyexternalpartyname?: string;
+  modifiedbyexternalpartyname?: string | null;
   //  StringType
-  contractdetailidname?: string;
+  contractdetailidname?: string | null;
   // Case Title [Required] StringType Type a subject or descriptive name, such as the request, issue, or company name, to identify the case in Microsoft Dynamics 365 views.
   title?: string;
   //  StringType
-  contactidname?: string;
+  contactidname?: string | null;
   // Modified By Username StringType
-  adx_modifiedbyusername?: string;
+  adx_modifiedbyusername?: string | null;
   //  StringType
-  slainvokedidname?: string;
+  slainvokedidname?: string | null;
   // Created By LookupType Shows who created the record.
-  createdby?: import("../../types/EntityReference").EntityReference;
+  createdby?: import("../../types/EntityReference").EntityReference | null;
   // Priority incident_incident_prioritycode Select the priority so that preferred customers or critical issues are handled quickly.
-  prioritycode?: import("../enums/incident_incident_prioritycode").incident_incident_prioritycode;
+  prioritycode?: import("../enums/incident_incident_prioritycode").incident_incident_prioritycode | null;
   // Product LookupType Choose the product associated with the case to identify warranty, service, or other product issues and be able to report the number of incidents for each product.
-  productid?: import("../../types/EntityReference").EntityReference;
+  productid?: import("../../types/EntityReference").EntityReference | null;
   // First Response By DateTimeType For internal use only. DateAndTime:UserLocal
-  responseby?: Date;
+  responseby?: Date | null;
   // Traversed Path StringType A comma separated list of string values representing the unique identifiers of stages in a Business Process Flow Instance in the order that they occur.
-  traversedpath?: string;
+  traversedpath?: string | null;
   //  StringType
-  modifiedonbehalfbyname?: string;
+  modifiedonbehalfbyname?: string | null;
   // Serial Number StringType Type the serial number of the product that is associated with this case, so that the number of cases per product can be reported.
-  productserialnumber?: string;
+  productserialnumber?: string | null;
   // Record Created On DateTimeType Date and time that the record was migrated. DateOnly:UserLocal
-  overriddencreatedon?: Date;
+  overriddencreatedon?: Date | null;
   //  [Required] StringType
   customeridyominame?: string;
   // Contract LookupType Choose the service contract that the case should be logged under to make sure the customer is eligible for support services.
-  contractid?: import("../../types/EntityReference").EntityReference;
+  contractid?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  createdbyexternalpartyname?: string;
+  createdbyexternalpartyname?: string | null;
   // Service Level incident_incident_contractservicelevelcode Select the service level for the case to make sure the case is handled correctly.
-  contractservicelevelcode?: import("../enums/incident_incident_contractservicelevelcode").incident_incident_contractservicelevelcode;
+  contractservicelevelcode?: import("../enums/incident_incident_contractservicelevelcode").incident_incident_contractservicelevelcode | null;
   // Created By (Delegate) LookupType Shows who created the record on behalf of another user.
-  createdonbehalfby?: import("../../types/EntityReference").EntityReference;
+  createdonbehalfby?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  modifiedbyname?: string;
+  modifiedbyname?: string | null;
   // On Hold Time (Minutes) IntegerType Shows the duration in minutes for which the case was on hold.
-  onholdtime?: number;
+  onholdtime?: number | null;
   //  StringType
-  accountidyominame?: string;
+  accountidyominame?: string | null;
   // Time Zone Rule Version Number IntegerType For internal use only.
-  timezoneruleversionnumber?: number;
+  timezoneruleversionnumber?: number | null;
   //  StringType
-  masteridname?: string;
+  masteridname?: string | null;
   // Decrementing BooleanType For system use only.
-  isdecrementing?: boolean;
+  isdecrementing?: boolean | null;
   // Resolve By KPI LookupType For internal use only.
-  resolvebykpiid?: import("../../types/EntityReference").EntityReference;
+  resolvebykpiid?: import("../../types/EntityReference").EntityReference | null;
   // Modified By (Delegate) LookupType Shows who last updated the record on behalf of another user.
-  modifiedonbehalfby?: import("../../types/EntityReference").EntityReference;
+  modifiedonbehalfby?: import("../../types/EntityReference").EntityReference | null;
   // Owning Team LookupType Unique identifier for the team that owns the record.
-  owningteam?: import("../../types/EntityReference").EntityReference;
+  owningteam?: import("../../types/EntityReference").EntityReference | null;
   //  EntityNameType Owner Id Type
-  owneridtype?: string;
+  owneridtype?: string | null;
   // Knowledge Base Article LookupType Choose the article that contains additional information or a resolution for the case, for reference during research or follow up with the customer.
-  kbarticleid?: import("../../types/EntityReference").EntityReference;
+  kbarticleid?: import("../../types/EntityReference").EntityReference | null;
 }

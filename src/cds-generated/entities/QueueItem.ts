@@ -96,101 +96,101 @@ export enum QueueItemAttributes {
 // Early Bound Interface
 export interface QueueItem extends IEntity {
   // Status (deprecated) IntegerType Status of the queue item.
-  state?: number;
+  state?: number | null;
   // UTC Conversion Time Zone Code IntegerType Time zone code that was in use when the record was created.
-  utcconversiontimezonecode?: number;
+  utcconversiontimezonecode?: number | null;
   //  EntityNameType
-  owneridtype?: string;
+  owneridtype?: string | null;
   // Worker Type [Required] EntityNameType
   workeridtype?: string;
   //  StringType
-  organizationidname?: string;
+  organizationidname?: string | null;
   // Owning User [Required] LookupType Unique identifier of the user who owns the queue item.
   owninguser?: import("../../types/EntityReference").EntityReference;
   // Exchange Rate DecimalType Shows the conversion rate of the record's currency. The exchange rate is used to convert all money fields in the record from the local currency to the system's default currency.
-  exchangerate?: number;
+  exchangerate?: number | null;
   // Status queueitem_queueitem_statecode Shows whether the queue record is active or inactive. Inactive queue records are read-only and can't be edited unless they are reactivated.
-  statecode?: import("../enums/queueitem_queueitem_statecode").queueitem_queueitem_statecode;
+  statecode?: import("../enums/queueitem_queueitem_statecode").queueitem_queueitem_statecode | null;
   //  StringType
-  createdonbehalfbyyominame?: string;
+  createdonbehalfbyyominame?: string | null;
   // Status Reason queueitem_queueitem_statuscode Select the item's status.
-  statuscode?: import("../enums/queueitem_queueitem_statuscode").queueitem_queueitem_statuscode;
+  statuscode?: import("../enums/queueitem_queueitem_statuscode").queueitem_queueitem_statuscode | null;
   //  StringType
-  objectidname?: string;
+  objectidname?: string | null;
   // Worked On DateTimeType Shows the date and time when the queue item was last assigned to a user. DateOnly:UserLocal
-  workeridmodifiedon?: Date;
+  workeridmodifiedon?: Date | null;
   //  StringType
-  queueidname?: string;
+  queueidname?: string | null;
   // Currency LookupType Choose the local currency for the record to make sure budgets are reported in the correct currency.
-  transactioncurrencyid?: import("../../types/EntityReference").EntityReference;
+  transactioncurrencyid?: import("../../types/EntityReference").EntityReference | null;
   // Modified On DateTimeType Shows the date and time when the record was last updated. The date and time are displayed in the time zone selected in Microsoft Dynamics 365 options. DateAndTime:UserLocal
-  modifiedon?: Date;
+  modifiedon?: Date | null;
   // Owning Business Unit [Required] LookupType Unique identifier of the business unit that owns the queue item.
   owningbusinessunit?: import("../../types/EntityReference").EntityReference;
   //  StringType
-  workeridname?: string;
+  workeridname?: string | null;
   // From StringType Sender who created the queue item.
-  sender?: string;
+  sender?: string | null;
   // Queue [Required] LookupType Choose the queue that the item is assigned to.
   queueid?: import("../../types/EntityReference").EntityReference;
   //  StringType
-  workeridyominame?: string;
+  workeridyominame?: string | null;
   //  StringType
-  modifiedonbehalfbyname?: string;
+  modifiedonbehalfbyname?: string | null;
   // Object [Required] LookupType Choose the activity, case, or article assigned to the queue.
   objectid?: import("../../types/EntityReference").EntityReference;
   //  StringType
-  modifiedonbehalfbyyominame?: string;
+  modifiedonbehalfbyyominame?: string | null;
   //  StringType
-  modifiedbyname?: string;
+  modifiedbyname?: string | null;
   // Owner [Required] OwnerType Unique identifier of the user or team who owns the queue item.
   ownerid?: import("../../types/EntityReference").EntityReference;
   // Modified By LookupType Shows who last updated the record.
-  modifiedby?: import("../../types/EntityReference").EntityReference;
+  modifiedby?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  createdbyname?: string;
+  createdbyname?: string | null;
   // Status Reason (deprecated) IntegerType Reason for the status of the queue item.
-  status?: number;
+  status?: number | null;
   // Created On DateTimeType Shows the date and time when the record was created. The date and time are displayed in the time zone selected in Microsoft Dynamics 365 options. DateAndTime:UserLocal
-  createdon?: Date;
+  createdon?: Date | null;
   // Regarding Object Type EntityNameType
-  objectidtypecode?: string;
+  objectidtypecode?: string | null;
   // Organization LookupType Unique identifier of the organization with which the queue item is associated.
-  organizationid?: import("../../types/EntityReference").EntityReference;
+  organizationid?: import("../../types/EntityReference").EntityReference | null;
   // Created By (Delegate) LookupType Shows who created the record on behalf of another user.
-  createdonbehalfby?: import("../../types/EntityReference").EntityReference;
+  createdonbehalfby?: import("../../types/EntityReference").EntityReference | null;
   // Entered Queue DateTimeType Shows the date the record was assigned to the queue. DateAndTime:UserLocal
-  enteredon?: Date;
+  enteredon?: Date | null;
   // Import Sequence Number IntegerType Unique identifier of the data import or data migration that created this record.
-  importsequencenumber?: number;
+  importsequencenumber?: number | null;
   //  StringType
-  createdonbehalfbyname?: string;
+  createdonbehalfbyname?: string | null;
   // Time Zone Rule Version Number IntegerType For internal use only.
-  timezoneruleversionnumber?: number;
+  timezoneruleversionnumber?: number | null;
   // To StringType Recipients listed on the To line of the message for email queue items.
-  torecipients?: string;
+  torecipients?: string | null;
   // Version Number BigIntType Version number of the queue item.
-  versionnumber?: number;
+  versionnumber?: number | null;
   // Priority IntegerType Priority of the queue item.
-  priority?: number;
+  priority?: number | null;
   //  StringType
-  transactioncurrencyidname?: string;
+  transactioncurrencyidname?: string | null;
   // Worked By LookupType Shows who is working on the queue item.
-  workerid?: import("../../types/EntityReference").EntityReference;
+  workerid?: import("../../types/EntityReference").EntityReference | null;
   // Record Created On DateTimeType Date and time that the record was migrated. DateOnly:UserLocal
-  overriddencreatedon?: Date;
+  overriddencreatedon?: Date | null;
   // Type queueitem_queueitem_objecttypecode Select the type of the queue item, such as activity, case, or appointment.
-  objecttypecode?: import("../enums/queueitem_queueitem_objecttypecode").queueitem_queueitem_objecttypecode;
+  objecttypecode?: import("../enums/queueitem_queueitem_objecttypecode").queueitem_queueitem_objecttypecode | null;
   // Modified By (Delegate) LookupType Unique identifier of the delegate user who last modified the queueitem.
-  modifiedonbehalfby?: import("../../types/EntityReference").EntityReference;
+  modifiedonbehalfby?: import("../../types/EntityReference").EntityReference | null;
   // Title StringType Shows the title or name that describes the queue record. This value is copied from the record that was assigned to the queue.
-  title?: string;
+  title?: string | null;
   //  StringType
-  modifiedbyyominame?: string;
+  modifiedbyyominame?: string | null;
   // Queue Item UniqueidentifierType Unique identifier of the queue item.
-  queueitemid?: import("../../types/Guid").Guid;
+  queueitemid?: import("../../types/Guid").Guid | null;
   // Created By LookupType Shows who created the record.
-  createdby?: import("../../types/EntityReference").EntityReference;
+  createdby?: import("../../types/EntityReference").EntityReference | null;
   //  StringType
-  createdbyyominame?: string;
+  createdbyyominame?: string | null;
 }

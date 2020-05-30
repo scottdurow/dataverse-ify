@@ -1,0 +1,28 @@
+/* eslint-disable*/
+import { <%-referencedTypes["WebApiExecuteRequest"].name%> } from "<%-referencedTypes["WebApiExecuteRequest"].import%>";
+import { <%-referencedTypes["StructuralProperty"].name%> } from "<%-referencedTypes["StructuralProperty"].import%>";
+import { <%-referencedTypes["OperationType"].name%> } from "<%-referencedTypes["OperationType"].import%>";
+
+// Action <%-Name%>
+export const <%-Name%>Metadata = {
+  <%_ if (IsBound){ _%>
+  boundParameter: "entity",
+  <%_}_%>
+  parameterTypes: {
+  <%_ locals.Parameters.forEach(function(param){ _%>
+    "<%- param.Name %>": {
+      typeName: "<%-param.Type %>",
+      structuralProperty: StructuralProperty.<%- param.structuralTypeName %>
+      },		
+  <%});%>
+  },
+  operationType: OperationType.Action,
+  operationName: "<%-Name%>"
+};
+
+export interface <%- Name %>Request extends <%-referencedTypes["WebApiExecuteRequest"].name%> {
+<%_locals.Parameters.forEach(function(param){ _%>
+  <%-param.Name%><%-(param.IsRequired || param.Name==locals.BindingParameter ? ": " : "?: ") _%><%-param.TypescriptTypes.map(function(outputType){ 
+   return (outputType.importLocation ? `import("${outputType.importLocation}").` : "") + outputType.name}).join(" | ")%>;
+<%_ }) _%>
+}

@@ -1,0 +1,12 @@
+/* eslint-disable*/
+// Enum <%- locals.Name %>
+export const enum <%- Name %> {
+<% locals.Members && locals.Members.forEach(function(member){ _%>
+<%_if (locals.StringMembers){_%>
+  <%- member.Name %> = "<%- member.Name %>",
+<%_} else {_%>
+  <%- member.Name %> = <%- member.Value %>,
+<%_}_%>
+<%_}); _%>
+}
+  

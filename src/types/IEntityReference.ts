@@ -9,7 +9,8 @@ export interface IEntityReference {
   id: string;
 }
 export function odatifyEntityReference(entitySetName: string, id: string): string {
-  return `${entitySetName}(${trimGuid(id)})`;
+  // We set null ids to string null so we can pick up and run a disassociate
+  return `${entitySetName}(${id == null ? "null" : trimGuid(id)})`;
 }
 export async function getNavigationPathForEntityReference(
   entity: IEntity,
@@ -21,7 +22,6 @@ export async function getNavigationPathForEntityReference(
     //const navigation = metadata.navigation[attributeLogicalName] as string[];
     const entityReference = entity[attributeLogicalName] as IEntityReference;
     const entitySetName = await getEntitySetName(entityReference.entityType);
-    if (!entityReference.id) throw new Error(`No id set on entityreference for ${attributeLogicalName}`);
     return odatifyEntityReference(entitySetName, entityReference.id);
   }
   const collectionName = await Entity.getCollectionNameForEntity(attributeLogicalName);

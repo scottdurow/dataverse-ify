@@ -1,0 +1,34 @@
+/* eslint-disable*/
+<%_ EntityTypes.forEach(function(e){_%>
+import { <%-e.Name%>Metadata } from "./entities/<%-e.SchemaName%>";
+<%_})_%>
+<%_ Actions.forEach(function(e){_%>
+import { <%-e.Name%>Metadata } from "./actions/<%-e.Name%>";
+<%_})_%>
+<%_ Functions.forEach(function(e){_%>
+import { <%-e.Name%>Metadata } from "./functions/<%-e.Name%>";
+<%_})_%>
+
+export const Entities = {
+<%_ EntityTypes.forEach(function(e){_%>
+  <%-e.SchemaName%>: "<%-e.Name%>",
+<%_})_%>
+};
+
+// Setup Metadata
+// Usage: setMetadataCache(metadataCache);
+export const metadataCache = {
+  entities: {
+  <%_ EntityTypes.forEach(function(e){_%>
+    <%-e.Name%>: <%-e.Name%>Metadata,
+  <%_})_%>
+  },
+  actions: {
+  <%_ Actions.forEach(function(e){_%>
+    <%-e.Name%>: <%-e.Name%>Metadata,
+  <%_})_%>
+  <%_ Functions.forEach(function(e){_%>
+    <%-e.Name%>: <%-e.Name%>Metadata,
+  <%_})_%>
+  }
+};

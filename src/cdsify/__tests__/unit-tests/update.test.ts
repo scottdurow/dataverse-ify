@@ -8,8 +8,10 @@ test("update removes primary ID attribute", async () => {
     logicalName: contactMetadata.logicalName,
     contactid: "1234",
     lastname: "Test",
+    lastonholdtime: new Date(),
   } as Contact;
 
   const odataRecord = await odataify("Update", sdkRecord);
+  console.log(odataRecord);
   expect(odataRecord.contactid).toBeUndefined();
 });

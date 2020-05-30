@@ -177,7 +177,7 @@ async function sdkifyEntity<T>(entityRecord: IEntity, logicalName?: string): Pro
               entityRecord[formattedValueName] as string,
             );
 
-            // Get the attribute logcial name
+            // Get the attribute logical name
             const lookupAttributeName = entityRecord[navigationPropertyName] as string;
             if (attributeLogicalName.endsWith("_value") && attributeLogicalName.startsWith("_")) {
               attributeLogicalName = attributeLogicalName.substr(1, attributeLogicalName.length - "_value".length - 1);
