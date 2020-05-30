@@ -6,7 +6,10 @@
   "scripts": {
     "build": "tsc",
     "test": "tsc & jest",
-    "prepublish": "npm run build"
+    "preversion": "npm test",
+    "version": "npm run build",
+    "postversion": "git push",
+    "prepublishOnly": "npm version patch"
   },
   "author": "Scott Durow",
   "license": "MIT",
