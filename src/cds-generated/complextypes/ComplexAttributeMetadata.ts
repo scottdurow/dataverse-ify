@@ -3,6 +3,7 @@ export interface ComplexAttributeMetadata {
   SourceType?: number;
   SchemaName?: string;
   RequiredLevel?: import("../complextypes/AttributeRequiredLevelManagedProperty").AttributeRequiredLevelManagedProperty;
+  ModifiedOn?: Date;
   MetadataId?: import("../../types/Guid").Guid;
   LogicalName?: string;
   LinkedAttributeId?: import("../../types/Guid").Guid;
@@ -36,6 +37,7 @@ export interface ComplexAttributeMetadata {
   DisplayName?: import("../complextypes/Label").Label;
   Description?: import("../complextypes/Label").Label;
   DeprecatedVersion?: string;
+  CreatedOn?: Date;
   ColumnNumber?: number;
   CanModifyAdditionalSettings?: import("../complextypes/BooleanManagedProperty").BooleanManagedProperty;
   CanBeSecuredForUpdate?: boolean;

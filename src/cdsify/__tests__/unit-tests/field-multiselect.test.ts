@@ -3,13 +3,13 @@
 import { sdkify, odataify } from "../..";
 import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
 import { setMetadataCache } from "../../..";
-import { msdyn_travelchargetype } from "../../../cds-generated/enums/msdyn_travelchargetype";
+import { socialprofile_community } from "../../../cds-generated/enums/socialprofile_community";
 
 test("sdkify Multiselects", async () => {
   const accountSdk = {
     logicalName: accountMetadata.logicalName,
     name: "Account 1",
-    dev1_multiselect: [msdyn_travelchargetype.Fixed, msdyn_travelchargetype.Hourly],
+    cdsify_multiselect: [socialprofile_community.Facebook, socialprofile_community.Other],
   } as Account;
 
   const odata = odataify("Create", accountSdk);
@@ -19,16 +19,17 @@ test("sdkify Multiselects", async () => {
 test("sdkify Multiselects", async () => {
   setMetadataCache({ entities: { account: accountMetadata } });
   const odataRecord = {
-    "@odata.context": "https://develop1v9demo.crm11.dynamics.com/api/data/v9.1/$metadata#accounts/$entity",
+    "@odata.context": "https://org.crm11.dynamics.com/api/data/v9.1/$metadata#accounts/$entity",
     "@odata.etag": 'W/"24588414"',
-    "dev1_multiselect@OData.Community.Display.V1.FormattedValue": "Mileage; Fixed",
-    dev1_multiselect: "690970001,690970002",
+    "cdsify_multiselect@OData.Community.Display.V1.FormattedValue": "Facebook",
+    cdsify_multiselect: "1,2",
     name: "Account 1",
   };
 
   const sdkRecord = (await sdkify(odataRecord, "account")) as Account;
 
-  expect(sdkRecord.dev1_multiselect).toBeDefined();
-  expect(sdkRecord.dev1_multiselect?.length).toBe(2);
-  expect(sdkRecord.dev1_multiselect && sdkRecord.dev1_multiselect[0]).toBe(msdyn_travelchargetype.Fixed);
+  expect(sdkRecord.cdsify_multiselect).toBeDefined();
+  expect(sdkRecord.cdsify_multiselect?.length).toBe(2);
+  expect(sdkRecord.cdsify_multiselect && sdkRecord.cdsify_multiselect[0]).toBe(socialprofile_community.Twitter);
+  expect(sdkRecord.cdsify_multiselect && sdkRecord.cdsify_multiselect[1]).toBe(socialprofile_community.Facebook);
 });

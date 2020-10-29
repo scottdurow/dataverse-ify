@@ -11,7 +11,7 @@ import { XrmContextCdsServiceClient } from "../../CdsServiceClient/XrmContextSer
 import * as config from "config";
 import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
 import { account_account_accountcategorycode } from "../../../cds-generated/enums/account_account_accountcategorycode";
-import { msdyn_travelchargetype } from "../../../cds-generated/enums/msdyn_travelchargetype";
+import { socialprofile_community } from "../../../cds-generated/enums/socialprofile_community";
 describe("create", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {
@@ -54,7 +54,7 @@ describe("create", () => {
       // EntityReference
       preferredsystemuserid: new EntityReference("systemuser", userId),
       // MutliSelect
-      dev1_multiselect: [msdyn_travelchargetype.Fixed, msdyn_travelchargetype.Mileage],
+      cdsify_multiselect: [socialprofile_community.Twitter, socialprofile_community.Facebook],
     } as Account;
 
     // Create

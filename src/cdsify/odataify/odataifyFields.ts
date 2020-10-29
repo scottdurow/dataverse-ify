@@ -10,6 +10,7 @@ import { getNavigationPathForEntityReference } from "../../types/IEntityReferenc
 import { EntityCollection } from "../../types/EntityCollection";
 import { odataify } from "./odataify";
 import { AttributeTypeCode } from "../../cds-generated/enums/AttributeTypeCode";
+import { caseInsensitiveSearch } from "../../metadata/MetadataCache";
 export async function odataifyFields(
   action: "Create" | "Update" | "Action",
   output: IEntity,
@@ -104,9 +105,10 @@ export async function odataifyFields(
           const entityRef = fieldValue as EntityReference;
           let targetField = field;
           // If there are multiple navigation types, then convert to the correct field name by adding _<logicalname>
-          const navigation = (metadata.navigation as Dictionary<string[]>)[field];
+          const navigation = caseInsensitiveSearch(field, metadata.navigation as Dictionary<string[]>);
           if (navigation != null) {
-            if (navigation.length > 1) {
+            targetField = navigation.key;
+            if (navigation.value.length > 1) {
               // This is a customer style field that has more than one target type
               targetField = targetField + "_" + entityRef.entityType;
             }

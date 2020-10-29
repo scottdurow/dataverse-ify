@@ -44,7 +44,8 @@ export async function odataify(
     output["@odata.type"] = "Microsoft.Dynamics.CRM." + logicalName;
     // Remove attributes that are not needed in the OData payload
     delete output.id;
-    delete output.logicalName;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (output as any).logicalName;
     delete output.formattedValues;
     // Change the types for the odata payload
     await odataifyFields(action, output, entityValue, entityMetadata);
@@ -120,7 +121,8 @@ export async function odataify(
         throw new Error(`Unexpected parameter ${field} on execute Request`);
       }
     }
-    delete requestOdata.logicalName;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (requestOdata as any).logicalName;
     return requestOdata;
   }
 

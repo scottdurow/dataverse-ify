@@ -73,3 +73,16 @@ export function getMetadata(entity: IEntity): EntityWebApiMetadata {
   const logicalName = entity.logicalName;
   return getMetadataByLogicalName(logicalName);
 }
+
+export function caseInsensitiveSearch<T>(key: string, values: Dictionary<T>): { key: string; value: T } | undefined {
+  key = key.toLowerCase();
+  for (const index in values) {
+    if (index.toLowerCase() == key) {
+      return {
+        key: index,
+        value: values[index],
+      };
+    }
+  }
+  return undefined;
+}

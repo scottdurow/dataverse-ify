@@ -6,7 +6,7 @@ import { EntityReference } from "../../types/EntityReference";
 import { CdsServiceClient } from "./CdsServiceClient";
 import { odataify } from "../odataify/odataify";
 import { sdkify } from "..";
-import { getMetadataByLogicalName } from "../../metadata/MetadataCache";
+import { caseInsensitiveSearch, getMetadataByLogicalName } from "../../metadata/MetadataCache";
 import { WebApiExecuteRequest } from "../../types/WebApiExecuteRequest";
 
 export class XrmContextCdsServiceClient implements CdsServiceClient {
@@ -102,8 +102,11 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
         } else {
           let correctedAttribute = attribute;
           // If the attribute is a navigation property then format it correctly
-          if (entityMetadata.navigation && entityMetadata.navigation[attribute]) {
-            correctedAttribute = "_" + attribute + "_value";
+          if (entityMetadata.navigation) {
+            const navigation = caseInsensitiveSearch(attribute, entityMetadata.navigation);
+            if (navigation) {
+              correctedAttribute = "_" + attribute + "_value";
+            }
           }
           cols.push(correctedAttribute);
         }
@@ -115,6 +118,7 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
       }
     }
     const response = await this._webApi.retrieveRecord(entityName, id, query);
+    console.log(response);
     const sdkified = (await sdkify(response, entityName)) as T;
     return sdkified;
   }
