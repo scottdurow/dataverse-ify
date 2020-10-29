@@ -14,6 +14,7 @@ export interface ComplexEntityMetadata {
   OwnershipType?: import("../enums/OwnershipTypes").OwnershipTypes;
   OneToManyRelationships?: import("../complextypes/ComplexOneToManyRelationshipMetadata").ComplexOneToManyRelationshipMetadata[];
   ObjectTypeCode?: number;
+  ModifiedOn?: Date;
   MobileOfflineFilters?: string;
   MetadataId?: import("../../types/Guid").Guid;
   ManyToOneRelationships?: import("../complextypes/ComplexOneToManyRelationshipMetadata").ComplexOneToManyRelationshipMetadata[];
@@ -69,6 +70,7 @@ export interface ComplexEntityMetadata {
   IconLargeName?: string;
   HasNotes?: boolean;
   HasFeedback?: boolean;
+  HasEmailAddresses?: boolean;
   HasChanged?: boolean;
   HasActivities?: boolean;
   ExternalName?: string;
@@ -84,6 +86,7 @@ export interface ComplexEntityMetadata {
   DaysSinceRecordLastModified?: number;
   DataSourceId?: import("../../types/Guid").Guid;
   DataProviderId?: import("../../types/Guid").Guid;
+  CreatedOn?: Date;
   CollectionSchemaName?: string;
   ChangeTrackingEnabled?: boolean;
   CanTriggerWorkflow?: boolean;

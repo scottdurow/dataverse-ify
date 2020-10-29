@@ -13,7 +13,7 @@ test("Set String, Integer, Double, Money, Date Attributes", async () => {
     address1_utcoffset: 123.45, // Integer
     address1_latitude: 123.456, // Double
     revenue: 456.78, // Money
-    lastonholdtime: new Date("2020-04-01 10:00:00"), // Date
+    lastonholdtime: new Date("2020-04-01T09:00:00.000Z"), // Date
   } as Account;
 
   const accountOdata = await odataify("Create", accountSdk);

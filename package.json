@@ -18,7 +18,7 @@
     "config": "^3.3.1",
     "cryptr": "^6.0.2",
     "fs": "0.0.1-security",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "os": "^0.1.1",
     "request": "^2.88.2"
   },
