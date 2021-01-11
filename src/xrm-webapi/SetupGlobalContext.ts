@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as config from "config";
 import { NodeXrmConfig } from "./config/NodeXrmConfig";
-import { NodeXrmStatic } from "./NodeXrmStatic";
+import { XrmStatic } from "./XrmStatic";
 let xrmGlobalContextSetup = false;
 const defaultConfig: NodeXrmConfig = {
   proxy: {
@@ -34,12 +34,12 @@ export async function SetupGlobalContext() {
   }
 
   // Check if it's set already
-  if (globalAny && globalAny.Xrm) return globalAny.Xrm as NodeXrmStatic;
+  if (globalAny && globalAny.Xrm) return globalAny.Xrm as XrmStatic;
 
-  const xrmInstance = await NodeXrmStatic.createInstance(xrmConfig);
+  const xrmInstance = await XrmStatic.createInstance(xrmConfig);
   globalAny.Xrm = xrmInstance;
-  globalAny.GetGlobalContext = NodeXrmStatic.getGlobalContext;
-  globalAny.NodeXrm = NodeXrmStatic;
+  globalAny.GetGlobalContext = XrmStatic.getGlobalContext;
+  globalAny.NodeXrm = XrmStatic;
   xrmGlobalContextSetup = true;
   return xrmInstance;
 }

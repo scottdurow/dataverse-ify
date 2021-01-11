@@ -1,12 +1,12 @@
-import { SetupGlobalContext } from "../../../cdsnode/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../xrm-webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
-import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
+import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { XrmContextCdsServiceClient } from "../..";
 import { Entity } from "../../../types/Entity";
 import * as config from "config";
-import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
-import { contactMetadata, Contact } from "../../../cds-generated/entities/Contact";
-import { opportunityMetadata, Opportunity } from "../../../cds-generated/entities/Opportunity";
+import { NodeXrmConfig } from "../../../xrm-webapi/config/NodeXrmConfig";
+import { contactMetadata, Contact } from "../../../dataverse-gen/entities/Contact";
+import { opportunityMetadata, Opportunity } from "../../../dataverse-gen/entities/Opportunity";
 describe("customer", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {

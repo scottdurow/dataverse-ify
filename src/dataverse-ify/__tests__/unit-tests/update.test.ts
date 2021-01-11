@@ -1,4 +1,4 @@
-import { Contact, contactMetadata } from "../../../cds-generated/entities/Contact";
+import { Contact, contactMetadata } from "../../../dataverse-gen/entities/Contact";
 import { setMetadataCache } from "../../../metadata";
 import { odataify } from "../..";
 

@@ -2,8 +2,8 @@
 import { setMetadataCache } from "../../../metadata";
 import { odataify } from "../../odataify/odataify";
 import { EntityReference, sdkify } from "../../..";
-import { opportunityMetadata, Opportunity } from "../../../cds-generated/entities/Opportunity";
-import { accountMetadata } from "../../../cds-generated/entities/Account";
+import { opportunityMetadata, Opportunity } from "../../../dataverse-gen/entities/Opportunity";
+import { accountMetadata } from "../../../dataverse-gen/entities/Account";
 test("odataify customer lookups", async () => {
   setMetadataCache({
     entities: { opportunity: opportunityMetadata, account: accountMetadata },

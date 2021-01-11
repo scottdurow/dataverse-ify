@@ -9,7 +9,7 @@ import { Dictionary } from "../../types/Dictionary";
 import { getNavigationPathForEntityReference } from "../../types/IEntityReference";
 import { EntityCollection } from "../../types/EntityCollection";
 import { odataify } from "./odataify";
-import { AttributeTypeCode } from "../../cds-generated/enums/AttributeTypeCode";
+import { AttributeTypeCode } from "../../dataverse-gen/enums/AttributeTypeCode";
 import { caseInsensitiveSearch } from "../../metadata/MetadataCache";
 export async function odataifyFields(
   action: "Create" | "Update" | "Action",

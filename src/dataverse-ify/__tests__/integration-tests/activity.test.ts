@@ -1,12 +1,12 @@
-import { SetupGlobalContext } from "../../../cdsnode/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../xrm-webapi/SetupGlobalContext";
 import { XrmContextCdsServiceClient } from "../..";
 import { ActivityParty, activitypartyMetadata } from "../../../types/ActivityParty";
 import { Entity } from "../../../types/Entity";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import * as config from "config";
-import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
-import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
-import { letterMetadata, Letter } from "../../../cds-generated/entities/Letter";
+import { NodeXrmConfig } from "../../../xrm-webapi/config/NodeXrmConfig";
+import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
+import { letterMetadata, Letter } from "../../../dataverse-gen/entities/Letter";
 describe("activity", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/camelcase */
-import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
+import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { EntityReference, odataify, setMetadataCache } from "../../..";
-import { NodeXrmStatic } from "../../../cdsnode/NodeXrmStatic";
-import { NodeXrmUtilityStatic } from "../../../cdsnode";
+import { XrmStatic } from "../../../xrm-webapi/XrmStatic";
+import { NodeXrmUtilityStatic } from "../../../xrm-webapi";
 import { sdkify } from "../../sdkify/sdkify";
 
 test("odataify lookups - pascal case navigation property", async () => {
@@ -14,7 +14,7 @@ test("odataify lookups - pascal case navigation property", async () => {
     cdsify_account1: new EntityReference(accountMetadata.logicalName, "123"),
   } as Account;
 
-  (global as any).Xrm = new NodeXrmStatic();
+  (global as any).Xrm = new XrmStatic();
   Xrm.Utility = new NodeXrmUtilityStatic();
   Xrm.Utility.getEntityMetadata = jest.fn().mockImplementation((entityName: string, attributes?: string[]) => {
     console.log("getEntityMetadata", entityName, attributes);

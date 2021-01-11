@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { accountMetadata } from "../../../cds-generated/entities/Account";
+import { accountMetadata } from "../../../dataverse-gen/entities/Account";
 import { setMetadataCache, sdkify } from "../../..";
 
 test("sdkify lookups", async () => {

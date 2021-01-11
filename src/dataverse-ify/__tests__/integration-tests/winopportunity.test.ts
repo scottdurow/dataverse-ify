@@ -1,13 +1,13 @@
-import { SetupGlobalContext } from "../../../cdsnode/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../xrm-webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
-import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
+import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { XrmContextCdsServiceClient } from "../..";
 import { Entity } from "../../../types/Entity";
 import * as config from "config";
-import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
-import { opportunityMetadata, Opportunity } from "../../../cds-generated/entities/Opportunity";
-import { opportunitycloseMetadata } from "../../../cds-generated/entities/OpportunityClose";
-import { WinOpportunityMetadata, WinOpportunityRequest } from "../../../cds-generated/actions/WinOpportunity";
+import { NodeXrmConfig } from "../../../xrm-webapi/config/NodeXrmConfig";
+import { opportunityMetadata, Opportunity } from "../../../dataverse-gen/entities/Opportunity";
+import { opportunitycloseMetadata } from "../../../dataverse-gen/entities/OpportunityClose";
+import { WinOpportunityMetadata, WinOpportunityRequest } from "../../../dataverse-gen/actions/WinOpportunity";
 describe("winopportunity", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {

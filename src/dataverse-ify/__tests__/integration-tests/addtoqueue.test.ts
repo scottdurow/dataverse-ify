@@ -1,14 +1,14 @@
-import { SetupGlobalContext } from "../../../cdsnode/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../xrm-webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { Entity } from "../../../types/Entity";
 import { XrmContextCdsServiceClient } from "../..";
 import * as config from "config";
-import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
-import { letterMetadata, Letter } from "../../../cds-generated/entities/Letter";
-import { queueMetadata, Queue } from "../../../cds-generated/entities/Queue";
-import { queueitemMetadata } from "../../../cds-generated/entities/QueueItem";
-import { AddToQueueMetadata, AddToQueueRequest } from "../../../cds-generated/actions/AddToQueue";
-import { AddToQueueResponse } from "../../../cds-generated/complextypes/AddToQueueResponse";
+import { NodeXrmConfig } from "../../../xrm-webapi/config/NodeXrmConfig";
+import { letterMetadata, Letter } from "../../../dataverse-gen/entities/Letter";
+import { queueMetadata, Queue } from "../../../dataverse-gen/entities/Queue";
+import { queueitemMetadata } from "../../../dataverse-gen/entities/QueueItem";
+import { AddToQueueMetadata, AddToQueueRequest } from "../../../dataverse-gen/actions/AddToQueue";
+import { AddToQueueResponse } from "../../../dataverse-gen/complextypes/AddToQueueResponse";
 describe("addtoqueue", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {

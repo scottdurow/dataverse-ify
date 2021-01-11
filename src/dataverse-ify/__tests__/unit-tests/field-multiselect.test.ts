@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/camelcase */
 import { sdkify, odataify } from "../..";
-import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
+import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { setMetadataCache } from "../../..";
-import { socialprofile_community } from "../../../cds-generated/enums/socialprofile_community";
+import { socialprofile_community } from "../../../dataverse-gen/enums/socialprofile_community";
 
 test("sdkify Multiselects", async () => {
   const accountSdk = {

@@ -234,7 +234,7 @@ export interface OpportunityClose extends IEntity {
   // Sub-Category StringType Subcategory of the opportunity close activity.
   subcategory?: string | null;
   // Status Reason opportunityclose_OpportunityClose_opportunity_statuscode Status reason of the opportunity.
-  opportunitystatuscode?: import("../enums/opportunityclose_OpportunityClose_opportunity_statuscode").opportunityclose_OpportunityClose_opportunity_statuscode | null;
+  opportunitystatuscode?: import("../enums/opportunityclose_opportunityclose_opportunity_statuscode").opportunityclose_OpportunityClose_opportunity_statuscode | null;
   // Owning Team LookupType Unique identifier of the team that owns the activity.
   owningteam?: import("../../types/EntityReference").EntityReference | null;
   // Delivery Priority activitypointer_deliveryprioritycode Priority of delivery of the activity to the email server.

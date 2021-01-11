@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { SetupGlobalContext } from "../../../cdsnode/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../xrm-webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
-import { accountMetadata, Account, AccountAttributes } from "../../../cds-generated/entities/Account";
+import { accountMetadata, Account, AccountAttributes } from "../../../dataverse-gen/entities/Account";
 import { XrmContextCdsServiceClient } from "../..";
 import * as config from "config";
-import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
+import { NodeXrmConfig } from "../../../xrm-webapi/config/NodeXrmConfig";
 import { Entity } from "../../../types";
 describe("pascalcase-navigation-property", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;

@@ -1,9 +1,9 @@
-import { WinOpportunityRequest, WinOpportunityMetadata } from "../../../cds-generated/actions/WinOpportunity";
-import { opportunitycloseMetadata } from "../../../cds-generated/entities/OpportunityClose";
+import { WinOpportunityRequest, WinOpportunityMetadata } from "../../../dataverse-gen/actions/WinOpportunity";
+import { opportunitycloseMetadata } from "../../../dataverse-gen/entities/OpportunityClose";
 import { odataify } from "../../odataify/odataify";
 import { EntityReference } from "../../../types";
 import { setMetadataCache } from "../../../metadata";
-import { opportunityMetadata } from "../../../cds-generated/entities/Opportunity";
+import { opportunityMetadata } from "../../../dataverse-gen/entities/Opportunity";
 
 test("odataify winopportunty", async () => {
   setMetadataCache({

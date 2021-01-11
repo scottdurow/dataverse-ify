@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
+import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { setMetadataCache } from "../../../metadata";
 import { odataify } from "../../odataify/odataify";
 import { sdkify } from "../../sdkify/sdkify";

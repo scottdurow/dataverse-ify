@@ -1,14 +1,14 @@
-import { SetupGlobalContext } from "../../../cdsnode/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../xrm-webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { XrmContextCdsServiceClient } from "../..";
 import { Entity } from "../../../types/Entity";
 import * as config from "config";
-import { NodeXrmConfig } from "../../../cdsnode/config/NodeXrmConfig";
-import { accountMetadata, Account } from "../../../cds-generated/entities/Account";
+import { NodeXrmConfig } from "../../../xrm-webapi/config/NodeXrmConfig";
+import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import {
   CalculateRollupFieldMetadata,
   CalculateRollupFieldRequest,
-} from "../../../cds-generated/functions/CalculateRollupField";
+} from "../../../dataverse-gen/functions/CalculateRollupField";
 describe("calculaterollpfield", () => {
   const configFile = config.get("nodecds") as NodeXrmConfig;
   beforeAll(async () => {

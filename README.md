@@ -1,15 +1,15 @@
-# Welcome to cdsify!
+# Welcome to dataverse-ify!
 ```
-          _     _  __        __  
-   ___ __| |___(_)/ _|_   _  \ \ 
-  / __/ _` / __| | |_| | | |  \ \
- | (_| (_| \__ \ |  _| |_| |  / /
-  \___\__,_|___/_|_|  \__, | /_/ 
-                      |___/    
+       __      __                                        _ ____     
+  ____/ /___ _/ /_____ __   _____  _____________        (_) __/_  __
+ / __  / __ `/ __/ __ `/ | / / _ \/ ___/ ___/ _ \______/ / /_/ / / /
+/ /_/ / /_/ / /_/ /_/ /| |/ /  __/ /  (__  )  __/_____/ / __/ /_/ / 
+\__,_/\__,_/\__/\__,_/ |___/\___/_/  /____/\___/     /_/_/  \__, /  
+                                                           /____/   
 ```
-The TypeScript library that allows you to use the CDS/Xrm WebApi using IOrganizationService SDK like types.
-Works with [cdsify-gen](https://www.npmjs.com/package/cdsify-gen) and [node-cds-auth](https://www.npmjs.com/package/node-cds-auth) to create early bound classes.
+The TypeScript library that allows you to use the Microsoft Dataverse Xrm WebApi using IOrganizationService SDK like types.
+Works with [dataverse-gen](https://www.npmjs.com/package/dataverse-gen) and [dataverse-auth](https://www.npmjs.com/package/dataverse-gen) to create early bound classes.
 
-- [Introduction to cdsify](https://github.com/scottdurow/cdsify/wiki)
-- [Quick Start](https://github.com/scottdurow/cdsify/wiki/Quick-start)
-- [Integration tests with cdsify](https://github.com/scottdurow/cdsify/wiki/Integration-testing-the-Xrm.WebApi-implementation)
+- [Introduction to dataverse-ify](https://github.com/scottdurow/dataverse-ify/wiki)
+- [Quick Start](https://github.com/scottdurow/dataverse-ify/wiki/Quick-start)
+- [Integration tests with dataverse-ify](https://github.com/scottdurow/dataverse-ify/wiki/Integration-testing-the-Xrm.WebApi-implementation)

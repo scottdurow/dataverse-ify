@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { NodeXrmStatic } from "./NodeXrmStatic";
+import { XrmStatic } from "./XrmStatic";
 export class GlobalContextStatic {
   private _userId: string;
   constructor(userId: string) {
@@ -13,7 +13,7 @@ export class GlobalContextStatic {
   }
   getClientUrl(): string {
     // Return the full url of the endpoint in the form "https://org.crm11.dynamics.com"
-    return NodeXrmStatic.webapiInstance.getClientUrl().toString();
+    return XrmStatic.webapiInstance.getClientUrl().toString();
   }
   getCurrentAppName(): Xrm.Async.PromiseLike<string> {
     throw new Error("Method not implemented.");
@@ -58,7 +58,7 @@ export class GlobalContextStatic {
     throw new Error("Method not implemented.");
   }
   getVersion(): string {
-    return NodeXrmStatic.webapiInstance.apiVersion;
+    return XrmStatic.webapiInstance.apiVersion;
   }
   isOnPremise(): boolean {
     throw new Error("Method not implemented.");
