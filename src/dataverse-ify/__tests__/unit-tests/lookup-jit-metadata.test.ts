@@ -2,8 +2,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { EntityReference, odataify, setMetadataCache } from "../../..";
-import { XrmStatic } from "../../../xrm-webapi/XrmStatic";
-import { NodeXrmUtilityStatic } from "../../../xrm-webapi";
+import { XrmStatic } from "../../../webapi/XrmStatic";
+import { NodeXrmUtilityStatic } from "../../../webapi";
 import { sdkify } from "../../sdkify/sdkify";
 
 test("odataify lookups - pascal case navigation property", async () => {

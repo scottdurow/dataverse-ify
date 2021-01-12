@@ -16,9 +16,10 @@ import { AssociateRequest } from "../types/requests/AssociateRequest";
 import { RequestWithTarget } from "../types/RequestWithTarget";
 import { DisassociateRequest } from "../types/requests/DisassociateRequest";
 import { getMetadataByLogicalName } from "../metadata/MetadataCache";
-import { WebApiRequest } from "../request/WebApiRequest";
 import { getAccessToken } from "./TokenCache";
 
+// Implementation of Xrm.WebApi for where Xrm.WebApi is not available
+// E.g. Node Utilities or integration tests
 export class WebApiStatic {
   isAvailableOffline(_entityLogicalName: string): boolean {
     throw new Error("Not implemented");
@@ -30,6 +31,7 @@ export class WebApiStatic {
   apiVersion!: string;
   accessToken!: string;
   entitySetNames: Dictionary<string> = {};
+  webApiUrl = "";
   constructor(accessToken?: string) {
     this.online = (this as unknown) as Xrm.WebApiOnline;
     if (accessToken) {
@@ -39,6 +41,10 @@ export class WebApiStatic {
   public getClientUrl() {
     return this.server;
   }
+  getOdataContext(): string {
+    return this.server + "/$metadata#$ref";
+  }
+
   private async getEntitySetName(logicalName: string): Promise<string> {
     let metadata = this.entitySetNames[logicalName];
     if (!metadata) {
@@ -369,7 +375,7 @@ export class WebApiStatic {
         for (const related of associateRequest.relatedEntities) {
           const entitysetName = await this.getEntitySetName(related.entityType);
           associate.push({
-            "@odata.context": WebApiRequest.getOdataContext(),
+            "@odata.context": this.getOdataContext(),
             "@odata.id": `${entitysetName}(${related.id})`,
           });
         }

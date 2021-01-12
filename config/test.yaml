@@ -1,5 +1,5 @@
 ﻿# Configuration file for the XrmNode Unit tests
-nodecds:
+nodewebapi:
  logging: verbose
  runIntegrationTests: true
  proxy:

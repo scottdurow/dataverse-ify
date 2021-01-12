@@ -1,16 +1,16 @@
-import { SetupGlobalContext } from "../../../xrm-webapi/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { Entity } from "../../../types/Entity";
 import { XrmContextCdsServiceClient } from "../..";
 import * as config from "config";
-import { NodeXrmConfig } from "../../../xrm-webapi/config/NodeXrmConfig";
+import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { letterMetadata, Letter } from "../../../dataverse-gen/entities/Letter";
 import { queueMetadata, Queue } from "../../../dataverse-gen/entities/Queue";
 import { queueitemMetadata } from "../../../dataverse-gen/entities/QueueItem";
 import { AddToQueueMetadata, AddToQueueRequest } from "../../../dataverse-gen/actions/AddToQueue";
 import { AddToQueueResponse } from "../../../dataverse-gen/complextypes/AddToQueueResponse";
 describe("addtoqueue", () => {
-  const configFile = config.get("nodecds") as NodeXrmConfig;
+  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
     if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?

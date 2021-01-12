@@ -1,18 +1,19 @@
-let webApiUrl = "";
+import { WebApiRequest } from "./WebApiRequest";
 
-export class WebApiRequest {
-  static getOdataContext(): string {
-    return WebApiRequest.getWebApiUrl() + "/$metadata#$ref";
+export class XMLHttpWebApiRequest implements WebApiRequest {
+  webApiUrl: string | undefined = "";
+  getOdataContext(): string {
+    return this.getWebApiUrl() + "/$metadata#$ref";
   }
-  static getWebApiUrl(): string {
+  getWebApiUrl(): string {
     let context: Xrm.GlobalContext;
-    if (webApiUrl) return webApiUrl;
+    if (this.webApiUrl) return this.webApiUrl;
 
     if (window.GetGlobalContext) {
       context = window.GetGlobalContext();
     } else {
       if (window.Xrm) {
-        context = window.Xrm.Page.context;
+        context = window.Xrm.Utility.getGlobalContext();
       } else {
         throw new Error("Context is not available.");
       }
@@ -24,9 +25,9 @@ export class WebApiRequest {
       .toString()
       .split(".");
 
-    webApiUrl = `${clientUrl}/api/data/v${versionParts[0]}.${versionParts[1]}`;
+    this.webApiUrl = `${clientUrl}/api/data/v${versionParts[0]}.${versionParts[1]}`;
     // Add the WebApi version
-    return webApiUrl;
+    return this.webApiUrl;
   }
   send(
     action: "POST" | "PATCH" | "PUT" | "GET" | "DELETE",
@@ -37,7 +38,7 @@ export class WebApiRequest {
   ): Promise<unknown> {
     // Construct a fully qualified URI if a relative URI is passed in.
     if (uri.charAt(0) === "/") {
-      uri = WebApiRequest.getWebApiUrl() + uri;
+      uri = this.getWebApiUrl() + uri;
     }
 
     return new Promise(function(resolve, reject) {

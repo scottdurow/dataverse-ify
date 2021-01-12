@@ -2,18 +2,18 @@
 /* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { SetupGlobalContext } from "../../../xrm-webapi/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
-import { whoAmI } from "../../../xrm-webapi/whoAmI";
+import { whoAmI } from "../../../webapi/whoAmI";
 import { EntityReference } from "../../../types/EntityReference";
 import { XrmContextCdsServiceClient } from "../../CdsServiceClient/XrmContextServiceClient";
 import * as config from "config";
-import { NodeXrmConfig } from "../../../xrm-webapi/config/NodeXrmConfig";
+import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { account_account_accountcategorycode } from "../../../dataverse-gen/enums/account_account_accountcategorycode";
 import { socialprofile_community } from "../../../dataverse-gen/enums/socialprofile_community";
 describe("create", () => {
-  const configFile = config.get("nodecds") as NodeXrmConfig;
+  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
     if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?

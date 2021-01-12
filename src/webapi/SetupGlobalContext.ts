@@ -15,7 +15,7 @@ export async function SetupGlobalContext() {
   const globalAny = global as any;
   if (xrmGlobalContextSetup) return globalAny.Xrm;
   // Create global Xrm instance so we can simulate the Xrm context
-  const configFile = config.get("nodecds") as NodeXrmConfig;
+  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   const xrmConfig = { ...defaultConfig, ...configFile };
 
   if (xrmConfig.proxy && xrmConfig.proxy.useproxy) {

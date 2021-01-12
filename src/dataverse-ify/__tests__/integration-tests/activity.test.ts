@@ -1,14 +1,14 @@
-import { SetupGlobalContext } from "../../../xrm-webapi/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { XrmContextCdsServiceClient } from "../..";
 import { ActivityParty, activitypartyMetadata } from "../../../types/ActivityParty";
 import { Entity } from "../../../types/Entity";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import * as config from "config";
-import { NodeXrmConfig } from "../../../xrm-webapi/config/NodeXrmConfig";
+import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { letterMetadata, Letter } from "../../../dataverse-gen/entities/Letter";
 describe("activity", () => {
-  const configFile = config.get("nodecds") as NodeXrmConfig;
+  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
     if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
