@@ -118,7 +118,6 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
       }
     }
     const response = await this._webApi.retrieveRecord(entityName, id, query);
-    console.log(response);
     const sdkified = (await sdkify(response, entityName)) as T;
     return sdkified;
   }
