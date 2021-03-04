@@ -84,11 +84,20 @@ describe("activity", () => {
     } finally {
       if (letter1.id) {
         // Tidy up
-        await cdsServiceClient.delete(letter1);
+        // Retry once if we get Sql ErrorCode: -2146232060 Sql Number: 1205 - DeadLock
+        try {
+          await cdsServiceClient.delete(letter1);
+        } catch (ex) {
+          await cdsServiceClient.delete(letter1);
+        }
       }
       if (account1.id) {
         // Tidy up
-        await cdsServiceClient.delete(account1);
+        try {
+          await cdsServiceClient.delete(account1);
+        } catch (ex) {
+          await cdsServiceClient.delete(account1);
+        }
       }
     }
   }, 30000);
