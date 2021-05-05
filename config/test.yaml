@@ -1,5 +1,5 @@
 ﻿# Configuration file for the XrmNode Unit tests
-nodecds:
+nodewebapi:
  logging: verbose
  runIntegrationTests: true
  proxy:
@@ -7,5 +7,5 @@ nodecds:
   httpProxy: http://127.0.0.1:8888
   httpsProxy: http://127.0.0.1:8888
  server:
-  host: https://orgbdc72c18.crm3.dynamics.com
+  host: https://dev1demos13.crm3.dynamics.com
   version: 9.1
