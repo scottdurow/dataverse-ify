@@ -4,6 +4,7 @@ export interface ComplexOneToManyRelationshipMetadata {
   SchemaName?: string;
   RelationshipType?: import("../enums/RelationshipType").RelationshipType;
   RelationshipBehavior?: number;
+  RelationshipAttributes?: import("../complextypes/RelationshipAttribute").RelationshipAttribute[];
   ReferencingEntityNavigationPropertyName?: string;
   ReferencingEntity?: string;
   ReferencingAttribute?: string;
@@ -18,6 +19,7 @@ export interface ComplexOneToManyRelationshipMetadata {
   IsCustomRelationship?: boolean;
   IntroducedVersion?: string;
   HasChanged?: boolean;
+  EntityKey?: string;
   CascadeConfiguration?: import("../complextypes/CascadeConfiguration").CascadeConfiguration;
   AssociatedMenuConfiguration?: import("../complextypes/AssociatedMenuConfiguration").AssociatedMenuConfiguration;
 }

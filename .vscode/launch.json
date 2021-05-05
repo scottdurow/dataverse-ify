@@ -8,8 +8,8 @@
             "type": "node",
             "name": "vscode-jest-tests",
             "request": "launch",
-            "args": ["${fileBasename}", "--runInBand", "--code-coverage=false",
-                //"--testNamePattern", "cdsify lookups"
+            "args": ["${fileBasename}", "--runInBand", "--code-coverage=false", "activity.test.ts"
+                //"--testNamePattern", "activity"
                 //"--testNamePattern", "customer"
             ],
             "cwd": "${workspaceFolder}",

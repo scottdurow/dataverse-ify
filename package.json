@@ -1,6 +1,6 @@
 {
   "name": "cdsify",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Easily call the CDS WebApi using SDK style types. Works with 'npx cdsify-gen' to create early bound classes.",
   "main": "lib/index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "config": "^3.3.1",
     "cryptr": "^6.0.2",
     "fs": "0.0.1-security",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "os": "^0.1.1",
     "request": "^2.88.2"
   },
