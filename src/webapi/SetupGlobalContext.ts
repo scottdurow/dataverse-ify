@@ -33,13 +33,19 @@ export async function SetupGlobalContext() {
     //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Doesn't work in Jest!
   }
 
-  // Check if it's set already
-  if (globalAny && globalAny.Xrm) return globalAny.Xrm as XrmStatic;
-
   const xrmInstance = await XrmStatic.createInstance(xrmConfig);
-  globalAny.Xrm = xrmInstance;
+  // If Xrm is already defined by another system (e.g. xrm-mock), then re-use it
+  globalAny.Xrm = globalAny.Xrm || xrmInstance;
+
+  // Add the dataverse-ify versions of the Xrm Api
+  const overrides = {
+    WebApi: xrmInstance.WebApi,
+    Utility: xrmInstance.Utility,
+  };
+  globalAny.Xrm = { ...globalAny.Xrm, ...overrides };
   globalAny.GetGlobalContext = XrmStatic.getGlobalContext;
   globalAny.NodeXrm = XrmStatic;
   xrmGlobalContextSetup = true;
-  return xrmInstance;
+
+  return globalAny.Xrm;
 }
