@@ -123,13 +123,23 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
   }
 
   private getEntityLogicalNameFromFetch(fetch: string): string {
-    const domParser = new DOMParser();
-    const parsedFetch = domParser.parseFromString(fetch, "text/html");
-    const attributeLogicalName = parsedFetch
-      .getElementsByTagName("fetch")[0]
-      .getElementsByTagName("entity")[0]
-      .getAttributeNode("name");
-    return attributeLogicalName ? attributeLogicalName.value : "";
+    let entityLogicalName: string | undefined = undefined;
+    if (typeof DOMParser != "undefined") {
+      const domParser = new DOMParser();
+      const parsedFetch = domParser.parseFromString(fetch, "text/html");
+      const entityNameNode = parsedFetch
+        .getElementsByTagName("fetch")[0]
+        .getElementsByTagName("entity")[0]
+        .getAttributeNode("name");
+      entityLogicalName = entityNameNode ? entityNameNode.value : "";
+    } else {
+      // Fall back to regex for when we are running inside a pure node test environment
+      const regex = /name=["']?([\w]+)["']?/gm;
+      const match = regex.exec(fetch);
+      entityLogicalName = match && match.length > 0 ? match[1] : "";
+    }
+    if (entityLogicalName) return entityLogicalName;
+    else throw new Error(`Cannot find entityLogicalName from fetchxml ${fetch}`);
   }
 
   async retrieveMultiple<T extends IEntity>(fetchxml: string): Promise<EntityCollection<T>> {
