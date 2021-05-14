@@ -36,7 +36,6 @@ test("sdkify lookups", async () => {
   };
 
   const sdkRecord = await sdkify(recordOdata, "opportunity");
-  console.log(JSON.stringify(sdkRecord, undefined, 2));
   const expected = {
     opportunityid: "0faa41b7-4c85-ea11-a811-00224801badc",
     logicalName: "opportunity",

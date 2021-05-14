@@ -48,7 +48,7 @@ describe("calculaterollpfield", () => {
       } as CalculateRollupFieldRequest;
 
       const response = await cdsServiceClient.execute(request);
-      console.log(response);
+      expect(response).toBeDefined();
     } catch (ex) {
       fail(ex);
     } finally {

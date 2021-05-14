@@ -6,14 +6,18 @@ import { setMetadataCache } from "../../..";
 import { socialprofile_community } from "../../../dataverse-gen/enums/socialprofile_community";
 
 test("sdkify Multiselects", async () => {
+  setMetadataCache({ entities: { account: accountMetadata } });
   const accountSdk = {
     logicalName: accountMetadata.logicalName,
     name: "Account 1",
     cdsify_multiselect: [socialprofile_community.Facebook, socialprofile_community.Other],
   } as Account;
 
-  const odata = odataify("Create", accountSdk);
-  console.log(odata);
+  const odata = await odataify("Create", accountSdk);
+  expect(odata).toBeDefined();
+  expect(odata.cdsify_multiselect).toBe("1,0");
+  expect(odata.name).toBe("Account 1");
+  expect(odata["@odata.type"]).toBe("Microsoft.Dynamics.CRM.account");
 });
 
 test("sdkify Multiselects", async () => {

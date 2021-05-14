@@ -12,6 +12,5 @@ test("update removes primary ID attribute", async () => {
   } as Contact;
 
   const odataRecord = await odataify("Update", sdkRecord);
-  console.log(odataRecord);
   expect(odataRecord.contactid).toBeUndefined();
 });

@@ -25,7 +25,7 @@ describe("create", () => {
         fail(ex);
       }
     }
-  }, 10000);
+  }, 100000);
   test("Create an account", async () => {
     if (!configFile.runIntegrationTests) return;
     const userId = await whoAmI();
@@ -84,9 +84,11 @@ describe("create", () => {
       // Because a lookup value comes in as null we can't figure out the entity reference lookup type
       // so we get an undefined value not null
       expect(account1Retreived2.preferredsystemuserid).toBeUndefined();
+    } catch (ex) {
+      fail(ex);
     } finally {
       // Delete
       await cdsServiceClient.delete("account", account1.accountid);
     }
-  }, 10000);
+  }, 100000);
 });

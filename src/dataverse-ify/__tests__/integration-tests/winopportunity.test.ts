@@ -68,7 +68,7 @@ describe("winopportunity", () => {
       } as WinOpportunityRequest;
 
       const winResponse = await cdsServiceClient.execute(winRequest);
-      console.log(winResponse);
+      expect(winResponse).toBeUndefined();
     } catch (ex) {
       fail(ex);
     } finally {

@@ -16,8 +16,8 @@ test("odataify lookups - pascal case navigation property", async () => {
 
   (global as any).Xrm = new XrmStatic();
   Xrm.Utility = new NodeXrmUtilityStatic();
-  Xrm.Utility.getEntityMetadata = jest.fn().mockImplementation((entityName: string, attributes?: string[]) => {
-    console.log("getEntityMetadata", entityName, attributes);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Xrm.Utility.getEntityMetadata = jest.fn().mockImplementation((entityName: string, _attributes?: string[]) => {
     switch (entityName) {
       case "resource":
         return {
@@ -28,7 +28,6 @@ test("odataify lookups - pascal case navigation property", async () => {
     }
   });
   const odataEntity = await odataify("Create", account);
-  console.log(odataEntity);
   expect(odataEntity).toBeDefined();
 
   if (odataEntity) {
@@ -47,7 +46,6 @@ test("sdkify lookups - pascal case navigation property", async () => {
   };
   const sdkAccount = (await sdkify<Account>(account, accountMetadata.logicalName)) as Account;
 
-  console.log(sdkAccount);
   expect(sdkAccount.cdsify_account1).toBeDefined();
   expect(sdkAccount.cdsify_account1?.id).toEqual("123");
   expect(sdkAccount.cdsify_account1?.entityType).toEqual("account");

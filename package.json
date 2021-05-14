@@ -5,7 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
-    "test": "tsc & jest",
+    "test": "tsc & jest unit-tests/",
+    "integration-test": "tsc & jest integration-tests/",
     "preversion": "npm test",
     "version": "npm run build",
     "postversion": "git push",

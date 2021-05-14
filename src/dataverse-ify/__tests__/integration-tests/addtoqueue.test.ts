@@ -22,7 +22,7 @@ describe("addtoqueue", () => {
         fail(ex);
       }
     }
-  }, 30000);
+  }, 300000);
   test("AddToQueue", async () => {
     if (!configFile.runIntegrationTests) return;
     setMetadataCache({
@@ -60,7 +60,6 @@ describe("addtoqueue", () => {
       } as AddToQueueRequest;
 
       const response = (await cdsServiceClient.execute(request)) as AddToQueueResponse;
-      console.log(response);
       expect(response.QueueItemId).toBeDefined();
     } catch (ex) {
       fail(ex);
@@ -74,5 +73,5 @@ describe("addtoqueue", () => {
         await cdsServiceClient.delete(queue);
       }
     }
-  }, 30000);
+  }, 300000);
 });

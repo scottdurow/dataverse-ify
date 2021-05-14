@@ -51,11 +51,10 @@ describe("pascalcase-navigation-property", () => {
       AccountAttributes.cdsify_Account1,
     ])) as Account;
 
-    console.log(accountRetrieved);
     expect(accountRetrieved.cdsify_account1).toBeDefined();
 
     // Tidy up
-    cdsServiceClient.delete(accountRelated);
-    cdsServiceClient.delete(account1);
+    await cdsServiceClient.delete(accountRelated);
+    await cdsServiceClient.delete(account1);
   }, 30000);
 });
