@@ -26,7 +26,7 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
     // Convert null lookups to EntityReferences with null guid so we can run a delete association
     for (const attribute in entity) {
       const navigation = entityMetadata.navigation && entityMetadata.navigation[attribute];
-      if (navigation && entity[attribute] == null) {
+      if (navigation && entity[attribute] === null) {
         // We don't support just nulling a pollymorphic lookup because we don't know which relationship
         // to null.
         entity[attribute] = new EntityReference(navigation[0].replace("mscrm.", ""), null);
@@ -76,7 +76,7 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
   async delete(entity: string | IEntity): Promise<void>;
   async delete(entityName: string, id: Guid): Promise<void>;
   async delete(entity: unknown, id?: Guid): Promise<void> {
-    if (typeof entity == "string") {
+    if (typeof entity === "string") {
       await this._webApi.deleteRecord(entity as string, id as Guid);
     } else {
       const entityValue = entity as IEntity;

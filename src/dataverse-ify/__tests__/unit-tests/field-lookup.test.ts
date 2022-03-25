@@ -23,6 +23,7 @@ test("odataify lookups", async () => {
   setMetadataCache({ entities: { account: accountMetadata } });
   const odataRecord = {
     "@odata.context": "https://develop1v9demo.crm11.dynamics.com/api/data/v9.1/$metadata#accounts/$entity",
+    // eslint-disable-next-line quotes
     "@odata.etag": 'W/"24588382"',
     name: "Account 1",
     "_preferredsystemuserid_value@OData.Community.Display.V1.FormattedValue": "Scott Durow",

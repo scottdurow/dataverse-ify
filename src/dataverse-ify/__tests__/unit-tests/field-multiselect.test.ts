@@ -24,6 +24,7 @@ test("sdkify Multiselects", async () => {
   setMetadataCache({ entities: { account: accountMetadata } });
   const odataRecord = {
     "@odata.context": "https://org.crm11.dynamics.com/api/data/v9.1/$metadata#accounts/$entity",
+    // eslint-disable-next-line quotes
     "@odata.etag": 'W/"24588414"',
     "cdsify_multiselect@OData.Community.Display.V1.FormattedValue": "Facebook",
     cdsify_multiselect: "1,2",

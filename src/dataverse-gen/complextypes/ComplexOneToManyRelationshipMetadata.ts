@@ -13,13 +13,16 @@ export interface ComplexOneToManyRelationshipMetadata {
   ReferencedAttribute?: string;
   MetadataId?: import("../../types/Guid").Guid;
   IsValidForAdvancedFind?: boolean;
+  IsRelationshipAttributeDenormalized?: boolean;
   IsManaged?: boolean;
   IsHierarchical?: boolean;
+  IsDenormalizedLookup?: boolean;
   IsCustomizable?: import("../complextypes/BooleanManagedProperty").BooleanManagedProperty;
   IsCustomRelationship?: boolean;
   IntroducedVersion?: string;
   HasChanged?: boolean;
   EntityKey?: string;
+  DenormalizedAttributeName?: string;
   CascadeConfiguration?: import("../complextypes/CascadeConfiguration").CascadeConfiguration;
   AssociatedMenuConfiguration?: import("../complextypes/AssociatedMenuConfiguration").AssociatedMenuConfiguration;
 }

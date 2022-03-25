@@ -12,7 +12,7 @@ describe("customer", () => {
   beforeAll(async () => {
     if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
-    if (typeof Xrm == "undefined") {
+    if (typeof Xrm === "undefined") {
       try {
         // Set up the Node Xrm global context
         await SetupGlobalContext();

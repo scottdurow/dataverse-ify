@@ -15,7 +15,7 @@ export async function odataify(
 ): Promise<any> {
   const metadataCache = getMetadataCache();
   // Is the value an array or Entitycollection?
-  if (value.constructor.name == "Array") {
+  if (value.constructor.name === "Array") {
     const odataRecords = [];
     for (const record of value as IEntity[]) {
       const value = await odataify(action, record);
@@ -24,7 +24,7 @@ export async function odataify(
     return odataRecords;
   }
   // EntityCollection
-  else if ((value as EntityCollection<IEntity>).entities != undefined) {
+  else if ((value as EntityCollection<IEntity>).entities !== undefined) {
     const odataValue = await odataify(action, (value as EntityCollection<IEntity>).entities);
     return odataValue;
   }
@@ -80,7 +80,7 @@ export async function odataify(
     const requestOdata: WebApiExecuteRequest = Object.assign(webApiRequest, request) as WebApiExecuteRequest;
     // Get the parameters
     for (const field of Object.keys(requestOdata)) {
-      if (field == "getMetadata" || field == "logicalName") continue;
+      if (field === "getMetadata" || field === "logicalName") continue;
       // odataify each field if it is an entity
       const fieldValue = requestOdata[field] as object;
       // Get the type from the metadata
@@ -88,7 +88,7 @@ export async function odataify(
 
       if (parameterMetadata) {
         // If Taret - then change to EntityType
-        if (field == "Target" && parameterMetadata.structuralProperty == StructuralProperty.ComplexType) {
+        if (field === "Target" && parameterMetadata.structuralProperty === StructuralProperty.ComplexType) {
           parameterMetadata.structuralProperty = StructuralProperty.EntityType;
         }
         switch (parameterMetadata.structuralProperty) {

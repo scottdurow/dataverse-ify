@@ -10,7 +10,10 @@
     "preversion": "npm test",
     "version": "npm run build",
     "postversion": "git push",
-    "prepublishOnly": "npm version patch"
+    "prepublishOnly": "npm version patch",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "npm run lint -- --fix",
+    "coverage": "tsc & jest --coverage"
   },
   "author": "Scott Durow",
   "license": "MIT",

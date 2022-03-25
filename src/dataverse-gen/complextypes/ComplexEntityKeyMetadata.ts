@@ -5,6 +5,7 @@ export interface ComplexEntityKeyMetadata {
   LogicalName?: string;
   KeyAttributes?: string[];
   IsSynchronous?: boolean;
+  IsSecondaryKey?: boolean;
   IsManaged?: boolean;
   IsExportKey?: boolean;
   IsCustomizable?: import("../complextypes/BooleanManagedProperty").BooleanManagedProperty;

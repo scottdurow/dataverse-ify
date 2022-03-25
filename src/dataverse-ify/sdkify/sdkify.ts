@@ -11,6 +11,7 @@ import { IEntityCollection } from "../../types/IEntityCollection";
 import { EntityCollection } from "../../types/EntityCollection";
 import { dateReviver } from "./dateReviver";
 import { getEntityMetadataFromRecord } from "../../metadata/getEntityMetadataFromRecord";
+import { isNullOrUndefined } from "../../webapi/utils/NullOrUndefined";
 
 // Remove the fields not needed (@ and _ fields)
 function removeNonSdkFields(entityRecord: IEntity): void {
@@ -60,7 +61,7 @@ function expandActivityPartiesToFields(entityRecord: IEntity, activityPartiesFie
     }
     if (partyField != null) {
       let partyList = entityRecord[partyField] as IEntity[];
-      if (partyList == null) {
+      if (isNullOrUndefined(partyList)) {
         partyList = [];
         entityRecord[partyField] = partyList;
       }
@@ -264,9 +265,9 @@ export async function sdkify<T>(
     value = JSON.parse(value.responseText, dateReviver);
   }
 
-  if ((value as Xrm.RetrieveMultipleResult).entities != undefined) {
+  if ((value as Xrm.RetrieveMultipleResult).entities !== undefined) {
     return sdkifyEntityCollection(value, logicalName);
-  } else if (value.constructor.name == "Array") {
+  } else if (value.constructor.name === "Array") {
     return sdkifyArray(value, logicalName);
   } else {
     return sdkifyEntity(value as IEntity, logicalName);

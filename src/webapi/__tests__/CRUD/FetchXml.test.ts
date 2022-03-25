@@ -4,7 +4,7 @@ import { SetupGlobalContext } from "../../SetupGlobalContext";
 describe("XrmWebApiNode", () => {
   beforeAll(async () => {
     // Is this running inside NodeJS?
-    if (typeof Xrm == "undefined") {
+    if (typeof Xrm === "undefined") {
       try {
         // Set up the Node Xrm global context
         await SetupGlobalContext();

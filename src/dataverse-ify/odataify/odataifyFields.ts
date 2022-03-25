@@ -123,7 +123,7 @@ export async function odataifyFields(
         const dateValue = fieldValue as Date;
         let dateString = dateValue.toJSON();
         // If the date field is DateOnly:DateOnly then trim the value to have no time
-        if (dateString && (metadata.attributeTypes as Dictionary<string>)[field] == "DateOnly:DateOnly") {
+        if (dateString && (metadata.attributeTypes as Dictionary<string>)[field] === "DateOnly:DateOnly") {
           dateString = dateString.substring(0, 10);
         }
         output[field] = dateString;

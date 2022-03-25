@@ -11,7 +11,10 @@ export interface ComplexEntityMetadata {
   PrimaryNameAttribute?: string;
   PrimaryImageAttribute?: string;
   PrimaryIdAttribute?: string;
+  OwningBusinessUnit?: import("../../types/Guid").Guid;
   OwnershipType?: import("../enums/OwnershipTypes").OwnershipTypes;
+  OwnerIdType?: number;
+  OwnerId?: import("../../types/Guid").Guid;
   OneToManyRelationships?: import("../complextypes/ComplexOneToManyRelationshipMetadata").ComplexOneToManyRelationshipMetadata[];
   ObjectTypeCode?: number;
   ModifiedOn?: Date;
@@ -29,6 +32,8 @@ export interface ComplexEntityMetadata {
   IsStateModelAware?: boolean;
   IsSolutionAware?: boolean;
   IsSLAEnabled?: boolean;
+  IsRetrieveMultipleAuditEnabled?: boolean;
+  IsRetrieveAuditEnabled?: boolean;
   IsRenameable?: import("../complextypes/BooleanManagedProperty").BooleanManagedProperty;
   IsReadingPaneEnabled?: boolean;
   IsReadOnlyInMobileClient?: import("../complextypes/BooleanManagedProperty").BooleanManagedProperty;

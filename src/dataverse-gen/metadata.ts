@@ -5,8 +5,8 @@ import { incidentMetadata } from "./entities/Incident";
 import { letterMetadata } from "./entities/Letter";
 import { opportunityMetadata } from "./entities/Opportunity";
 import { opportunitycloseMetadata } from "./entities/OpportunityClose";
-import { queueitemMetadata } from "./entities/QueueItem";
 import { queueMetadata } from "./entities/Queue";
+import { queueitemMetadata } from "./entities/QueueItem";
 import { AddToQueueMetadata } from "./actions/AddToQueue";
 import { WinOpportunityMetadata } from "./actions/WinOpportunity";
 import { CalculateRollupFieldMetadata } from "./functions/CalculateRollupField";
@@ -20,8 +20,8 @@ export const Entities = {
   Letter: "letter",
   Opportunity: "opportunity",
   OpportunityClose: "opportunityclose",
-  QueueItem: "queueitem",
   Queue: "queue",
+  QueueItem: "queueitem",
 };
 
 // Setup Metadata
@@ -34,8 +34,8 @@ export const metadataCache = {
     letter: letterMetadata,
     opportunity: opportunityMetadata,
     opportunityclose: opportunitycloseMetadata,
-    queueitem: queueitemMetadata,
     queue: queueMetadata,
+    queueitem: queueitemMetadata,
   },
   actions: {
     AddToQueue: AddToQueueMetadata,

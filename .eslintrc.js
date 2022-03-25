@@ -3,20 +3,14 @@
     extends: [
       "plugin:@typescript-eslint/recommended",
       "plugin:prettier/recommended",
-      "plugin:react/recommended",
       "prettier",
       "prettier/@typescript-eslint",
-      "prettier/react",
     ],
-    plugins: ["react", "@typescript-eslint", "prettier"],
+    plugins: ["@typescript-eslint", "prettier"],
     parserOptions: {
       project: "./tsconfig.json",
     },
     settings: {
-      react: {
-        pragma: "React",
-        version: "detect",
-      },
     },
     env: {
       browser: true,
@@ -27,7 +21,23 @@
       {
         files: ["*.ts"],
         rules: {
-          camelcase: [2, { properties: "never" }],
+          "camelcase": [2, { properties: "never" }],
+          "eqeqeq": [2, "smart"],
+          "prettier/prettier": "error",
+          "arrow-body-style": "off",
+          "prefer-arrow-callback": "off",
+          "linebreak-style": [
+              "error",
+              "windows"
+          ],
+          "quotes": [
+              "warn",
+              "double"
+          ],
+          "semi": [
+              "error",
+              "always"
+          ]
         },
       },
     ],

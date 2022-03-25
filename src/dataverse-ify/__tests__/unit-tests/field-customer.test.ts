@@ -27,6 +27,7 @@ test("sdkify lookups", async () => {
   const recordOdata = {
     "@odata.context":
       "https://develop1v9demo.crm11.dynamics.com/api/data/v9.1/$metadata#opportunities(_customerid_value)/$entity",
+    // eslint-disable-next-line quotes
     "@odata.etag": 'W/"24587791"',
     "_customerid_value@OData.Community.Display.V1.FormattedValue": "Test Unit",
     "_customerid_value@Microsoft.Dynamics.CRM.associatednavigationproperty": "customerid_contact",

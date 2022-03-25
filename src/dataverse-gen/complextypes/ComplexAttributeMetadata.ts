@@ -1,6 +1,7 @@
 /* eslint-disable*/
 export interface ComplexAttributeMetadata {
   SourceType?: number;
+  Settings?: import("../complextypes/EntitySetting").EntitySetting[];
   SchemaName?: string;
   RequiredLevel?: import("../complextypes/AttributeRequiredLevelManagedProperty").AttributeRequiredLevelManagedProperty;
   ModifiedOn?: Date;

@@ -17,6 +17,7 @@ import { RequestWithTarget } from "../types/RequestWithTarget";
 import { DisassociateRequest } from "../types/requests/DisassociateRequest";
 import { getMetadataByLogicalName } from "../metadata/MetadataCache";
 import { getAccessToken } from "./TokenCache";
+import { requireValue } from "./utils/NullOrUndefined";
 
 // Implementation of Xrm.WebApi for where Xrm.WebApi is not available
 // E.g. Node Utilities or integration tests
@@ -91,7 +92,7 @@ export class WebApiStatic {
   }
   createException(message: string, ex: unknown) {
     const innerEx = ex as Error;
-    if (innerEx.message != undefined) {
+    if (innerEx.message !== undefined) {
       innerEx.message = message + ":" + innerEx.message;
       return innerEx;
     } else {
@@ -113,7 +114,7 @@ export class WebApiStatic {
       const guidMatch = /\(([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\)/g.exec(
         apiResponse.headers["odata-entityid"] as string,
       );
-      if (guidMatch === null || guidMatch.length == 0)
+      if (guidMatch === null || guidMatch.length === 0)
         throw new Error("Could not find the guid in the createRecord response");
       const guid = guidMatch[1];
       const response = {
@@ -135,10 +136,9 @@ export class WebApiStatic {
    * @see {@link https://docs.microsoft.com/en-us/dynamics365/customer-engagement/developer/clientapi/reference/xrm-webapi/updaterecord External Link: updateRecord (Client API reference)}
    */
   async updateRecord(entityLogicalName: string, id: string, data: unknown) {
-    if (entityLogicalName == undefined || entityLogicalName == null)
-      throw new Error("entityLogicalName is a required parameter");
-    if (id == undefined || id == null) throw new Error("id is a required parameter");
-    if (data == undefined || data == null) throw new Error("data is a required parameter");
+    requireValue("entityLogicalName is a required parameter", entityLogicalName);
+    requireValue("id is a required parameter", id);
+    requireValue("data is a required parameter", data);
     try {
       const entitySetName = await this.getEntitySetName(entityLogicalName);
       const path = `${entitySetName}(${this.toPathGuid(id)})`;
@@ -174,6 +174,7 @@ export class WebApiStatic {
   async retrieveRecord(entityLogicalName: string, id: string, options?: string) {
     try {
       const entitySetName = await this.getEntitySetName(entityLogicalName);
+      // eslint-disable-next-line quotes
       const preferHeader = ['odata.include-annotations="*"'];
       const headers = {
         Prefer: preferHeader.join(","),
@@ -194,9 +195,9 @@ export class WebApiStatic {
    * @see {@link https://docs.microsoft.com/en-us/dynamics365/customer-engagement/developer/clientapi/reference/xrm-webapi/deleterecord External Link: deleteRecord (Client API reference)}
    */
   async deleteRecord(entityLogicalName: string, id: string) {
-    if (entityLogicalName == undefined || entityLogicalName == null)
-      throw new Error("entityLogicalName is a required parameter");
-    if (id == undefined || id == null) throw new Error("id is a required parameter");
+    requireValue("entityLogicalName is a required parameter", entityLogicalName);
+    requireValue("id is a required parameter", id);
+
     try {
       const entitySetName = await this.getEntitySetName(entityLogicalName);
       const path = `${entitySetName}(${this.toPathGuid(id)})`;
@@ -213,8 +214,9 @@ export class WebApiStatic {
   async retrieveMultipleRecords(entityType: string, options?: string, maxPageSize?: number) {
     try {
       const entitySetName = await this.getEntitySetName(entityType);
+      // eslint-disable-next-line quotes
       const preferHeader = ['odata.include-annotations="*"'];
-      if (maxPageSize != undefined) {
+      if (maxPageSize !== undefined) {
         preferHeader.push(`odata.maxpagesize=${maxPageSize.toString()}`);
       }
       const headers = {
@@ -234,9 +236,8 @@ export class WebApiStatic {
   }
   async execute(request: WebApiExecuteRequest) {
     try {
-      if (request == null) {
-        throw new Error("Request cannot be null");
-      }
+      requireValue("Request cannot be null", request);
+
       // Currently the UCI requires us to have a class that defines the getMetadata rather than just a function
       // otherwise the getMetadata function is serialised into the request.
       const metadata = request.getMetadata();
@@ -250,8 +251,8 @@ export class WebApiStatic {
       let count = 0;
       const parameterObject: Dictionary<unknown> = {};
       for (const key of Object.keys(request)) {
-        if (key == "getMetadata") continue;
-        if (key == metadata.boundParameter) {
+        if (key === "getMetadata") continue;
+        if (key === metadata.boundParameter) {
           boundParameterValue = request[key] as IEntity;
           continue;
         }
@@ -261,7 +262,7 @@ export class WebApiStatic {
         const parameterMetadata = metadata.parameterTypes[key];
         if (parameterMetadata) {
           const structuralType = parameterMetadata.structuralProperty;
-          const forUrl = verb == "GET";
+          const forUrl = verb === "GET";
           parameterObject[key] = parameterValue;
           switch (structuralType) {
             case StructuralProperty.EntityType:
@@ -314,7 +315,7 @@ export class WebApiStatic {
           break;
       }
       let path =
-        functionParametersString != ""
+        functionParametersString !== ""
           ? `${metadata.operationName}(${functionParametersString})`
           : metadata.operationName;
       // If bound function/action then add the entity path
@@ -413,7 +414,7 @@ export class WebApiStatic {
   public async getEntityMetadata(entityName: string, attributes?: string[]) {
     try {
       const path = `EntityDefinitions(LogicalName='${entityName}')`;
-      const options = attributes != undefined ? `?$select=${attributes.join(",")}` : undefined;
+      const options = attributes !== undefined ? `?$select=${attributes.join(",")}` : undefined;
       const apiResponse = await this.webApiRequest("GET", undefined, path, options);
       return apiResponse["data"] as Xrm.Metadata.EntityMetadata;
     } catch (ex) {
@@ -471,7 +472,7 @@ export class WebApiStatic {
     });
   }
   private trimOptions(options: string | undefined) {
-    if (options != undefined && options != null) {
+    if (options !== undefined && options !== null) {
       if (!options.startsWith("?")) options = `?${options}`;
     } else {
       options = "";
@@ -500,7 +501,7 @@ export class WebApiStatic {
     const uri = this.server + this.apiPath + path + options;
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-    const hasData = data != undefined && data != null;
+    const hasData = data !== undefined && data !== null;
     const standardHeaders = this.getStandardHeaders();
     const headers = { ...standardHeaders, ...additionalHeaders };
     const requestOptions = {
@@ -550,7 +551,7 @@ export class WebApiStatic {
 
     if (response.statusCode < 200 || response.statusCode > 299) {
       // HTTP Error
-      if (apiResponse.data != undefined && apiResponse.data.error != undefined) {
+      if (apiResponse.data !== undefined && apiResponse.data.error !== undefined) {
         apiResponse.error = apiResponse.data.error;
       } else {
         apiResponse.error = `HTTP Error ${response.statusMessage}`;
@@ -569,7 +570,7 @@ export class WebApiStatic {
 
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
-    const hasData = payload != undefined && payload != null;
+    const hasData = payload !== undefined && payload !== null;
     const standardHeaders = this.getStandardHeaders();
     const headers = { ...standardHeaders };
     const requestOptions = {

@@ -2,6 +2,7 @@ import { Dictionary } from "../types/Dictionary";
 import { EntityWebApiMetadata } from "./EntityWebApiMetadata";
 import { WebApiExecuteRequestMetadata } from "./WebApiExecuteRequestMetadata";
 import { IEntity } from "../types/IEntity";
+import { isNullOrUndefined } from "../webapi/utils/NullOrUndefined";
 export let _metadataCache: MetadataCache = { entities: {}, entitySetNames: {}, actions: {} };
 
 export interface MetadataCache {
@@ -19,7 +20,7 @@ export function setMetadataCache(metadataCache: MetadataCache): void {
   }
 }
 export function getMetadataCache(): MetadataCache {
-  if (_metadataCache == null) {
+  if (isNullOrUndefined(_metadataCache)) {
     throw new Error("Metadata cache is not initialised. Ensure that setMetadata is called");
   }
   return _metadataCache;
@@ -38,7 +39,7 @@ export function getMetadataFromEntitySet(entitySetName: string): EntityWebApiMet
     for (const logicalName of Object.keys(metadataCache.entities)) {
       // Check logical name
       const metadata = metadataCache.entities[logicalName] as EntityWebApiMetadata;
-      if (metadata.collectionName == entitySetName) return metadata;
+      if (metadata.collectionName === entitySetName) return metadata;
     }
   }
   throw new Error(`Cannot find entity metadata for ${entitySetName}. Please generate early bound types`);
@@ -48,12 +49,12 @@ export async function getEntitySetName(entityLogicalName: string): Promise<strin
   if (metadataCache.entitySetNames) {
     // Check the generated metadata
     const metadata = metadataCache.entitySetNames[entityLogicalName];
-    if (metadata != undefined) {
+    if (metadata !== undefined) {
       return metadata;
     }
   }
   // Check the cache
-  if (entitySetNames[entityLogicalName] != undefined) {
+  if (entitySetNames[entityLogicalName] !== undefined) {
     return entitySetNames[entityLogicalName];
   }
   // Lookup the entity set name from the logical name
@@ -77,7 +78,7 @@ export function getMetadata(entity: IEntity): EntityWebApiMetadata {
 export function caseInsensitiveSearch<T>(key: string, values: Dictionary<T>): { key: string; value: T } | undefined {
   key = key.toLowerCase();
   for (const index in values) {
-    if (index.toLowerCase() == key) {
+    if (index.toLowerCase() === key) {
       return {
         key: index,
         value: values[index],

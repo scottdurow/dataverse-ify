@@ -16,7 +16,7 @@ export class EntityReference {
 export function toEntityReference(record: IEntity): EntityReference {
   let id = record.id;
   // Set the id field if not already
-  if (id == undefined || id === null) {
+  if (id === undefined || id === null) {
     const metadata = getMetadata(record);
     id = record[metadata.primaryIdAttribute] as string;
   }

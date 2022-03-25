@@ -2,11 +2,12 @@ import { IEntity } from "../types/IEntity";
 import { getMetadataFromEntitySet, getMetadataByLogicalName } from "./MetadataCache";
 import { EntityWebApiMetadata } from "./EntityWebApiMetadata";
 import { WebApiExecuteRequestMetadata } from "./WebApiExecuteRequestMetadata";
+import { isNullOrUndefined } from "../webapi/utils/NullOrUndefined";
 export function getEntityMetadataFromRecord(entityRecord: IEntity, logicalName?: string): EntityWebApiMetadata {
   let entityMetadata: EntityWebApiMetadata | WebApiExecuteRequestMetadata | null;
   const actionPrefix = "Microsoft.Dynamics.CRM.";
   entityRecord.logicalName = entityRecord.logicalName || (logicalName as string); // allow passing the logical name rather than using the @odata.context
-  if (entityRecord.logicalName == null) {
+  if (isNullOrUndefined(entityRecord.logicalName)) {
     // Get the @data.context to get the logical name
     // E.g. https://org.crm11.dynamics.com/api/data/v9.0/$metadata#accounts(name,parentaccountid)/$entity
     const odatacontext = entityRecord["@odata.context"] as string;

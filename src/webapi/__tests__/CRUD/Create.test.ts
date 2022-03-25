@@ -5,7 +5,7 @@ import { whoAmI } from "../../whoAmI";
 describe("XrmWebApiNode CRUD", () => {
   beforeAll(async () => {
     // Is this running inside NodeJS?
-    if (typeof Xrm == "undefined") {
+    if (typeof Xrm === "undefined") {
       try {
         // Set up the Node Xrm global context
         await SetupGlobalContext();
