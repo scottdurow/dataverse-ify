@@ -9,7 +9,7 @@ export interface IEntityReference {
 }
 export function odatifyEntityReference(entitySetName: string, id: string): string {
   // We set null ids to string null so we can pick up and run a disassociate
-  return `${entitySetName}(${id == null ? "null" : trimGuid(id)})`;
+  return `${entitySetName}(${id === null ? "null" : trimGuid(id)})`;
 }
 export async function getNavigationPathForEntityReference(
   entity: IEntity,
