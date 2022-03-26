@@ -2,6 +2,12 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { WebApiStatic } from "./WebApiStatic";
 export class NodeXrmUtilityStatic implements Xrm.Utility {
+  getLearningPathAttributeName(): string {
+    throw new Error("Method not implemented.");
+  }
+  getPageContext(): Xrm.PageContext {
+    throw new Error("Method not implemented.");
+  }
   closeProgressIndicator(): void {
     throw new Error("Not implemented");
   }

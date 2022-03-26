@@ -3,6 +3,7 @@ import { NodeXrmConfig } from "./config/NodeXrmConfig";
 import { WebApiStatic } from "./WebApiStatic";
 import { NodeXrmUtilityStatic } from "./XrmUtilityStatic";
 export class XrmStatic implements Xrm.XrmStatic {
+  App!: Xrm.App;
   Page!: Xrm.Page;
   Navigation!: Xrm.Navigation;
   Utility!: Xrm.Utility;
