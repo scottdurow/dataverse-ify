@@ -1,49 +1,55 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { AuthenticationContext, TokenResponse } from "adal-node";
-import request = require("request");
-import { ApiResponse } from "./ApiResponse";
-import { IEntityReference, odatifyEntityReference } from "../types/IEntityReference";
-import { WebApiExecuteRequest } from "../types/WebApiExecuteRequest";
-import { WebApiExecuteRequestMetadata } from "../metadata/WebApiExecuteRequestMetadata";
-import { OperationType } from "../types/OperationType";
-import { IEntity } from "../types/IEntity";
-import { Dictionary } from "../types/Dictionary";
-import { StructuralProperty } from "../types/StructuralProperty";
-import { WebApiRequestDefinition } from "../types/WebApiRequest";
-import { trimGuid } from "../types/Guid";
-import { AssociateRequest } from "../types/requests/AssociateRequest";
-import { RequestWithTarget } from "../types/RequestWithTarget";
-import { DisassociateRequest } from "../types/requests/DisassociateRequest";
 import { getMetadataByLogicalName } from "../metadata/MetadataCache";
+import { WebApiExecuteRequestMetadata } from "../metadata/WebApiExecuteRequestMetadata";
+import { Dictionary } from "../types/Dictionary";
+import { trimGuid } from "../types/Guid";
+import { IEntity } from "../types/IEntity";
+import { IEntityReference, odatifyEntityReference } from "../types/IEntityReference";
+import { OperationType } from "../types/OperationType";
+import { AssociateRequest } from "../types/requests/AssociateRequest";
+import { DisassociateRequest } from "../types/requests/DisassociateRequest";
+import { RequestWithTarget } from "../types/RequestWithTarget";
+import { StructuralProperty } from "../types/StructuralProperty";
+import { WebApiExecuteRequest } from "../types/WebApiExecuteRequest";
+import { WebApiRequestDefinition } from "../types/WebApiRequest";
+import { ApiResponse, constructApiResponse } from "./ApiResponse";
 import { getAccessToken } from "./TokenCache";
 import { requireValue } from "./utils/NullOrUndefined";
+import requestJs = require("request");
 
 // Implementation of Xrm.WebApi for where Xrm.WebApi is not available
 // E.g. Node Utilities or integration tests
+// This also works inside the browser since it does not use nodejs specific http.request
+// WebApiStatic does not really have anything to do with dataverse-ify when using sdkify and odataify
+// but can be used with those functions to allow use of the WebApi outside of the Dataverse execution context
+// It is also used by dataverse-gen to fetch metadata when generating early bound types of sdkify
 export class WebApiStatic {
-  isAvailableOffline(_entityLogicalName: string): boolean {
-    throw new Error("Not implemented");
-  }
-  online!: Xrm.WebApiOnline;
-  offline!: Xrm.WebApiOffline;
-  server!: string;
-  apiPath!: string;
-  apiVersion!: string;
-  accessToken!: string;
-  entitySetNames: Dictionary<string> = {};
-  webApiUrl = "";
+  public online!: Xrm.WebApiOnline;
+  public offline!: Xrm.WebApiOffline;
+  private server!: string;
+  private apiPath!: string;
+  public apiVersion!: string;
+  private accessToken!: string;
+  private entitySetNames: Dictionary<string> = {};
+
   constructor(accessToken?: string) {
-    this.online = (this as unknown) as Xrm.WebApiOnline;
+    this.online = this as unknown as Xrm.WebApiOnline;
     if (accessToken) {
       this.accessToken = accessToken;
     }
   }
+
   public getClientUrl() {
     return this.server;
   }
-  getOdataContext(): string {
+
+  private getOdataContext(): string {
     return this.server + "/$metadata#$ref";
+  }
+
+  public isAvailableOffline(_entityLogicalName: string): boolean {
+    throw new Error("Not implemented");
   }
 
   private async getEntitySetName(logicalName: string): Promise<string> {
@@ -51,12 +57,13 @@ export class WebApiStatic {
     if (!metadata) {
       // request https://org.crm11.dynamics.com/api/data/v9.0/EntityDefinitions(LogicalName='account')?$select=DisplayName,IsKnowledgeManagementEnabled,EntitySetName
       const path = `EntityDefinitions(LogicalName='${logicalName}')`;
-      const apiResponse = await this.webApiRequest("GET", undefined, path, "?$select=EntitySetName");
+      const apiResponse = await this.webApiRequest({ action: "GET", path: path, options: "?$select=EntitySetName" });
       metadata = apiResponse.data["EntitySetName"] as string;
       this.entitySetNames[logicalName] = metadata;
     }
     return metadata;
   }
+
   async authoriseWithCdsAuthToken(server: string, apiVersion: string) {
     // Pick up the cds auth token cache
     this.server = server;
@@ -65,31 +72,6 @@ export class WebApiStatic {
     this.accessToken = await getAccessToken(server.replace("https://", ""));
   }
 
-  async authoriseUserNamePassword(
-    server: string,
-    apiVersion: string,
-    username: string,
-    password: string,
-    clientId: string,
-  ) {
-    const authorityHostUrl = "https://login.windows.net/common";
-    this.server = server;
-    this.apiVersion = apiVersion;
-    this.apiPath = `/api/data/v${apiVersion}/`;
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
-    return new Promise((resolve, reject) => {
-      const context = new AuthenticationContext(authorityHostUrl);
-      context.acquireTokenWithUsernamePassword(this.server, username, password, clientId, (err, tokenResponse) => {
-        if (err) {
-          reject(err);
-        } else {
-          self.accessToken = (tokenResponse as TokenResponse).accessToken;
-          resolve(self.accessToken);
-        }
-      });
-    });
-  }
   createException(message: string, ex: unknown) {
     const innerEx = ex as Error;
     if (innerEx.message !== undefined) {
@@ -99,6 +81,7 @@ export class WebApiStatic {
       return new Error(message + ":" + JSON.stringify(ex));
     }
   }
+
   /**
    * Creates an entity record
    * @param entityLogicalName Logical name of the entity you want to create. For example: "account".
@@ -109,7 +92,11 @@ export class WebApiStatic {
   public async createRecord(entityLogicalName: string, record: unknown): Promise<IEntityReference> {
     try {
       const entitySetName = await this.getEntitySetName(entityLogicalName);
-      const apiResponse = await this.webApiRequest("POST", undefined, entitySetName, undefined, JSON.stringify(record));
+      const apiResponse = await this.webApiRequest({
+        action: "POST",
+        path: entitySetName,
+        data: JSON.stringify(record),
+      });
       // Get the GUID from the OData-EntityId header
       const guidMatch = /\(([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\)/g.exec(
         apiResponse.headers["odata-entityid"] as string,
@@ -117,16 +104,16 @@ export class WebApiStatic {
       if (guidMatch === null || guidMatch.length === 0)
         throw new Error("Could not find the guid in the createRecord response");
       const guid = guidMatch[1];
-      const response = {
+      //   CodeGenerator.generateCreate(entityLogicalName, record, response);
+      return {
         entityType: entityLogicalName,
         id: guid,
       } as IEntityReference;
-      //   CodeGenerator.generateCreate(entityLogicalName, record, response);
-      return response;
     } catch (ex) {
       throw this.createException("Exception in createRecord", ex);
     }
   }
+
   /**
    * Updates an entity record.
    * @param entityLogicalName The entity logical name of the record you want to update. For example: "account".
@@ -135,23 +122,23 @@ export class WebApiStatic {
    * @returns On success, returns a promise object containing the attributes specified earlier in the description of the successCallback parameter.
    * @see {@link https://docs.microsoft.com/en-us/dynamics365/customer-engagement/developer/clientapi/reference/xrm-webapi/updaterecord External Link: updateRecord (Client API reference)}
    */
-  async updateRecord(entityLogicalName: string, id: string, data: unknown) {
+  public async updateRecord(entityLogicalName: string, id: string, data: unknown): Promise<IEntityReference> {
     requireValue("entityLogicalName is a required parameter", entityLogicalName);
     requireValue("id is a required parameter", id);
     requireValue("data is a required parameter", data);
     try {
       const entitySetName = await this.getEntitySetName(entityLogicalName);
       const path = `${entitySetName}(${this.toPathGuid(id)})`;
-      await this.webApiRequest("PATCH", undefined, path, undefined, JSON.stringify(data));
-      const response = {
+      await this.webApiRequest({ action: "PATCH", path: path, data: JSON.stringify(data) });
+      return {
         entityType: entityLogicalName,
         id: id,
       } as IEntityReference;
-      return response;
     } catch (ex) {
       throw this.createException("Exception in updateRecord", ex);
     }
   }
+
   /**
    * Retrieves an entity record.
    * @param entityLogicalName The entity logical name of the record you want to retrieve. For example: "account".
@@ -171,22 +158,24 @@ export class WebApiStatic {
    * @returns On success, returns a promise containing a JSON object with the retrieved attributes and their values.
    * @see {@link https://docs.microsoft.com/en-us/dynamics365/customer-engagement/developer/clientapi/reference/xrm-webapi/retrieverecord External Link: retrieveRecord (Client API reference)}
    */
-  async retrieveRecord(entityLogicalName: string, id: string, options?: string) {
-    try {
-      const entitySetName = await this.getEntitySetName(entityLogicalName);
-      // eslint-disable-next-line quotes
-      const preferHeader = ['odata.include-annotations="*"'];
-      const headers = {
-        Prefer: preferHeader.join(","),
-      };
-      const path = `${entitySetName}(${id})`;
-      const apiResponse = await this.webApiRequest("GET", headers, path, options);
-      const data: unknown = apiResponse["data"];
-      return data;
-    } catch (error) {
-      throw error;
-    }
+  public async retrieveRecord(entityLogicalName: string, id: string, options?: string): Promise<unknown> {
+    const entitySetName = await this.getEntitySetName(entityLogicalName);
+    // eslint-disable-next-line quotes
+    const preferHeader = ['odata.include-annotations="*"'];
+    const headers = {
+      Prefer: preferHeader.join(","),
+    };
+    const path = `${entitySetName}(${id})`;
+    const apiResponse = await this.webApiRequest({
+      action: "GET",
+      additionalHeaders: headers,
+      path: path,
+      options: options,
+    });
+    const data: unknown = apiResponse["data"];
+    return data;
   }
+
   /**
    * Deletes an entity record.
    * @param entityLogicalName The entity logical name of the record you want to delete. For example: "account".
@@ -194,24 +183,28 @@ export class WebApiStatic {
    * @returns On success, returns a promise object containing the attributes specified earlier in the description of the successCallback parameter.
    * @see {@link https://docs.microsoft.com/en-us/dynamics365/customer-engagement/developer/clientapi/reference/xrm-webapi/deleterecord External Link: deleteRecord (Client API reference)}
    */
-  async deleteRecord(entityLogicalName: string, id: string) {
+  public async deleteRecord(entityLogicalName: string, id: string): Promise<IEntityReference> {
     requireValue("entityLogicalName is a required parameter", entityLogicalName);
     requireValue("id is a required parameter", id);
 
     try {
       const entitySetName = await this.getEntitySetName(entityLogicalName);
       const path = `${entitySetName}(${this.toPathGuid(id)})`;
-      await this.webApiRequest("DELETE", undefined, path);
-      const response = {
+      await this.webApiRequest({ action: "DELETE", path: path });
+      return {
         entityType: entityLogicalName,
         id: id,
       } as IEntityReference;
-      return response;
     } catch (ex) {
       throw this.createException("Exception in deleteRecord", ex);
     }
   }
-  async retrieveMultipleRecords(entityType: string, options?: string, maxPageSize?: number) {
+
+  public async retrieveMultipleRecords(
+    entityType: string,
+    options?: string,
+    maxPageSize?: number,
+  ): Promise<Xrm.RetrieveMultipleResult> {
     try {
       const entitySetName = await this.getEntitySetName(entityType);
       // eslint-disable-next-line quotes
@@ -222,182 +215,230 @@ export class WebApiStatic {
       const headers = {
         Prefer: preferHeader.join(","),
       };
-      const apiResponse = await this.webApiRequest("GET", headers, entitySetName, options);
+      const apiResponse = await this.webApiRequest({
+        action: "GET",
+        additionalHeaders: headers,
+        path: entitySetName,
+        options: options,
+      });
       const data = apiResponse["data"];
-      const response = {
+      //CodeGenerator.generateRetrieveMultiple(response, entityType, options, maxPageSize);
+      return {
         entities: data["value"],
         nextLink: data["@odata.nextLink"],
       } as Xrm.RetrieveMultipleResult;
-      //CodeGenerator.generateRetrieveMultiple(response, entityType, options, maxPageSize);
-      return response;
     } catch (ex) {
       throw this.createException("Exception in retrieveMultipleRecords", ex);
     }
   }
-  async execute(request: WebApiExecuteRequest) {
+
+  public async execute(request: WebApiExecuteRequest): Promise<Xrm.ExecuteResponse | void> {
     try {
       requireValue("Request cannot be null", request);
 
       // Currently the UCI requires us to have a class that defines the getMetadata rather than just a function
-      // otherwise the getMetadata function is serialised into the request.
+      // otherwise the getMetadata function is serialized into the request.
       const metadata = request.getMetadata();
       const verb = metadata.operationType === OperationType.Action ? "POST" : "GET";
       let requestPayload = "";
       let queryString = "";
       let functionParametersString = "";
-      let boundParameterValue: IEntity | IEntityReference | undefined;
-      const functionParameters: string[] = [];
-      const queryStringValues: string[] = [];
-      let count = 0;
-      const parameterObject: Dictionary<unknown> = {};
-      for (const key of Object.keys(request)) {
-        if (key === "getMetadata") continue;
-        if (key === metadata.boundParameter) {
-          boundParameterValue = request[key] as IEntity;
-          continue;
-        }
-        const parameterName = `@p${count.toString()}`;
-        let parameterValue: unknown = request[key];
-        const parameterType = typeof parameterValue;
-        const parameterMetadata = metadata.parameterTypes[key];
-        if (parameterMetadata) {
-          const structuralType = parameterMetadata.structuralProperty;
-          const forUrl = verb === "GET";
-          parameterObject[key] = parameterValue;
-          switch (structuralType) {
-            case StructuralProperty.EntityType:
-              const valueEntityReference = parameterValue as IEntityReference;
-              if (valueEntityReference.id && valueEntityReference.entityType) {
-                if (forUrl) {
-                  // Url Entity reference
-                  const entitySetName = await this.getEntitySetName(valueEntityReference.entityType);
-                  parameterValue = JSON.stringify({
-                    "@odata.id": odatifyEntityReference(entitySetName, valueEntityReference.id),
-                  });
-                } else {
-                  // POST entity reference
-                  const entityMetadata = getMetadataByLogicalName(valueEntityReference.entityType);
-                  const entityReferenceParam: Dictionary<string> = {};
-                  entityReferenceParam["@odata.type"] = "Microsoft.Dynamics.CRM." + valueEntityReference.entityType;
-                  entityReferenceParam[entityMetadata.primaryIdAttribute] = trimGuid(valueEntityReference.id);
-                  parameterObject[key] = entityReferenceParam;
-                }
-              } else {
-                parameterValue = JSON.stringify(parameterValue);
-              }
-              break;
-            case StructuralProperty.PrimitiveType:
-              if (parameterType === "string") {
-                // We need to wrap the string in single quotes
-                parameterValue = `'${(parameterValue as string).replace("'", "'")}'`;
-              } else {
-                parameterValue = JSON.stringify(parameterValue);
-              }
-              break;
-          }
-          functionParameters.push(`${key}=${parameterName}`);
-          queryStringValues.push(`${parameterName}=${parameterValue}`);
-          count++;
-        }
-      }
+
+      const requestInfo = await this.parseRequest(request, metadata);
+
       switch (metadata.operationType) {
         case OperationType.CRUD:
-          // Special Case for Associate/Dissasociate
-          await this.executeCRUD(metadata, request);
-          return;
-          break;
+          // Special case for Associate/Disassociate
+          return await this.executeCRUD(metadata, request);
         case OperationType.Action:
-          requestPayload = JSON.stringify(parameterObject);
+          requestPayload = JSON.stringify(requestInfo.parameterObject);
           break;
         case OperationType.Function:
-          functionParametersString = functionParameters.join(",");
-          queryString = queryStringValues.join("&");
+          functionParametersString = requestInfo.functionParameters.join(",");
+          queryString = requestInfo.queryStringValues.join("&");
           break;
       }
+
       let path =
         functionParametersString !== ""
           ? `${metadata.operationName}(${functionParametersString})`
           : metadata.operationName;
+
       // If bound function/action then add the entity path
-      if (boundParameterValue && metadata.boundParameter) {
-        const entityReference = boundParameterValue as IEntityReference;
+      if (requestInfo.boundParameterValue && metadata.boundParameter) {
+        const entityReference = requestInfo.boundParameterValue as IEntityReference;
         if (!entityReference.id) throw new Error("No Id found on entity reference");
         if (!entityReference.entityType) throw new Error("No entityType found on entity reference");
         const collectionName = await this.getEntitySetName(entityReference.entityType);
         const navigationPath = odatifyEntityReference(collectionName, entityReference.id);
         path = navigationPath + "/Microsoft.Dynamics.CRM." + path;
       }
-      const apiResponse = await this.webApiRequest(verb, undefined, path, queryString, requestPayload);
+
+      // Send the request
+      const apiResponse = await this.webApiRequest({
+        action: verb,
+        path: path,
+        options: queryString,
+        data: requestPayload,
+      });
+
       const responseString = apiResponse["responseText"];
       const responseJson = responseString && responseString.length > 0 ? JSON.parse(apiResponse["responseText"]) : null;
-      const jsonPromise = new Promise<string>((resolve, _reject) => {
-        resolve(responseJson);
-      });
-      const responseTextPromise = new Promise<string>((_resolve, _reject) => {
-        _resolve(responseString);
-      });
-      const executeResponse = {
-        ok: true,
-        json: () => {
-          return jsonPromise;
-        },
-        text: () => {
-          return responseTextPromise;
-        },
-        //type: "",
-        //headers: [],
-        status: 200,
-        //body: "",
-        statusText: "OK",
-        url: path,
-        //responseText: apiResponse["responseText"],
-      } as Xrm.ExecuteResponse;
 
-      //CodeGenerator.generateExcecute(request, executeResponse);
-      return executeResponse;
+      return this.createExecuteResponse(responseJson, responseString, path);
     } catch (ex) {
       throw this.createException("Exception in execute", ex);
     }
-    // ExecuteResponse
-  }
-  executeMultiple(_request: unknown[]) {
-    // ExecuteResponse[]
   }
 
-  async executeCRUD(metadata: WebApiExecuteRequestMetadata, request: unknown) {
-    const requestWithTaret = request as RequestWithTarget;
-    const targetEntitySetName = await this.getEntitySetName(requestWithTaret.target.entityType);
-    //const relationship = request["relationship"] as string;
+  private async parseRequest(request: WebApiExecuteRequest, metadata: WebApiExecuteRequestMetadata) {
+    let count = 0;
+    const functionParameters: string[] = [];
+    const queryStringValues: string[] = [];
+    let boundParameterValue: IEntity | IEntityReference | undefined;
+    const verb = metadata.operationType === OperationType.Action ? "POST" : "GET";
+
+    const parameterObject: Dictionary<unknown> = {};
+    for (const key of Object.keys(request)) {
+      if (key === "getMetadata") continue;
+      if (key === metadata.boundParameter) {
+        boundParameterValue = request[key] as IEntity;
+        continue;
+      }
+      const parameterName = `@p${count.toString()}`;
+      let parameterValue: unknown = request[key];
+      const parameterType = typeof parameterValue;
+      const parameterMetadata = metadata.parameterTypes[key];
+
+      if (parameterMetadata) {
+        const structuralType = parameterMetadata.structuralProperty;
+        const forUrl = verb === "GET";
+        parameterObject[key] = parameterValue;
+        switch (structuralType) {
+          case StructuralProperty.EntityType:
+            parameterValue = await this.parseExecuteParameterEntityType(parameterValue, forUrl, parameterObject, key);
+            break;
+
+          case StructuralProperty.PrimitiveType:
+            parameterValue = this.parseExecuteParameterPrimitiveType(parameterType, parameterValue);
+            break;
+        }
+        functionParameters.push(`${key}=${parameterName}`);
+        queryStringValues.push(`${parameterName}=${parameterValue}`);
+        count++;
+      }
+    }
+
+    return {
+      parameterObject: parameterObject,
+      boundParameterValue: boundParameterValue,
+      functionParameters: functionParameters,
+      queryStringValues: queryStringValues,
+    };
+  }
+
+  private parseExecuteParameterPrimitiveType(parameterType: string, parameterValue: unknown) {
+    if (parameterType === "string") {
+      // We need to wrap the string in single quotes
+      parameterValue = `'${(parameterValue as string).replace("'", "'")}'`;
+    } else {
+      parameterValue = JSON.stringify(parameterValue);
+    }
+    return parameterValue;
+  }
+
+  private async parseExecuteParameterEntityType(
+    parameterValue: unknown,
+    forUrl: boolean,
+    parameterObject: Dictionary<unknown>,
+    key: string,
+  ) {
+    {
+      const valueEntityReference = parameterValue as IEntityReference;
+      if (valueEntityReference.id && valueEntityReference.entityType) {
+        if (forUrl) {
+          // Url Entity reference
+          const entitySetName = await this.getEntitySetName(valueEntityReference.entityType);
+          parameterValue = JSON.stringify({
+            "@odata.id": odatifyEntityReference(entitySetName, valueEntityReference.id),
+          });
+        } else {
+          // POST entity reference
+          const entityMetadata = getMetadataByLogicalName(valueEntityReference.entityType);
+          const entityReferenceParam: Dictionary<string> = {};
+          entityReferenceParam["@odata.type"] = "Microsoft.Dynamics.CRM." + valueEntityReference.entityType;
+          entityReferenceParam[entityMetadata.primaryIdAttribute] = trimGuid(valueEntityReference.id);
+          parameterObject[key] = entityReferenceParam;
+        }
+      } else {
+        parameterValue = JSON.stringify(parameterValue);
+      }
+    }
+    return parameterValue;
+  }
+
+  private createExecuteResponse(responseJson: string, responseString: string, path: string): Xrm.ExecuteResponse {
+    const jsonPromise = new Promise<string>((resolve, _reject) => {
+      resolve(responseJson);
+    });
+    const responseTextPromise = new Promise<string>((_resolve, _reject) => {
+      _resolve(responseString);
+    });
+
+    return {
+      ok: true,
+      json: () => {
+        return jsonPromise;
+      },
+      text: () => {
+        return responseTextPromise;
+      },
+      status: 200,
+      statusText: "OK",
+      url: path,
+    } as Xrm.ExecuteResponse;
+  }
+
+  public async executeMultiple(_request: unknown[]): Promise<Xrm.ExecuteResponse[]> {
+    throw new Error("Not implemented");
+  }
+
+  private async executeCRUD(metadata: WebApiExecuteRequestMetadata, request: unknown): Promise<void> {
+    const requestWithTarget = request as RequestWithTarget;
+    const targetEntitySetName = await this.getEntitySetName(requestWithTarget.target.entityType);
+
     // This is a special case for associate/disassociate
     switch (metadata.operationName) {
       case "Associate":
-        const associate: unknown[] = [];
-        const associateRequest = request as AssociateRequest;
-        for (const related of associateRequest.relatedEntities) {
-          const entitysetName = await this.getEntitySetName(related.entityType);
-          associate.push({
-            "@odata.context": this.getOdataContext(),
-            "@odata.id": `${entitysetName}(${related.id})`,
-          });
-        }
-        if (associate.length > 1) {
-          const batch: WebApiRequestDefinition[] = [];
-          // We need to a batch request to associate multiple related entities
-          for (const record of associate) {
-            batch.push({
-              action: "POST",
-              path: `${targetEntitySetName}(${associateRequest.target.id})/${associateRequest.relationship}/$ref`,
-              data: JSON.stringify(record),
+        {
+          const associate: unknown[] = [];
+          const associateRequest = request as AssociateRequest;
+          for (const related of associateRequest.relatedEntities) {
+            const entitySetName = await this.getEntitySetName(related.entityType);
+            associate.push({
+              "@odata.context": this.getOdataContext(),
+              "@odata.id": `${entitySetName}(${related.id})`,
             });
           }
-          await this.batchWebApiRequest(batch);
-        } else {
-          // Get the target and related entities
-          const url = `${targetEntitySetName}(${associateRequest.target.id})/${associateRequest.relationship}/$ref`;
-          await this.webApiRequest("POST", undefined, url, undefined, JSON.stringify(associate[0]));
+          if (associate.length > 1) {
+            const batch: WebApiRequestDefinition[] = [];
+            // We need to a batch request to associate multiple related entities
+            for (const record of associate) {
+              batch.push({
+                action: "POST",
+                path: `${targetEntitySetName}(${associateRequest.target.id})/${associateRequest.relationship}/$ref`,
+                data: JSON.stringify(record),
+              });
+            }
+            await this.batchWebApiRequest(batch);
+          } else {
+            // Get the target and related entities
+            const url = `${targetEntitySetName}(${associateRequest.target.id})/${associateRequest.relationship}/$ref`;
+            await this.webApiRequest({ action: "POST", path: url, data: JSON.stringify(associate[0]) });
+          }
         }
         break;
-      case "Disassociate":
+      case "Disassociate": {
         const disassociateRequest = request as DisassociateRequest;
         // Send a delete DELETE https://develop1v9demo.crm11.dynamics.com/api/data/v9.0/contacts(ca12bd9a-7b34-e911-a8b9-002248019477)/account_primary_contact(d012bd9a-7b34-e911-a8b9-002248019477)/$ref
         let disassociateRequestRelatedEntityId = "";
@@ -406,21 +447,24 @@ export class WebApiStatic {
           disassociateRequestRelatedEntityId = `(${disassociateRequest.relatedEntityId})`;
         }
         const url = `${targetEntitySetName}(${disassociateRequest.target.id})/${disassociateRequest.relationship}${disassociateRequestRelatedEntityId}/$ref`;
-        await this.webApiRequest("DELETE", undefined, url);
+        await this.webApiRequest({ action: "DELETE", path: url });
         break;
+      }
     }
   }
 
-  public async getEntityMetadata(entityName: string, attributes?: string[]) {
+  public async getEntityMetadata(entityName: string, attributes?: string[]): Promise<Xrm.Metadata.EntityMetadata> {
+    // TODO: Cache the entity metadata like the UCI client does
     try {
       const path = `EntityDefinitions(LogicalName='${entityName}')`;
       const options = attributes !== undefined ? `?$select=${attributes.join(",")}` : undefined;
-      const apiResponse = await this.webApiRequest("GET", undefined, path, options);
+      const apiResponse = await this.webApiRequest({ action: "GET", path: path, options: options });
       return apiResponse["data"] as Xrm.Metadata.EntityMetadata;
     } catch (ex) {
       throw this.createException("Exception in getEntityMetadata", ex);
     }
   }
+
   private dateReviver(_key: string, value: string) {
     if (typeof value === "string") {
       const a = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
@@ -430,9 +474,31 @@ export class WebApiStatic {
     }
     return value;
   }
+
   private toPathGuid(id: string) {
     return id.replace(/[{}]/g, "");
   }
+
+  private trimOptions(options: string | undefined) {
+    if (options !== undefined && options !== null) {
+      if (!options.startsWith("?")) options = `?${options}`;
+    } else {
+      options = "";
+    }
+    return options;
+  }
+
+  private getStandardHeaders() {
+    return {
+      "OData-MaxVersion": "4.0",
+      "OData-Version": "4.0",
+      Accept: "application/json",
+      "Content-Type": "application/json; charset=UTF-8",
+      Authorization: `Bearer ${this.accessToken}`,
+      Connection: "keep-alive",
+    };
+  }
+
   private async batchWebApiRequest(requests: WebApiRequestDefinition[]) {
     const uri = this.server + this.apiPath + "$batch";
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -455,10 +521,10 @@ export class WebApiStatic {
     const requestOptions = {
       method: "POST",
       headers: { ...standardHeaders, ...additionalHeaders },
-    } as request.CoreOptions;
+    } as requestJs.CoreOptions;
     return new Promise<ApiResponse>((resolve, reject) => {
       requestOptions.body = requestBody.join("\n");
-      request(uri, requestOptions, (error, response) => {
+      requestJs(uri, requestOptions, (error, response) => {
         if (error != null) reject(error);
         else {
           const apiResponse = self.getResponse(response);
@@ -471,49 +537,28 @@ export class WebApiStatic {
       });
     });
   }
-  private trimOptions(options: string | undefined) {
-    if (options !== undefined && options !== null) {
-      if (!options.startsWith("?")) options = `?${options}`;
-    } else {
-      options = "";
-    }
-    return options;
-  }
-  private getStandardHeaders() {
-    const standardHeaders = {
-      "OData-MaxVersion": "4.0",
-      "OData-Version": "4.0",
-      Accept: "application/json",
-      "Content-Type": "application/json; charset=UTF-8",
-      Authorization: `Bearer ${this.accessToken}`,
-    };
-    return standardHeaders;
-  }
-  private async webApiRequest(
-    action: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
-    additionalHeaders: request.Headers | undefined,
-    path: string,
-    options?: string,
-    data?: unknown,
-  ) {
+
+  private async webApiRequest(req: WebApiRequestDefinition) {
     // Strip leading ? from query
-    options = this.trimOptions(options);
-    const uri = this.server + this.apiPath + path + options;
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
-    const hasData = data !== undefined && data !== null;
+    req.options = this.trimOptions(req.options);
+    const uri = this.server + this.apiPath + req.path + req.options;
+    const hasData = req.data !== undefined && req.data !== null;
     const standardHeaders = this.getStandardHeaders();
-    const headers = { ...standardHeaders, ...additionalHeaders };
+    const headers = { ...standardHeaders, ...req.additionalHeaders };
     const requestOptions = {
-      method: action,
+      method: req.action,
       headers: headers,
-    } as request.CoreOptions;
+    } as requestJs.CoreOptions;
+    if (hasData) requestOptions.body = req.data;
+    return await this.asyncRequest(uri, requestOptions);
+  }
+
+  private async asyncRequest(uri: string, requestOptions: requestJs.CoreOptions) {
     return new Promise<ApiResponse>((resolve, reject) => {
-      if (hasData) requestOptions.body = data;
-      request(uri, requestOptions, (error, response) => {
+      requestJs(uri, requestOptions, (error, response) => {
         if (error != null) reject(error);
         else {
-          const apiResponse = self.getResponse(response);
+          const apiResponse = this.getResponse(response);
           if (apiResponse.error != null) {
             reject(apiResponse.error);
           } else {
@@ -523,7 +568,8 @@ export class WebApiStatic {
       });
     });
   }
-  private getResponse(response: request.Response): ApiResponse {
+
+  private getResponse(response: requestJs.Response): ApiResponse {
     let responseData: unknown = null;
     // Check if this is a batch response
     if (response.body.startsWith("--batchresponse_")) {
@@ -540,56 +586,6 @@ export class WebApiStatic {
       responseData =
         response.body != null && response.body.length > 0 ? JSON.parse(response.body, this.dateReviver) : null;
     }
-    const apiResponse = {
-      responseText: response.body,
-      data: responseData,
-      headers: response.headers,
-      statusCode: response.statusCode,
-      statusMessage: response.statusMessage,
-      error: null,
-    } as ApiResponse;
-
-    if (response.statusCode < 200 || response.statusCode > 299) {
-      // HTTP Error
-      if (apiResponse.data !== undefined && apiResponse.data.error !== undefined) {
-        apiResponse.error = apiResponse.data.error;
-      } else {
-        apiResponse.error = `HTTP Error ${response.statusMessage}`;
-      }
-    }
-    return apiResponse;
-  }
-  public request(
-    action: "POST" | "PATCH" | "PUT" | "GET" | "DELETE",
-    path: string,
-    payload?: unknown,
-    _includeFormattedValues?: boolean,
-    _maxPageSize?: number,
-  ) {
-    debugger;
-
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
-    const hasData = payload !== undefined && payload !== null;
-    const standardHeaders = this.getStandardHeaders();
-    const headers = { ...standardHeaders };
-    const requestOptions = {
-      method: action,
-      headers: headers,
-    } as request.CoreOptions;
-    return new Promise<ApiResponse>((resolve, reject) => {
-      if (hasData) requestOptions.body = JSON.stringify(payload);
-      request(path, requestOptions, (error, response) => {
-        if (error != null) reject(error);
-        else {
-          const apiResponse = self.getResponse(response);
-          if (apiResponse.error != null) {
-            reject(apiResponse.error);
-          } else {
-            resolve(apiResponse);
-          }
-        }
-      });
-    });
+    return constructApiResponse(response, responseData);
   }
 }

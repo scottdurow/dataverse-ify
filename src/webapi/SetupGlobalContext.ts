@@ -17,22 +17,6 @@ export async function SetupGlobalContext() {
   // Create global Xrm instance so we can simulate the Xrm context
   const configFile = config.get("nodewebapi") as NodeXrmConfig;
   const xrmConfig = { ...defaultConfig, ...configFile };
-
-  if (xrmConfig.proxy && xrmConfig.proxy.useproxy) {
-    // Enable Fiddler - trust the fiddler root self-cert
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const syswidecas = require("syswide-cas");
-    syswidecas.addCAs(".\\config\\FiddlerRoot.crt");
-
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    process.env.https_proxy = xrmConfig.proxy.httpProxy;
-    // eslint-disable-next-line @typescript-eslint/camelcase
-    process.env.http_proxy = xrmConfig.proxy.httpProxy;
-
-    //process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // Doesn't work in Jest!
-  }
-
   const xrmInstance = await XrmStatic.createInstance(xrmConfig);
   // If Xrm is already defined by another system (e.g. xrm-mock), then re-use it
   globalAny.Xrm = globalAny.Xrm || xrmInstance;

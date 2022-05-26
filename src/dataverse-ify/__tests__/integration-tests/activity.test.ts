@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/cognitive-complexity */
 import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { XrmContextCdsServiceClient } from "../..";
 import { ActivityParty, activitypartyMetadata } from "../../../types/ActivityParty";

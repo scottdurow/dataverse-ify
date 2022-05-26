@@ -5,7 +5,7 @@ import { EntityReference } from "../../../types";
 import { setMetadataCache } from "../../../metadata";
 import { opportunityMetadata } from "../../../dataverse-gen/entities/Opportunity";
 
-test("odataify winopportunty", async () => {
+test("odataify WinOpportunity", async () => {
   setMetadataCache({
     entities: {
       opportunity: opportunityMetadata,

@@ -21,7 +21,7 @@ export function setMetadataCache(metadataCache: MetadataCache): void {
 }
 export function getMetadataCache(): MetadataCache {
   if (isNullOrUndefined(_metadataCache)) {
-    throw new Error("Metadata cache is not initialised. Ensure that setMetadata is called");
+    throw new Error("Metadata cache is not initialized. Ensure that setMetadata is called");
   }
   return _metadataCache;
 }
@@ -44,6 +44,7 @@ export function getMetadataFromEntitySet(entitySetName: string): EntityWebApiMet
   }
   throw new Error(`Cannot find entity metadata for ${entitySetName}. Please generate early bound types`);
 }
+
 export async function getEntitySetName(entityLogicalName: string): Promise<string> {
   const metadataCache = getMetadataCache();
   if (metadataCache.entitySetNames) {
@@ -58,18 +59,19 @@ export async function getEntitySetName(entityLogicalName: string): Promise<strin
     return entitySetNames[entityLogicalName];
   }
   // Lookup the entity set name from the logical name
-  // We only lookup the entityset names automatically at the moment
+  // We only lookup the entity set names automatically at the moment
   try {
     const entityMetadata = await Xrm.Utility.getEntityMetadata(entityLogicalName, ["EntitySetName"]);
     entitySetNames[entityLogicalName] = entityMetadata.EntitySetName;
     return entityMetadata.EntitySetName;
   } catch (ex) {
     throw new Error(
-      `Just-In-Time retreival of EntitySetName for '${entityLogicalName}' failed: ${ex}\nIdeally you should use setMetadataCache`,
+      `Just-In-Time retrieval of EntitySetName for '${entityLogicalName}' failed: ${ex}\nIdeally you should use setMetadataCache`,
     );
   }
   //throw new Error(`Cannot find entity metadata for ${entityLogicalName}. Please generate early bound types`);
 }
+
 export function getMetadata(entity: IEntity): EntityWebApiMetadata {
   const logicalName = entity.logicalName;
   return getMetadataByLogicalName(logicalName);

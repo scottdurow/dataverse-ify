@@ -2,7 +2,6 @@ import { trimGuid } from "./Guid";
 import { Entity } from "./Entity";
 import { IEntity } from "./IEntity";
 
-// eslint-disable-next-line @typescript-eslint/interface-name-prefix
 export interface IEntityReference {
   entityType: string;
   id: string;

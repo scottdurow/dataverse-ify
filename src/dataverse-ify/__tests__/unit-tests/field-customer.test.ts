@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { setMetadataCache } from "../../../metadata";
 import { odataify } from "../../odataify/odataify";
 import { EntityReference, sdkify } from "../../..";

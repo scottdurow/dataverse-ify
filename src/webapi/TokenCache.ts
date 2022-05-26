@@ -10,13 +10,13 @@ let _inMemoryTokenCache: TokenCache | undefined;
 
 function getAuthCachePath(): string {
   const homeDirPath = os.homedir();
-  const authCachePath = path.join(homeDirPath, "cds-auth-cache");
-  return authCachePath;
+  return path.join(homeDirPath, "cds-auth-cache");
 }
+
 function getCrypto(): Cryptr {
-  const cryptr = new Cryptr(os.userInfo.name);
-  return cryptr;
+  return new Cryptr(os.userInfo.name);
 }
+
 export function loadTokenCache(): TokenCache {
   if (!_inMemoryTokenCache) {
     const authCachePath = getAuthCachePath();
@@ -25,7 +25,7 @@ export function loadTokenCache(): TokenCache {
     // Load existing file if there is one
     if (fs.existsSync(authCachePath)) {
       const tokenCacheJSON = fs.readFileSync(authCachePath);
-      tokenCache = (JSON.parse(tokenCacheJSON.toString()) as unknown) as TokenCache;
+      tokenCache = JSON.parse(tokenCacheJSON.toString()) as unknown as TokenCache;
     }
     _inMemoryTokenCache = tokenCache;
   }
@@ -36,9 +36,9 @@ export function addTokenToCache(envUrl: string, token: TokenResponse): void {
   const tokenCache = loadTokenCache();
   // Encrypt - not 100% secure, but just so we are not putting down plain text
   const jsonToken = JSON.stringify(token);
-  const jsonTokenEncrypyed = getCrypto().encrypt(jsonToken);
+  const jsonTokenEncrypted = getCrypto().encrypt(jsonToken);
   // Add to the token cache
-  tokenCache[envUrl] = jsonTokenEncrypyed;
+  tokenCache[envUrl] = jsonTokenEncrypted;
   _inMemoryTokenCache = tokenCache;
   fs.writeFileSync(getAuthCachePath(), JSON.stringify(tokenCache));
 }
@@ -52,8 +52,9 @@ export function getTokenFromCache(envUrl: string): TokenResponse {
   const jsonToken = getCrypto().decrypt(tokenEncrypted);
   return JSON.parse(jsonToken) as TokenResponse;
 }
+
 export function getAccessToken(envUrl: string): Promise<string> {
-  return new Promise<string>(function(resolve, reject) {
+  return new Promise<string>(function (resolve, reject) {
     let accessToken = "";
     const token = getTokenFromCache(envUrl);
     const context = new AuthenticationContext("https://login.windows.net/common");
@@ -62,7 +63,7 @@ export function getAccessToken(envUrl: string): Promise<string> {
     // Check if the token has expired
     const expiryDate = new Date(Date.parse(token.expiresOn.toString()));
     const nowDate = new Date();
-    const expiresInMinutes = (((expiryDate as unknown) as number) - ((nowDate as unknown) as number)) / 1000 / 60;
+    const expiresInMinutes = ((expiryDate as unknown as number) - (nowDate as unknown as number)) / 1000 / 60;
     const hasTokenExpired = expiresInMinutes < 5;
     if (hasTokenExpired) {
       // Get new token using refresh token

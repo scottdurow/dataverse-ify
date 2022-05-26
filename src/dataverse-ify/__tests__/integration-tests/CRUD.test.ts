@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
@@ -40,7 +39,7 @@ describe("create", () => {
     const account1 = {
       logicalName: accountMetadata.logicalName,
       name: "Account 1",
-      // Optionset
+      // OptionSet
       accountcategorycode: account_account_accountcategorycode.PreferredCustomer,
       // Money
       creditlimit: 100,
@@ -52,7 +51,7 @@ describe("create", () => {
       lastonholdtime: new Date(),
       // EntityReference
       preferredsystemuserid: new EntityReference("systemuser", userId),
-      // MutliSelect
+      // MultiSelect
       cdsify_multiselect: [socialprofile_community.Twitter, socialprofile_community.Facebook],
     } as Account;
 
@@ -66,23 +65,23 @@ describe("create", () => {
     }
 
     // Retrieve
-    const account1Retreived = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
-    expect(account1Retreived.name).toBe(account1.name);
-    expect(account1Retreived.accountcategorycode).toBe(account1.accountcategorycode);
-    expect(account1Retreived.creditlimit).toBe(account1.creditlimit);
-    expect(account1Retreived.address1_latitude).toBe(account1.address1_latitude);
-    expect(account1Retreived.lastonholdtime?.toLocaleDateString()).toBe(account1?.lastonholdtime?.toLocaleDateString());
-    expect(account1Retreived.preferredsystemuserid?.id).toBe(account1.preferredsystemuserid?.id);
-    expect(account1Retreived.preferredsystemuserid?.entityType).toBe(account1.preferredsystemuserid?.entityType);
-    expect(account1Retreived.preferredsystemuserid?.name).toBeDefined();
+    const account1Retrieved = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
+    expect(account1Retrieved.name).toBe(account1.name);
+    expect(account1Retrieved.accountcategorycode).toBe(account1.accountcategorycode);
+    expect(account1Retrieved.creditlimit).toBe(account1.creditlimit);
+    expect(account1Retrieved.address1_latitude).toBe(account1.address1_latitude);
+    expect(account1Retrieved.lastonholdtime?.toLocaleDateString()).toBe(account1?.lastonholdtime?.toLocaleDateString());
+    expect(account1Retrieved.preferredsystemuserid?.id).toBe(account1.preferredsystemuserid?.id);
+    expect(account1Retrieved.preferredsystemuserid?.entityType).toBe(account1.preferredsystemuserid?.entityType);
+    expect(account1Retrieved.preferredsystemuserid?.name).toBeDefined();
 
     // Update
     account1.name = "Updated Name";
     await cdsServiceClient.update(account1);
 
     // Retrieve Updated
-    const account1Retreived2 = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
-    expect(account1Retreived2.name).toBe("Updated Name");
+    const account1Retrieved2 = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
+    expect(account1Retrieved2.name).toBe("Updated Name");
 
     // Delete
     await cdsServiceClient.delete("account", account1.accountid);

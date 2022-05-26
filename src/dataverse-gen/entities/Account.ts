@@ -89,6 +89,7 @@ export const accountMetadata = {
     owningbusinessunit: ["mscrm.businessunit"],
     ownerid: ["mscrm.principal"],
     originatingleadid: ["mscrm.lead"],
+    msdyn_salesaccelerationinsightid: ["mscrm.msdyn_salesaccelerationinsight"],
     msdyn_accountkpiid: ["mscrm.msdyn_accountkpiitem"],
     modifiedonbehalfby: ["mscrm.systemuser"],
     modifiedby: ["mscrm.systemuser"],
@@ -228,6 +229,8 @@ export enum AccountAttributes {
   msdyn_accountkpiid = "msdyn_accountkpiid",
   msdyn_accountkpiidName = "msdyn_accountkpiidname",
   msdyn_gdproptout = "msdyn_gdproptout",
+  msdyn_salesaccelerationinsightid = "msdyn_salesaccelerationinsightid",
+  msdyn_salesaccelerationinsightidName = "msdyn_salesaccelerationinsightidname",
   Name = "name",
   NumberOfEmployees = "numberofemployees",
   OnHoldTime = "onholdtime",
@@ -556,6 +559,10 @@ export interface Account extends IEntity {
   msdyn_accountkpiidname?: string | null;
   // GDPR Optout BooleanType Describes whether account is opted out or not
   msdyn_gdproptout?: boolean | null;
+  // Sales Acceleration Insights ID LookupType Sales Acceleration Insights ID
+  msdyn_salesaccelerationinsightid?: import("../../types/EntityReference").EntityReference | null;
+  //  StringType
+  msdyn_salesaccelerationinsightidname?: string | null;
   // Account Name [Required] StringType Type the company or business name.
   name?: string;
   // Number of Employees IntegerType Type the number of employees that work at the account for use in marketing segmentation and demographic analysis.

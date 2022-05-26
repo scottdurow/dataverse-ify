@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account, AccountAttributes } from "../../../dataverse-gen/entities/Account";

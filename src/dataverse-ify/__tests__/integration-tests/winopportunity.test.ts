@@ -8,9 +8,8 @@ import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { opportunityMetadata, Opportunity, OpportunityAttributes } from "../../../dataverse-gen/entities/Opportunity";
 import { opportunitycloseMetadata } from "../../../dataverse-gen/entities/OpportunityClose";
 import { WinOpportunityMetadata, WinOpportunityRequest } from "../../../dataverse-gen/actions/WinOpportunity";
-// eslint-disable-next-line camelcase, @typescript-eslint/camelcase
 import { opportunity_opportunity_statecode } from "../../../dataverse-gen/enums/opportunity_opportunity_statecode";
-describe("winopportunity", () => {
+describe("winOpportunity", () => {
   const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
     if (!configFile.runIntegrationTests) return;
@@ -79,7 +78,6 @@ describe("winopportunity", () => {
         opportunity1.id,
         [OpportunityAttributes.StateCode],
       );
-      // eslint-disable-next-line @typescript-eslint/camelcase
       expect(opportunityWon.statecode).toBe(opportunity_opportunity_statecode.Won);
     } catch (ex) {
       fail(ex);

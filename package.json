@@ -5,15 +5,18 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
-    "test": "tsc & jest unit-tests/",
-    "integration-test": "tsc & jest integration-tests/",
+    "test": "jest",
+    "unit-test": "jest unit-tests/",
+    "integration-test": "jest integration-tests/",
+    "build-browser": "webpack --config webpack.config.js --watch",
+    "start-browser": "webpack --config webpack.config.js --watch",
     "preversion": "npm test",
     "version": "npm run build",
     "postversion": "git push",
     "prepublishOnly": "npm version patch",
     "lint": "eslint src --ext .ts",
     "lint:fix": "npm run lint -- --fix",
-    "coverage": "tsc & jest --coverage"
+    "coverage": "jest --coverage"
   },
   "author": "Scott Durow",
   "license": "MIT",
@@ -38,12 +41,16 @@
     "eslint": "^8.12.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
-    "eslint-plugin-react": "^7.29.4",
+    "eslint-plugin-sonarjs": "^0.13.0",
     "jest": "^26.6.3",
     "jest-environment-jsdom-fourteen": "^1.0.1",
     "prettier": "^2.6.1",
     "syswide-cas": "^5.3.0",
     "ts-jest": "^26.5.1",
-    "typescript": "^3.9.7"
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.6.4",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-merge": "^5.8.0"
   }
 }

@@ -20,15 +20,14 @@ export class XMLHttpWebApiRequest implements WebApiRequest {
     }
     const clientUrl = context.getClientUrl();
 
-    const versionParts = context
-      .getVersion()
-      .toString()
-      .split(".");
+    const versionParts = context.getVersion().toString().split(".");
 
     this.webApiUrl = `${clientUrl}/api/data/v${versionParts[0]}.${versionParts[1]}`;
     // Add the WebApi version
     return this.webApiUrl;
   }
+
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   send(
     action: "POST" | "PATCH" | "PUT" | "GET" | "DELETE",
     uri: string,
@@ -41,7 +40,7 @@ export class XMLHttpWebApiRequest implements WebApiRequest {
       uri = this.getWebApiUrl() + uri;
     }
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       const request = new XMLHttpRequest();
       request.open(action, encodeURI(uri), true);
       request.setRequestHeader("OData-MaxVersion", "4.0");
@@ -54,7 +53,8 @@ export class XMLHttpWebApiRequest implements WebApiRequest {
       if (includeFormattedValues) {
         request.setRequestHeader("Prefer", "odata.include-annotations=OData.Community.Display.V1.FormattedValue");
       }
-      request.onreadystatechange = function(): void {
+      request.onreadystatechange = function (): void {
+        let error: unknown;
         if (this.readyState === 4) {
           request.onreadystatechange = null;
           switch (this.status) {
@@ -64,7 +64,6 @@ export class XMLHttpWebApiRequest implements WebApiRequest {
               break;
             default:
               // All other statuses are unexpected so are treated like errors.
-              let error;
               try {
                 error = JSON.parse(request.response).error;
               } catch (e) {

@@ -7,4 +7,5 @@ export interface CascadeConfiguration {
   Merge?: import("../enums/CascadeType").CascadeType;
   Delete?: import("../enums/CascadeType").CascadeType;
   Assign?: import("../enums/CascadeType").CascadeType;
+  Archive?: import("../enums/CascadeType").CascadeType;
 }

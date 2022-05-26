@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/camelcase */
 import { EntityReference } from "./EntityReference";
 import { IEntity } from "./IEntity";
 import { Guid } from "./Guid";
@@ -13,7 +12,7 @@ export const activitypartyMetadata = {
     addressusedemailcolumnnumber: "Integer",
     effort: "Double",
     versionnumber: "BigInt",
-    // Optionsets
+    // Option sets
     instancetypecode: "Optionset",
     participationtypemask: "Optionset",
     // Date Formats
@@ -43,7 +42,7 @@ export interface ActivityParty extends IEntity {
       Unique identifier of the activity associated with the activity party. (A "party" is any person who is associated with an activity.)
       */
   activityid?: EntityReference;
-  /**Activity Party		UniqueidentifierType
+  /**Activity Party		Unique identifier Type
       Unique identifier of the activity party.
       */
   activitypartyid?: Guid;

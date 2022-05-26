@@ -16,7 +16,6 @@ describe("XrmWebApiNode CRUD", () => {
   test("Deep insert", async () => {
     const account = {
       name: "Sample Account",
-      // eslint-disable-next-line @typescript-eslint/camelcase
       contact_customer_accounts: [
         {
           firstname: "Sample",

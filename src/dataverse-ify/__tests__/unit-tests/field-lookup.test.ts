@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable sonarjs/no-duplicate-string */
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { setMetadataCache } from "../../../metadata";
 import { odataify } from "../../odataify/odataify";

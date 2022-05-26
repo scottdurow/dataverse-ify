@@ -7,5 +7,5 @@ nodewebapi:
   httpProxy: http://127.0.0.1:8888
   httpsProxy: http://127.0.0.1:8888
  server:
-  host: https://dev1demos13.crm3.dynamics.com
+  host: https://org1bfe9950.api.crm3.dynamics.com
   version: 9.1

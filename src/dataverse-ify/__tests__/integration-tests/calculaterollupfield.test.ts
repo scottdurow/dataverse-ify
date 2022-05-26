@@ -9,7 +9,7 @@ import {
   CalculateRollupFieldMetadata,
   CalculateRollupFieldRequest,
 } from "../../../dataverse-gen/functions/CalculateRollupField";
-describe("calculaterollpfield", () => {
+describe("CalculateRollUpField", () => {
   const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
     if (!configFile.runIntegrationTests) return;
@@ -40,7 +40,7 @@ describe("calculaterollpfield", () => {
       // Create Account
       account1.id = await cdsServiceClient.create(account1);
 
-      // Calculate Rollup field openddeals
+      // Calculate Rollup field open deals
       const request = {
         logicalName: CalculateRollupFieldMetadata.operationName,
         FieldName: "opendeals",

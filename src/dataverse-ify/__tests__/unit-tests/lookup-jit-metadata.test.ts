@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/camelcase */
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { EntityReference, odataify, setMetadataCache } from "../../..";
 import { XrmStatic } from "../../../webapi/XrmStatic";
@@ -18,14 +17,11 @@ test("odataify lookups - pascal case navigation property", async () => {
   Xrm.Utility = new NodeXrmUtilityStatic();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Xrm.Utility.getEntityMetadata = jest.fn().mockImplementation((entityName: string, _attributes?: string[]) => {
-    switch (entityName) {
-      case "resource":
-        return {
+    return entityName === "resource"
+      ? ({
           EntitySetName: "Resources",
-        } as Xrm.Metadata.EntityMetadata;
-      default:
-        return null;
-    }
+        } as Xrm.Metadata.EntityMetadata)
+      : null;
   });
   const odataEntity = await odataify("Create", account);
   expect(odataEntity).toBeDefined();

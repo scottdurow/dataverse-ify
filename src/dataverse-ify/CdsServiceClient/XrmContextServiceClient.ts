@@ -9,6 +9,7 @@ import { sdkify } from "..";
 import { caseInsensitiveSearch, getMetadataByLogicalName } from "../../metadata/MetadataCache";
 import { WebApiExecuteRequest } from "../../types/WebApiExecuteRequest";
 
+const activitypartyAttributes = ["to", "from", "cc", "bcc", "required", "optional", "organizer"];
 export class XrmContextCdsServiceClient implements CdsServiceClient {
   _webApi: Xrm.WebApi;
   constructor(webApi: Xrm.WebApi) {
@@ -27,7 +28,7 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
     for (const attribute in entity) {
       const navigation = entityMetadata.navigation && entityMetadata.navigation[attribute];
       if (navigation && entity[attribute] === null) {
-        // We don't support just nulling a pollymorphic lookup because we don't know which relationship
+        // We don't support just nulling a polymorphic lookup because we don't know which relationship
         // to null.
         entity[attribute] = new EntityReference(navigation[0].replace("mscrm.", ""), null);
       }
@@ -47,7 +48,7 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
     // otherwise we get "CRM do not support direct update of Entity Reference properties, Use Navigation properties instead."
     for (const attribute in record) {
       if (attribute.endsWith("@odata.bind") && record[attribute] && record[attribute].endsWith("(null)")) {
-        const dissassociateRequest = new (class {
+        const disassociateRequest = new (class {
           target = {
             id: id,
             entityType: entity.logicalName,
@@ -63,14 +64,14 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
           }
         })();
 
-        await Xrm.WebApi.online.execute(dissassociateRequest);
+        await Xrm.WebApi.online.execute(disassociateRequest);
         delete record[attribute];
       }
     }
     try {
       await this._webApi.updateRecord(entity.logicalName, id, record);
     } catch (ex) {
-      throw new Error("Error during update:" + ex.message);
+      throw new Error("Error during update:" + (ex as Error).message);
     }
   }
   async delete(entity: string | IEntity): Promise<void>;
@@ -84,14 +85,14 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
     }
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   async retrieve<T extends IEntity>(entityName: string, id: Guid, columnSet: string[] | boolean): Promise<T> {
     let query = "";
 
     const entityMetadata = getMetadataByLogicalName(entityName);
     const cols: string[] = [];
-    // When retreiving the activity parties - we simulate the SDK by making virtual fields
+    // When retrieving the activity parties - we simulate the SDK by making virtual fields
     // for sender, to, cc, bcc, required, optional, organizer
-    const activitypartyAttributes = ["to", "from", "cc", "bcc", "required", "optional", "organizer"];
     let hasActivityPartyExpand = false;
     // Construct the select based on the columns requested
     // true means we return all the attributes
@@ -118,8 +119,7 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
       }
     }
     const response = await this._webApi.retrieveRecord(entityName, id, query);
-    const sdkified = (await sdkify(response, entityName)) as T;
-    return sdkified;
+    return (await sdkify(response, entityName)) as T;
   }
 
   private getEntityLogicalNameFromFetch(fetch: string): string {
@@ -154,8 +154,7 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
       output.push(sdkified);
     }
 
-    const entities = new EntityCollection(output);
-    return entities;
+    return new EntityCollection(output);
   }
 
   async associate(

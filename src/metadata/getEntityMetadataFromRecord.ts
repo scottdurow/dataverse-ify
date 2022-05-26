@@ -10,9 +10,9 @@ export function getEntityMetadataFromRecord(entityRecord: IEntity, logicalName?:
   if (isNullOrUndefined(entityRecord.logicalName)) {
     // Get the @data.context to get the logical name
     // E.g. https://org.crm11.dynamics.com/api/data/v9.0/$metadata#accounts(name,parentaccountid)/$entity
-    const odatacontext = entityRecord["@odata.context"] as string;
+    const oDataContext = entityRecord["@odata.context"] as string;
     const contextRegex = /\$metadata#([\w.]*)(\([\w()]*\))?(\/\$entity)?/g;
-    const match = contextRegex.exec(odatacontext);
+    const match = contextRegex.exec(oDataContext);
     if (match != null && match.length > 1) {
       const entitySetName = match[1];
       if (entitySetName.startsWith(actionPrefix)) {

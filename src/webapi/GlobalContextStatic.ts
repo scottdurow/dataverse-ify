@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { XrmStatic } from "./XrmStatic";
 export class GlobalContextStatic {

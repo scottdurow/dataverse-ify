@@ -59,14 +59,14 @@ describe("customer", () => {
       opportunity1.id = await cdsServiceClient.create(opportunity1);
 
       // Retrieve and check parent customerid field
-      const opportunityRetreived = (await cdsServiceClient.retrieve(opportunity1.logicalName, opportunity1.id, [
+      const opportunityRetrieved = (await cdsServiceClient.retrieve(opportunity1.logicalName, opportunity1.id, [
         "customerid",
       ])) as Opportunity;
 
-      expect(opportunityRetreived.customerid).toBeDefined();
-      expect(opportunityRetreived.customerid?.id).toBe(account1.id);
-      expect(opportunityRetreived.customerid?.entityType).toBe("account");
-      expect(opportunityRetreived.customerid?.name).toBe(account1.name);
+      expect(opportunityRetrieved.customerid).toBeDefined();
+      expect(opportunityRetrieved.customerid?.id).toBe(account1.id);
+      expect(opportunityRetrieved.customerid?.entityType).toBe("account");
+      expect(opportunityRetrieved.customerid?.name).toBe(account1.name);
 
       // Update to be parented by a contact
       contact1.id = await cdsServiceClient.create(contact1);
@@ -74,13 +74,13 @@ describe("customer", () => {
 
       await cdsServiceClient.update(opportunity1);
       // Retrieve and check parent customerid field
-      const opportunityRetreived2 = (await cdsServiceClient.retrieve(opportunity1.logicalName, opportunity1.id, [
+      const opportunityRetrieved2 = (await cdsServiceClient.retrieve(opportunity1.logicalName, opportunity1.id, [
         "customerid",
       ])) as Opportunity;
 
-      expect(opportunityRetreived2.customerid).toBeDefined();
-      expect(opportunityRetreived2.customerid?.id).toBe(contact1.id);
-      expect(opportunityRetreived2.customerid?.entityType).toBe("contact");
+      expect(opportunityRetrieved2.customerid).toBeDefined();
+      expect(opportunityRetrieved2.customerid?.id).toBe(contact1.id);
+      expect(opportunityRetrieved2.customerid?.entityType).toBe("contact");
     } catch (ex) {
       fail(ex);
     } finally {

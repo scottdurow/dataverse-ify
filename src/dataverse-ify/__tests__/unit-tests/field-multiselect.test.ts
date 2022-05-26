@@ -1,11 +1,10 @@
 /* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/camelcase */
 import { sdkify, odataify } from "../..";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { setMetadataCache } from "../../..";
 import { socialprofile_community } from "../../../dataverse-gen/enums/socialprofile_community";
 
-test("sdkify Multiselects", async () => {
+test("sdkify MultiSelects", async () => {
   setMetadataCache({ entities: { account: accountMetadata } });
   const accountSdk = {
     logicalName: accountMetadata.logicalName,
@@ -20,7 +19,7 @@ test("sdkify Multiselects", async () => {
   expect(odata["@odata.type"]).toBe("Microsoft.Dynamics.CRM.account");
 });
 
-test("sdkify Multiselects", async () => {
+test("sdkify MultiSelects", async () => {
   setMetadataCache({ entities: { account: accountMetadata } });
   const odataRecord = {
     "@odata.context": "https://org.crm11.dynamics.com/api/data/v9.1/$metadata#accounts/$entity",
