@@ -1,6 +1,6 @@
 import { trimGuid } from "./Guid";
-import { Entity } from "./Entity";
 import { IEntity } from "./IEntity";
+import { getEntitySetName } from "../metadata";
 
 export interface IEntityReference {
   entityType: string;
@@ -15,7 +15,7 @@ export async function getNavigationPathForEntityReference(
   attributeLogicalName: string,
 ): Promise<string> {
   const entityReference = entity[attributeLogicalName] as IEntityReference;
-  const collectionName = await Entity.getCollectionNameForEntity(entityReference.entityType);
+  const collectionName = await getEntitySetName(entityReference.entityType);
   if (collectionName) {
     return odatifyEntityReference(collectionName, entityReference.id);
   }

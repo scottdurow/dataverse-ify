@@ -11,7 +11,7 @@ import * as config from "config";
 import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { account_account_accountcategorycode } from "../../../dataverse-gen/enums/account_account_accountcategorycode";
 import { socialprofile_community } from "../../../dataverse-gen/enums/socialprofile_community";
-describe("create", () => {
+describe("null value handling", () => {
   const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
     if (!configFile.runIntegrationTests) return;
@@ -25,7 +25,7 @@ describe("create", () => {
       }
     }
   }, 100000);
-  test("Create an account", async () => {
+  test("null value on update", async () => {
     if (!configFile.runIntegrationTests) return;
     const userId = await whoAmI();
 

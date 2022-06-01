@@ -1,4 +1,3 @@
-import { getEntitySetName } from "../metadata/MetadataCache";
 import { IEntity } from "./IEntity";
 import { EntityReference } from "./EntityReference";
 export class Entity {
@@ -11,10 +10,7 @@ export class Entity {
     }
     return allOk;
   }
-  static async getCollectionNameForEntity(logicalName: string): Promise<string> {
-    // Try using the simple collection name lookup
-    return await getEntitySetName(logicalName);
-  }
+
   static toEntityReference(instance: IEntity): EntityReference {
     return new EntityReference(instance.logicalName, instance.id);
   }

@@ -25,7 +25,7 @@ describe("create", () => {
       }
     }
   }, 10000);
-  test("Create an account", async () => {
+  it("Create an account", async () => {
     if (!configFile.runIntegrationTests) return;
     const userId = await whoAmI();
 
@@ -86,4 +86,8 @@ describe("create", () => {
     // Delete
     await cdsServiceClient.delete("account", account1.accountid);
   }, 10000);
+
+  it.todo("allows fetchXml paging");
+
+  it.todo("allows batch requests");
 });

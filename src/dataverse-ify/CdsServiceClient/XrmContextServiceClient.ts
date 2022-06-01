@@ -24,15 +24,6 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
   async update(entity: IEntity): Promise<void> {
     // Get the primary key attribute
     const entityMetadata = getMetadataByLogicalName(entity.logicalName);
-    // Convert null lookups to EntityReferences with null guid so we can run a delete association
-    for (const attribute in entity) {
-      const navigation = entityMetadata.navigation && entityMetadata.navigation[attribute];
-      if (navigation && entity[attribute] === null) {
-        // We don't support just nulling a polymorphic lookup because we don't know which relationship
-        // to null.
-        entity[attribute] = new EntityReference(navigation[0].replace("mscrm.", ""), null);
-      }
-    }
     const record = await odataify("Update", entity);
 
     let id = entity[entityMetadata.primaryIdAttribute] as string | undefined;
@@ -43,31 +34,7 @@ export class XrmContextCdsServiceClient implements CdsServiceClient {
       throw new Error("Either id or the primary id attribute must be set to update the record");
     }
 
-    // Delete the lookups with null
-    // Support for updating related entities separately like we do in the node implementation
-    // otherwise we get "CRM do not support direct update of Entity Reference properties, Use Navigation properties instead."
-    for (const attribute in record) {
-      if (attribute.endsWith("@odata.bind") && record[attribute] && record[attribute].endsWith("(null)")) {
-        const disassociateRequest = new (class {
-          target = {
-            id: id,
-            entityType: entity.logicalName,
-          };
-          relationship = attribute.substr(0, attribute.length - "@odata.bind".length);
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          getMetadata(): any {
-            return {
-              parameterTypes: {},
-              operationType: 2,
-              operationName: "Disassociate",
-            };
-          }
-        })();
-
-        await Xrm.WebApi.online.execute(disassociateRequest);
-        delete record[attribute];
-      }
-    }
+    // We no longer need special handling of null values since it is now supported to null lookups inside a PATCH
     try {
       await this._webApi.updateRecord(entity.logicalName, id, record);
     } catch (ex) {

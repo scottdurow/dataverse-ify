@@ -11,7 +11,6 @@ export async function whoAmI(): Promise<string> {
         operationName: "WhoAmI",
       };
     }
-    Target = {};
   })();
   const whoAmIResponse = await Xrm.WebApi.online.execute(request);
   const response = await whoAmIResponse.json();

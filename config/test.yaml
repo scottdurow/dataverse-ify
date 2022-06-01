@@ -3,7 +3,7 @@ nodewebapi:
  logging: verbose
  runIntegrationTests: true
  proxy:
-  useproxy: false
+  useproxy: true
   httpProxy: http://127.0.0.1:8888
   httpsProxy: http://127.0.0.1:8888
  server:
