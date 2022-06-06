@@ -17,12 +17,8 @@ describe("null value handling", () => {
     if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
-      try {
-        // Set up the Node Xrm global context
-        await SetupGlobalContext();
-      } catch (ex) {
-        fail(ex);
-      }
+      // Set up the Node Xrm global context
+      await SetupGlobalContext();
     }
   }, 100000);
   test("null value on update", async () => {

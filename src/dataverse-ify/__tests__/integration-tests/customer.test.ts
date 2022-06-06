@@ -13,12 +13,8 @@ describe("customer", () => {
     if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
-      try {
-        // Set up the Node Xrm global context
-        await SetupGlobalContext();
-      } catch (ex) {
-        fail(ex);
-      }
+      // Set up the Node Xrm global context
+      await SetupGlobalContext();
     }
   }, 30000);
   test("Customer fields set and retrieved as EntityReference", async () => {
