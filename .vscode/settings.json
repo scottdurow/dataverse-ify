@@ -70,6 +70,7 @@
         "marketingonly",
         "modifiedby",
         "modifiedon",
+        "msal",
         "msdyn",
         "multiselect",
         "nodewebapi",
