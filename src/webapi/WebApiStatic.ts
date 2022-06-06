@@ -14,9 +14,9 @@ import { StructuralProperty } from "../types/StructuralProperty";
 import { WebApiExecuteRequest } from "../types/WebApiExecuteRequest";
 import { WebApiRequestDefinition } from "../types/WebApiRequest";
 import { ApiResponse, constructApiResponse } from "./ApiResponse";
-import { getAccessToken } from "./TokenCache";
 import { requireValue } from "./utils/NullOrUndefined";
 import requestJs = require("request");
+import { acquireToken } from "./MsalNodeAuth";
 
 // Implementation of Xrm.WebApi for where Xrm.WebApi is not available
 // E.g. Node Utilities or integration tests
@@ -64,12 +64,17 @@ export class WebApiStatic {
     return metadata;
   }
 
+  // Deprecated: For back-compat
   async authoriseWithCdsAuthToken(server: string, apiVersion: string) {
+    await this.authorize(server, apiVersion);
+  }
+
+  async authorize(server: string, apiVersion: string) {
     // Pick up the cds auth token cache
     this.server = server;
     this.apiVersion = apiVersion;
     this.apiPath = `/api/data/v${apiVersion}/`;
-    this.accessToken = await getAccessToken(server.replace("https://", ""));
+    this.accessToken = await acquireToken(server.replace("https://", ""));
   }
 
   createException(message: string, ex: unknown) {

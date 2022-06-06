@@ -22,7 +22,7 @@ export class XrmStatic implements Xrm.XrmStatic {
       XrmStatic.xrmInstance.WebApi = XrmStatic.webapiInstance as object as Xrm.WebApi;
       XrmStatic.xrmInstance.Utility = new NodeXrmUtilityStatic();
       if (config.server) {
-        await XrmStatic.webapiInstance.authoriseWithCdsAuthToken(config.server.host, config.server.version);
+        await XrmStatic.webapiInstance.authorize(config.server.host, config.server.version);
       } else {
         throw new Error("config.server not configured");
       }
