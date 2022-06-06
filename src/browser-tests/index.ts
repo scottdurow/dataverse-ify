@@ -1,3 +1,7 @@
+import { metadataCache } from "../dataverse-gen/metadata";
+import { fixWebresourceXrm } from "../metadata/fixWebresourceXrm";
+import { setMetadataCache } from "../metadata/MetadataCache";
+
 // Add missing Jest functions
 window.test = window.it;
 window.test.each = (inputs: any) => (testName: any, test: any) =>
@@ -6,6 +10,10 @@ window.test.each = (inputs: any) => (testName: any, test: any) =>
 (window as any).test.todo = function () {
   return undefined;
 };
+
+// Hack for UCI where entity metadata is not loaded if running outside of a model-driven app
+setMetadataCache(metadataCache);
+fixWebresourceXrm();
 
 require("../dataverse-ify/__tests__/integration-tests/activity.test");
 require("../dataverse-ify/__tests__/integration-tests/addtoqueue.test");
