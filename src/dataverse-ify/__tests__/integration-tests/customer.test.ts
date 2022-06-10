@@ -3,14 +3,10 @@ import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { XrmContextCdsServiceClient } from "../..";
 import { Entity } from "../../../types/Entity";
-import * as config from "config";
-import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { contactMetadata, Contact } from "../../../dataverse-gen/entities/Contact";
 import { opportunityMetadata, Opportunity } from "../../../dataverse-gen/entities/Opportunity";
 describe("customer", () => {
-  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
-    if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
       // Set up the Node Xrm global context
@@ -18,7 +14,6 @@ describe("customer", () => {
     }
   }, 30000);
   test("Customer fields set and retrieved as EntityReference", async () => {
-    if (!configFile.runIntegrationTests) return;
     setMetadataCache({
       entities: {
         account: accountMetadata,
@@ -44,6 +39,7 @@ describe("customer", () => {
     } as Opportunity;
 
     const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
+    let failed: unknown | undefined;
     try {
       // Create account
       account1.id = await cdsServiceClient.create(account1);
@@ -78,7 +74,7 @@ describe("customer", () => {
       expect(opportunityRetrieved2.customerid?.id).toBe(contact1.id);
       expect(opportunityRetrieved2.customerid?.entityType).toBe("contact");
     } catch (ex) {
-      fail(ex);
+      failed = ex;
     } finally {
       if (opportunity1.id) {
         // Tidy up
@@ -93,5 +89,6 @@ describe("customer", () => {
         await cdsServiceClient.delete(contact1);
       }
     }
+    expect(failed).toBeUndefined();
   }, 30000);
 });

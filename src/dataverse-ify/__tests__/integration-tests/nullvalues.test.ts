@@ -7,14 +7,10 @@ import { accountMetadata, Account } from "../../../dataverse-gen/entities/Accoun
 import { whoAmI } from "../../../webapi/whoAmI";
 import { EntityReference } from "../../../types/EntityReference";
 import { XrmContextCdsServiceClient } from "../../CdsServiceClient/XrmContextServiceClient";
-import * as config from "config";
-import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { account_account_accountcategorycode } from "../../../dataverse-gen/enums/account_account_accountcategorycode";
 import { socialprofile_community } from "../../../dataverse-gen/enums/socialprofile_community";
 describe("null value handling", () => {
-  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
-    if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
       // Set up the Node Xrm global context
@@ -22,7 +18,6 @@ describe("null value handling", () => {
     }
   }, 100000);
   test("null value on update", async () => {
-    if (!configFile.runIntegrationTests) return;
     const userId = await whoAmI();
 
     // Create an account with sdk types

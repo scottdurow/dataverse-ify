@@ -22,11 +22,9 @@
 		"noFallthroughCasesInSwitch": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
-		"emitDecoratorMetadata": true,
-		"experimentalDecorators": true,
-		"downlevelIteration": true,
 		"declaration": true,
 		"sourceMap": true,
-		"pretty": true
+		"pretty": true,
+		"esModuleInterop": true
 	}
 }

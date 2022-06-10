@@ -4,14 +4,10 @@ import { XrmContextCdsServiceClient } from "../..";
 import { ActivityParty, activitypartyMetadata } from "../../../types/ActivityParty";
 import { Entity } from "../../../types/Entity";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
-import * as config from "config";
-import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { letterMetadata, Letter } from "../../../dataverse-gen/entities/Letter";
 describe("activity", () => {
-  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
-    if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
       // Set up the Node Xrm global context
@@ -19,7 +15,6 @@ describe("activity", () => {
     }
   }, 30000);
   test("Create Activity with Activity Parties.", async () => {
-    if (!configFile.runIntegrationTests) return;
     setMetadataCache({
       entities: {
         account: accountMetadata,
@@ -37,6 +32,7 @@ describe("activity", () => {
       subject: `Sample Letter ${new Date().toUTCString()}`,
     } as Letter;
     const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
+    let failed: unknown | undefined;
     try {
       // Create
       account1.id = await cdsServiceClient.create(account1);
@@ -77,7 +73,7 @@ describe("activity", () => {
         }
       }
     } catch (ex) {
-      fail(ex);
+      failed = ex;
     } finally {
       if (letter1.id) {
         // Tidy up
@@ -97,5 +93,6 @@ describe("activity", () => {
         }
       }
     }
+    expect(failed).toBeUndefined();
   }, 30000);
 });

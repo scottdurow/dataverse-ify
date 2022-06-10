@@ -1,6 +1,6 @@
 ﻿/* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import * as config from "config";
+import config from "config";
 import { NodeXrmConfig } from "./config/NodeXrmConfig";
 import { XrmStatic } from "./XrmStatic";
 let xrmGlobalContextSetup = false;

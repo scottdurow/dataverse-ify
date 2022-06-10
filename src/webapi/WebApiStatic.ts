@@ -16,7 +16,7 @@ import { WebApiRequestDefinition } from "../types/WebApiRequest";
 import { ApiResponse, constructApiResponse } from "./ApiResponse";
 import { requireValue } from "./utils/NullOrUndefined";
 import requestJs = require("request");
-import { acquireToken } from "./MsalNodeAuth";
+import { acquireToken } from "./MsalAuth/MsalNodeAuth";
 
 // Implementation of Xrm.WebApi for where Xrm.WebApi is not available
 // E.g. Node Utilities or integration tests
@@ -28,15 +28,18 @@ export class WebApiStatic {
   public online!: Xrm.WebApiOnline;
   public offline!: Xrm.WebApiOffline;
   private server!: string;
-  private apiPath!: string;
+  private apiPath = "/api/data/v9.0/";
   public apiVersion!: string;
   private accessToken!: string;
   private entitySetNames: Dictionary<string> = {};
 
-  constructor(accessToken?: string) {
+  constructor(accessToken?: string, server?: string) {
     this.online = this as unknown as Xrm.WebApiOnline;
     if (accessToken) {
       this.accessToken = accessToken;
+    }
+    if (server) {
+      this.server = server;
     }
   }
 
@@ -64,7 +67,9 @@ export class WebApiStatic {
     return metadata;
   }
 
-  // Deprecated: For back-compat
+  /**
+   * @deprecated Provided for back-compat
+   */
   async authoriseWithCdsAuthToken(server: string, apiVersion: string) {
     await this.authorize(server, apiVersion);
   }
@@ -561,8 +566,11 @@ export class WebApiStatic {
   private async asyncRequest(uri: string, requestOptions: requestJs.CoreOptions) {
     return new Promise<ApiResponse>((resolve, reject) => {
       requestJs(uri, requestOptions, (error, response) => {
-        if (error != null) reject(error);
-        else {
+        if (error != null) {
+          reject(error);
+        } else if (response.statusCode >= 300) {
+          reject(response.statusMessage);
+        } else {
           const apiResponse = this.getResponse(response);
           if (apiResponse.error != null) {
             reject(apiResponse.error);

@@ -3,16 +3,12 @@ import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { XrmContextCdsServiceClient } from "../..";
 import { Entity } from "../../../types/Entity";
-import * as config from "config";
-import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { opportunityMetadata, Opportunity, OpportunityAttributes } from "../../../dataverse-gen/entities/Opportunity";
 import { opportunitycloseMetadata } from "../../../dataverse-gen/entities/OpportunityClose";
 import { WinOpportunityMetadata, WinOpportunityRequest } from "../../../dataverse-gen/actions/WinOpportunity";
 import { opportunity_opportunity_statecode } from "../../../dataverse-gen/enums/opportunity_opportunity_statecode";
 describe("winOpportunity", () => {
-  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
-    if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
       // Set up the Node Xrm global context
@@ -20,7 +16,6 @@ describe("winOpportunity", () => {
     }
   }, 30000);
   test("WinOpportunity", async () => {
-    if (!configFile.runIntegrationTests) return;
     setMetadataCache({
       entities: {
         account: accountMetadata,

@@ -1,10 +1,3 @@
-import {
-  DataProtectionScope,
-  Environment,
-  IPersistenceConfiguration,
-  PersistenceCachePlugin,
-  PersistenceCreator,
-} from "@azure/msal-node-extensions";
 import * as path from "path";
 import {
   AccountInfo,
@@ -16,10 +9,11 @@ import {
   SilentFlowRequest,
 } from "@azure/msal-node";
 import fetch from "node-fetch";
-import * as os from "os";
 import * as fs from "fs";
+import * as os from "os";
 import { msalConfig } from "./MsalConfig";
 import { ILoggerCallback, LogLevel } from "@azure/msal-common";
+import { MsalCachePlugin } from "./MsalCachePlugin";
 
 export interface UserLookup {
   [index: string]: string;
@@ -29,11 +23,7 @@ let msalClient: PublicClientApplication | undefined;
 
 function getLookupPath(): string {
   const homeDirPath = os.homedir();
-  return path.join(homeDirPath, "dataverse-auth-users");
-}
-
-function getTokenCachePath(): string {
-  return path.join(Environment.getUserRootDirectory(), "./dataverse-auth-cache");
+  return path.join(homeDirPath, "./dataverse-auth-users");
 }
 
 function loadLookup(): UserLookup {
@@ -49,6 +39,7 @@ function loadLookup(): UserLookup {
   }
   return userNameLookup as UserLookup;
 }
+
 function saveLookup(): void {
   fs.writeFileSync(getLookupPath(), JSON.stringify(userNameLookup));
 }
@@ -78,8 +69,8 @@ export function removeAccountByEnvUrl(environmentUrl: string): void {
 
 export function getAllUsers(): { userName: string; environment: string }[] {
   const lookup = loadLookup();
-  return Object.keys(lookup).map((userName) => {
-    return { environment: lookup[userName], userName: userName };
+  return Object.keys(lookup).map((environment) => {
+    return { userName: lookup[environment], environment };
   });
 }
 
@@ -94,14 +85,6 @@ export function getAccountByEnvUrl(accounts: AccountInfo[], environmentUrl: stri
 
 async function getMsalClient(logger?: ILoggerCallback): Promise<PublicClientApplication> {
   if (!msalClient) {
-    const persistenceConfiguration = {
-      cachePath: getTokenCachePath(),
-      dataProtectionScope: DataProtectionScope.CurrentUser,
-      serviceName: "dataverse-auth",
-      accountName: "dataverse-auth",
-      usePlaintextFileOnLinux: false,
-    } as IPersistenceConfiguration;
-    const persistence = await PersistenceCreator.createPersistence(persistenceConfiguration);
     const publicClientConfig = {
       auth: {
         clientId: msalConfig.clientId,
@@ -115,7 +98,7 @@ async function getMsalClient(logger?: ILoggerCallback): Promise<PublicClientAppl
         },
       },
       cache: {
-        cachePlugin: new PersistenceCachePlugin(persistence),
+        cachePlugin: MsalCachePlugin,
       },
     } as Configuration;
     msalClient = new PublicClientApplication(publicClientConfig);

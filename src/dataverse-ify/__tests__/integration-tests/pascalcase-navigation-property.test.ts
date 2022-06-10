@@ -2,13 +2,9 @@ import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account, AccountAttributes } from "../../../dataverse-gen/entities/Account";
 import { XrmContextCdsServiceClient } from "../..";
-import * as config from "config";
-import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { Entity } from "../../../types";
 describe("pascalcase-navigation-property", () => {
-  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
-    if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
       // Set up the Node Xrm global context
@@ -16,7 +12,6 @@ describe("pascalcase-navigation-property", () => {
     }
   }, 30000);
   test("pascalcase-navigation-property", async () => {
-    if (!configFile.runIntegrationTests) return;
     setMetadataCache({
       entities: {
         account: accountMetadata,

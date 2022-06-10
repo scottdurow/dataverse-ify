@@ -2,17 +2,13 @@ import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { XrmContextCdsServiceClient } from "../..";
 import { Entity } from "../../../types/Entity";
-import * as config from "config";
-import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import {
   CalculateRollupFieldMetadata,
   CalculateRollupFieldRequest,
 } from "../../../dataverse-gen/functions/CalculateRollupField";
 describe("CalculateRollUpField", () => {
-  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
-    if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
       // Set up the Node Xrm global context
@@ -20,7 +16,6 @@ describe("CalculateRollUpField", () => {
     }
   }, 30000);
   test("CalculateRollupField", async () => {
-    if (!configFile.runIntegrationTests) return;
     setMetadataCache({
       entities: { account: accountMetadata },
       actions: { CalculateRollupField: CalculateRollupFieldMetadata },

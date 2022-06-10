@@ -2,17 +2,13 @@ import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { Entity } from "../../../types/Entity";
 import { XrmContextCdsServiceClient } from "../..";
-import * as config from "config";
-import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { letterMetadata, Letter } from "../../../dataverse-gen/entities/Letter";
 import { queueMetadata, Queue } from "../../../dataverse-gen/entities/Queue";
 import { queueitemMetadata } from "../../../dataverse-gen/entities/QueueItem";
 import { AddToQueueMetadata, AddToQueueRequest } from "../../../dataverse-gen/actions/AddToQueue";
 import { AddToQueueResponse } from "../../../dataverse-gen/complextypes/AddToQueueResponse";
 describe("AddToQueue", () => {
-  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
-    if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
       // Set up the Node Xrm global context
@@ -20,7 +16,6 @@ describe("AddToQueue", () => {
     }
   }, 300000);
   test("AddToQueue", async () => {
-    if (!configFile.runIntegrationTests) return;
     setMetadataCache({
       entities: {
         letter: letterMetadata,
