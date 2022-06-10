@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/cognitive-complexity */
 import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
-import { XrmContextCdsServiceClient } from "../..";
+import { XrmContextDataverseClient } from "../..";
 import { ActivityParty, activitypartyMetadata } from "../../../types/ActivityParty";
 import { Entity } from "../../../types/Entity";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
@@ -31,21 +31,21 @@ describe("activity", () => {
       logicalName: "letter",
       subject: `Sample Letter ${new Date().toUTCString()}`,
     } as Letter;
-    const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
+    const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
     let failed: unknown | undefined;
     try {
       // Create
-      account1.id = await cdsServiceClient.create(account1);
+      account1.id = await serviceClient.create(account1);
       const account1Ref = Entity.toEntityReference(account1);
       letter1.regardingobjectid = account1Ref;
       letter1.to = [{ logicalName: "activityparty", partyid: account1Ref } as ActivityParty];
       if (account1.id) {
-        letter1.id = await cdsServiceClient.create(letter1);
+        letter1.id = await serviceClient.create(letter1);
       }
 
       // Retrieve
       if (letter1.id) {
-        const letterRetrieved = (await cdsServiceClient.retrieve("letter", letter1.id, ["subject", "to"])) as Letter;
+        const letterRetrieved = (await serviceClient.retrieve("letter", letter1.id, ["subject", "to"])) as Letter;
         expect(letterRetrieved.subject).toBe(letter1.subject);
         expect(letterRetrieved.regardingobjectid?.id).toBe(letterRetrieved.regardingobjectid?.id);
         expect(letterRetrieved.to).toBeDefined();
@@ -56,11 +56,11 @@ describe("activity", () => {
 
       // Add bcc
       letter1.bcc = [{ logicalName: "activityparty", partyid: account1Ref } as ActivityParty];
-      await cdsServiceClient.update(letter1);
+      await serviceClient.update(letter1);
 
       // Retrieve again to check bcc
       if (letter1.id) {
-        const letterRetrieved = (await cdsServiceClient.retrieve("letter", letter1.id, ["subject", "to"])) as Letter;
+        const letterRetrieved = (await serviceClient.retrieve("letter", letter1.id, ["subject", "to"])) as Letter;
         expect(letterRetrieved.subject).toBe(letter1.subject);
         expect(letterRetrieved.regardingobjectid?.id).toBe(letterRetrieved.regardingobjectid?.id);
         expect(letterRetrieved.to).toBeDefined();
@@ -79,17 +79,17 @@ describe("activity", () => {
         // Tidy up
         // Retry once if we get Sql ErrorCode: -2146232060 Sql Number: 1205 - DeadLock
         try {
-          await cdsServiceClient.delete(letter1);
+          await serviceClient.delete(letter1);
         } catch (ex) {
-          await cdsServiceClient.delete(letter1);
+          await serviceClient.delete(letter1);
         }
       }
       if (account1.id) {
         // Tidy up
         try {
-          await cdsServiceClient.delete(account1);
+          await serviceClient.delete(account1);
         } catch (ex) {
-          await cdsServiceClient.delete(account1);
+          await serviceClient.delete(account1);
         }
       }
     }

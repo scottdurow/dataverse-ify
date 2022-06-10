@@ -1,7 +1,7 @@
 import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
-import { XrmContextCdsServiceClient } from "../..";
+import { XrmContextDataverseClient } from "../..";
 import { Entity } from "../../../types/Entity";
 import { opportunityMetadata, Opportunity, OpportunityAttributes } from "../../../dataverse-gen/entities/Opportunity";
 import { opportunitycloseMetadata } from "../../../dataverse-gen/entities/OpportunityClose";
@@ -35,16 +35,16 @@ describe("winOpportunity", () => {
       name: "Opportunity 1",
     } as Opportunity;
 
-    const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
+    const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
     try {
       // Create account
-      account1.id = await cdsServiceClient.create(account1);
+      account1.id = await serviceClient.create(account1);
 
       // Assign parent customer
       opportunity1.customerid = Entity.toEntityReference(account1);
 
       // Create opportunity
-      opportunity1.id = await cdsServiceClient.create(opportunity1);
+      opportunity1.id = await serviceClient.create(opportunity1);
 
       // WinOpportunity
       const winRequest = {
@@ -59,12 +59,12 @@ describe("winOpportunity", () => {
         },
       } as WinOpportunityRequest;
 
-      const winResponse = await cdsServiceClient.execute(winRequest);
+      const winResponse = await serviceClient.execute(winRequest);
       expect(winResponse).toBeUndefined();
 
       // Get the opportunity to check it is won
       // Retrieve Updated
-      const opportunityWon = await cdsServiceClient.retrieve<Opportunity>(
+      const opportunityWon = await serviceClient.retrieve<Opportunity>(
         opportunityMetadata.logicalName,
         opportunity1.id,
         [OpportunityAttributes.StateCode],
@@ -75,11 +75,11 @@ describe("winOpportunity", () => {
     } finally {
       if (opportunity1.id) {
         // Tidy up
-        await cdsServiceClient.delete(opportunity1);
+        await serviceClient.delete(opportunity1);
       }
       if (account1.id) {
         // Tidy up
-        await cdsServiceClient.delete(account1);
+        await serviceClient.delete(account1);
       }
     }
   }, 30000);

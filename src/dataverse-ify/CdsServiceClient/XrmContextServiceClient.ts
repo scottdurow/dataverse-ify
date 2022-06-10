@@ -2,4 +2,4 @@ import { XrmContextDataverseClient } from "../DataverseClient/XrmContextDatavers
 /**
  * @deprecated Provided for back-compat
  */
-export class XrmContextCdsServiceClient extends XrmContextDataverseClient {}
+export type XrmContextCdsServiceClient = XrmContextDataverseClient;

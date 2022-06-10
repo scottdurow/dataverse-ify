@@ -6,9 +6,9 @@ import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { whoAmI } from "../../../webapi/whoAmI";
 import { EntityReference } from "../../../types/EntityReference";
-import { XrmContextCdsServiceClient } from "../../CdsServiceClient/XrmContextServiceClient";
 import { account_account_accountcategorycode } from "../../../dataverse-gen/enums/account_account_accountcategorycode";
 import { socialprofile_community } from "../../../dataverse-gen/enums/socialprofile_community";
+import { XrmContextDataverseClient } from "../../DataverseClient";
 describe("null value handling", () => {
   beforeAll(async () => {
     // Is this running inside NodeJS?
@@ -48,11 +48,11 @@ describe("null value handling", () => {
     } as Account;
 
     // Create
-    const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
-    account1.accountid = await cdsServiceClient.create(account1);
+    const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
+    account1.accountid = await serviceClient.create(account1);
 
     // Retrieve
-    const account1Retrieved = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
+    const account1Retrieved = (await serviceClient.retrieve("account", account1.accountid, true)) as Account;
     expect(account1Retrieved.description).toBe(account1.description);
     expect(account1Retrieved.accountcategorycode).toBe(account1.accountcategorycode);
     expect(account1Retrieved.creditlimit).toBe(account1.creditlimit);
@@ -66,10 +66,10 @@ describe("null value handling", () => {
       // Null values
       account1.description = null;
       account1.preferredsystemuserid = null; // The cdsServiceClient has special functionality to delete the lookups
-      await cdsServiceClient.update(account1);
+      await serviceClient.update(account1);
 
       // Retrieve Updated
-      const account1Retrieved2 = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
+      const account1Retrieved2 = (await serviceClient.retrieve("account", account1.accountid, true)) as Account;
       expect(account1Retrieved2.description).toBeNull();
       // Because a lookup value comes in as null we can't figure out the entity reference lookup type
       // so we get an undefined value not null
@@ -78,7 +78,7 @@ describe("null value handling", () => {
       fail(ex);
     } finally {
       // Delete
-      await cdsServiceClient.delete("account", account1.accountid);
+      await serviceClient.delete("account", account1.accountid);
     }
   }, 100000);
 });

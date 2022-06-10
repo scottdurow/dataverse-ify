@@ -1,7 +1,7 @@
 import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { Entity } from "../../../types/Entity";
-import { XrmContextCdsServiceClient } from "../..";
+import { XrmContextDataverseClient } from "../..";
 import { letterMetadata, Letter } from "../../../dataverse-gen/entities/Letter";
 import { queueMetadata, Queue } from "../../../dataverse-gen/entities/Queue";
 import { queueitemMetadata } from "../../../dataverse-gen/entities/QueueItem";
@@ -35,13 +35,13 @@ describe("AddToQueue", () => {
       subject: "Sample Letter",
     } as Letter;
 
-    const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
+    const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
     try {
       // Create Queue
-      queue.id = await cdsServiceClient.create(queue);
+      queue.id = await serviceClient.create(queue);
 
       // Create letter
-      letter.id = await cdsServiceClient.create(letter);
+      letter.id = await serviceClient.create(letter);
 
       // Add letter to queue
       const request = {
@@ -50,18 +50,18 @@ describe("AddToQueue", () => {
         Target: Entity.toEntityReference(letter),
       } as AddToQueueRequest;
 
-      const response = (await cdsServiceClient.execute(request)) as AddToQueueResponse;
+      const response = (await serviceClient.execute(request)) as AddToQueueResponse;
       expect(response.QueueItemId).toBeDefined();
     } catch (ex) {
       fail(ex);
     } finally {
       if (letter.id) {
         // Tidy up
-        await cdsServiceClient.delete(letter);
+        await serviceClient.delete(letter);
       }
       if (queue.id) {
         // Tidy up
-        await cdsServiceClient.delete(queue);
+        await serviceClient.delete(queue);
       }
     }
   }, 300000);

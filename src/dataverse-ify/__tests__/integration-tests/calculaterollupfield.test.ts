@@ -1,6 +1,6 @@
 import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
-import { XrmContextCdsServiceClient } from "../..";
+import { XrmContextDataverseClient } from "../..";
 import { Entity } from "../../../types/Entity";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import {
@@ -26,10 +26,10 @@ describe("CalculateRollUpField", () => {
       name: "Account 1",
     } as Account;
 
-    const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
+    const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
     try {
       // Create Account
-      account1.id = await cdsServiceClient.create(account1);
+      account1.id = await serviceClient.create(account1);
 
       // Calculate Rollup field open deals
       const request = {
@@ -38,14 +38,14 @@ describe("CalculateRollUpField", () => {
         Target: Entity.toEntityReference(account1),
       } as CalculateRollupFieldRequest;
 
-      const response = await cdsServiceClient.execute(request);
+      const response = await serviceClient.execute(request);
       expect(response).toBeDefined();
     } catch (ex) {
       fail(ex);
     } finally {
       if (account1.id) {
         // Tidy up
-        await cdsServiceClient.delete(account1);
+        await serviceClient.delete(account1);
       }
     }
   }, 30000);

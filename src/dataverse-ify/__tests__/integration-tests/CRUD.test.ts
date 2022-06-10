@@ -6,9 +6,9 @@ import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { whoAmI } from "../../../webapi/whoAmI";
 import { EntityReference } from "../../../types/EntityReference";
-import { XrmContextCdsServiceClient } from "../../CdsServiceClient/XrmContextServiceClient";
 import { account_account_accountcategorycode } from "../../../dataverse-gen/enums/account_account_accountcategorycode";
 import { socialprofile_community } from "../../../dataverse-gen/enums/socialprofile_community";
+import { XrmContextDataverseClient } from "../../DataverseClient";
 describe("create", () => {
   beforeAll(async () => {
     // Is this running inside NodeJS?
@@ -47,8 +47,8 @@ describe("create", () => {
     } as Account;
 
     // Create
-    const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
-    account1.accountid = await cdsServiceClient.create(account1);
+    const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
+    account1.accountid = await serviceClient.create(account1);
     expect(account1.accountid).toBeDefined();
 
     if (!account1.accountid) {
@@ -56,7 +56,7 @@ describe("create", () => {
     }
 
     // Retrieve
-    const account1Retrieved = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
+    const account1Retrieved = (await serviceClient.retrieve("account", account1.accountid, true)) as Account;
     expect(account1Retrieved.name).toBe(account1.name);
     expect(account1Retrieved.accountcategorycode).toBe(account1.accountcategorycode);
     expect(account1Retrieved.creditlimit).toBe(account1.creditlimit);
@@ -68,14 +68,14 @@ describe("create", () => {
 
     // Update
     account1.name = "Updated Name";
-    await cdsServiceClient.update(account1);
+    await serviceClient.update(account1);
 
     // Retrieve Updated
-    const account1Retrieved2 = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
+    const account1Retrieved2 = (await serviceClient.retrieve("account", account1.accountid, true)) as Account;
     expect(account1Retrieved2.name).toBe("Updated Name");
 
     // Delete
-    await cdsServiceClient.delete("account", account1.accountid);
+    await serviceClient.delete("account", account1.accountid);
   }, 10000);
 
   it.todo("allows fetchXml paging");
