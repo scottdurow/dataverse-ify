@@ -1,2 +1,2 @@
-export * from "./DataverseClient";
-export * from "./XrmContextDataverseClient";
+export { DataverseClient } from "./DataverseClient";
+export { XrmContextDataverseClient } from "./XrmContextDataverseClient";

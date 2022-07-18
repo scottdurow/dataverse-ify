@@ -59,3 +59,9 @@ npm unlink dateverse-ify
 ```
 
 Commit your changes to your fork and then submit a pull request for review.
+
+
+
+### Upgrading from version 1 to 2?
+
+You will need to make [some minor changes](UPGRADING.md).
