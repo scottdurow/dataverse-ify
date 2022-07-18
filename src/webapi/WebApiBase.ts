@@ -13,10 +13,8 @@ import { RequestWithTarget } from "../types/RequestWithTarget";
 import { StructuralProperty } from "../types/StructuralProperty";
 import { WebApiExecuteRequest } from "../types/WebApiExecuteRequest";
 import { WebApiRequestDefinition } from "../types/WebApiRequest";
-import { ApiResponse, constructApiResponse } from "./ApiResponse";
+import { WebApiRequest, WebApiResponse } from "./WebApiRequest";
 import { requireValue } from "./utils/NullOrUndefined";
-import requestJs = require("request");
-import { acquireToken } from "./MsalAuth/MsalNodeAuth";
 
 // Implementation of Xrm.WebApi for where Xrm.WebApi is not available
 // E.g. Node Utilities or integration tests
@@ -24,31 +22,23 @@ import { acquireToken } from "./MsalAuth/MsalNodeAuth";
 // WebApiStatic does not really have anything to do with dataverse-ify when using sdkify and odataify
 // but can be used with those functions to allow use of the WebApi outside of the Dataverse execution context
 // It is also used by dataverse-gen to fetch metadata when generating early bound types of sdkify
-export class WebApiStatic {
+export class WebApiBase {
   public online!: Xrm.WebApiOnline;
   public offline!: Xrm.WebApiOffline;
-  private server!: string;
-  private apiPath = "/api/data/v9.0/";
-  public apiVersion!: string;
-  private accessToken!: string;
+  public requestImplementation: WebApiRequest;
   private entitySetNames: Dictionary<string> = {};
 
-  constructor(accessToken?: string, server?: string) {
+  constructor(requestImplementation: WebApiRequest) {
     this.online = this as unknown as Xrm.WebApiOnline;
-    if (accessToken) {
-      this.accessToken = accessToken;
-    }
-    if (server) {
-      this.server = server;
-    }
+    this.requestImplementation = requestImplementation;
   }
 
   public getClientUrl() {
-    return this.server;
+    return this.requestImplementation.server;
   }
 
   private getOdataContext(): string {
-    return this.server + "/$metadata#$ref";
+    return this.requestImplementation.server + "/$metadata#$ref";
   }
 
   public isAvailableOffline(_entityLogicalName: string): boolean {
@@ -61,25 +51,12 @@ export class WebApiStatic {
       // request https://org.crm11.dynamics.com/api/data/v9.0/EntityDefinitions(LogicalName='account')?$select=DisplayName,IsKnowledgeManagementEnabled,EntitySetName
       const path = `EntityDefinitions(LogicalName='${logicalName}')`;
       const apiResponse = await this.webApiRequest({ action: "GET", path: path, options: "?$select=EntitySetName" });
-      metadata = apiResponse.data["EntitySetName"] as string;
-      this.entitySetNames[logicalName] = metadata;
+      if (apiResponse.data) {
+        metadata = apiResponse.data["EntitySetName"] as string;
+        this.entitySetNames[logicalName] = metadata;
+      }
     }
     return metadata;
-  }
-
-  /**
-   * @deprecated Provided for back-compat
-   */
-  async authoriseWithCdsAuthToken(server: string, apiVersion: string) {
-    await this.authorize(server, apiVersion);
-  }
-
-  async authorize(server: string, apiVersion: string) {
-    // Pick up the cds auth token cache
-    this.server = server;
-    this.apiVersion = apiVersion;
-    this.apiPath = `/api/data/v${apiVersion}/`;
-    this.accessToken = await acquireToken(server.replace("https://", ""));
   }
 
   createException(message: string, ex: unknown) {
@@ -114,7 +91,6 @@ export class WebApiStatic {
       if (guidMatch === null || guidMatch.length === 0)
         throw new Error("Could not find the guid in the createRecord response");
       const guid = guidMatch[1];
-      //   CodeGenerator.generateCreate(entityLogicalName, record, response);
       return {
         entityType: entityLogicalName,
         id: guid,
@@ -231,8 +207,8 @@ export class WebApiStatic {
         path: entitySetName,
         options: options,
       });
-      const data = apiResponse["data"];
-      //CodeGenerator.generateRetrieveMultiple(response, entityType, options, maxPageSize);
+      const data = apiResponse.data;
+
       return {
         entities: data["value"],
         nextLink: data["@odata.nextLink"],
@@ -292,10 +268,7 @@ export class WebApiStatic {
         data: requestPayload,
       });
 
-      const responseString = apiResponse["responseText"];
-      const responseJson = responseString && responseString.length > 0 ? JSON.parse(apiResponse["responseText"]) : null;
-
-      return this.createExecuteResponse(responseJson, responseString, path);
+      return this.createExecuteResponse(apiResponse.data, apiResponse.body as string, path);
     } catch (ex) {
       throw this.createException("Exception in execute", ex);
     }
@@ -387,9 +360,9 @@ export class WebApiStatic {
     return parameterValue;
   }
 
-  private createExecuteResponse(responseJson: string, responseString: string, path: string): Xrm.ExecuteResponse {
-    const jsonPromise = new Promise<string>((resolve, _reject) => {
-      resolve(responseJson);
+  private createExecuteResponse(responseObject: unknown, responseString: string, path: string): Xrm.ExecuteResponse {
+    const jsonPromise = new Promise<unknown>((resolve, _reject) => {
+      resolve(responseObject);
     });
     const responseTextPromise = new Promise<string>((_resolve, _reject) => {
       _resolve(responseString);
@@ -469,7 +442,7 @@ export class WebApiStatic {
       const path = `EntityDefinitions(LogicalName='${entityName}')`;
       const options = attributes !== undefined ? `?$select=${attributes.join(",")}` : undefined;
       const apiResponse = await this.webApiRequest({ action: "GET", path: path, options: options });
-      return apiResponse["data"] as Xrm.Metadata.EntityMetadata;
+      return apiResponse.data as unknown as Xrm.Metadata.EntityMetadata;
     } catch (ex) {
       throw this.createException("Exception in getEntityMetadata", ex);
     }
@@ -498,21 +471,21 @@ export class WebApiStatic {
     return options;
   }
 
+  private getApiPath() {
+    return `/api/data/v${this.requestImplementation.apiVersion}/`;
+  }
   private getStandardHeaders() {
     return {
       "OData-MaxVersion": "4.0",
       "OData-Version": "4.0",
       Accept: "application/json",
       "Content-Type": "application/json; charset=UTF-8",
-      Authorization: `Bearer ${this.accessToken}`,
       Connection: "keep-alive",
     };
   }
 
   private async batchWebApiRequest(requests: WebApiRequestDefinition[]) {
-    const uri = this.server + this.apiPath + "$batch";
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
+    const uri = this.requestImplementation.server + this.getApiPath() + "$batch";
     const requestBody: string[] = [];
     const standardHeaders = this.getStandardHeaders();
     const batchId = "--batch_" + new Date().getTime();
@@ -528,77 +501,58 @@ export class WebApiStatic {
     }
     requestBody.push(batchId);
     const additionalHeaders = { "content-type": `multipart/mixed;boundary=${batchId}` };
-    const requestOptions = {
-      method: "POST",
-      headers: { ...standardHeaders, ...additionalHeaders },
-    } as requestJs.CoreOptions;
-    return new Promise<ApiResponse>((resolve, reject) => {
-      requestOptions.body = requestBody.join("\n");
-      requestJs(uri, requestOptions, (error, response) => {
-        if (error != null) reject(error);
-        else {
-          const apiResponse = self.getResponse(response);
-          if (apiResponse.error != null) {
-            reject(apiResponse.error);
-          } else {
-            resolve(apiResponse);
-          }
-        }
-      });
-    });
+
+    const response = await this.requestImplementation.send(
+      "POST",
+      uri,
+      { ...standardHeaders, ...additionalHeaders },
+      requestBody.join("\n"),
+    );
+    this.getResponseData(response);
   }
 
   private async webApiRequest(req: WebApiRequestDefinition) {
     // Strip leading ? from query
     req.options = this.trimOptions(req.options);
-    const uri = this.server + this.apiPath + req.path + req.options;
-    const hasData = req.data !== undefined && req.data !== null;
+    const uri = this.requestImplementation.server + this.getApiPath() + req.path + req.options;
     const standardHeaders = this.getStandardHeaders();
     const headers = { ...standardHeaders, ...req.additionalHeaders };
-    const requestOptions = {
-      method: req.action,
-      headers: headers,
-    } as requestJs.CoreOptions;
-    if (hasData) requestOptions.body = req.data;
-    return await this.asyncRequest(uri, requestOptions);
+    const response = await this.requestImplementation.send(
+      req.action,
+      uri,
+      headers,
+      req.data !== null && req.data !== "" ? req.data : undefined,
+    );
+    response.data = this.getResponseData(response);
+    return response;
   }
 
-  private async asyncRequest(uri: string, requestOptions: requestJs.CoreOptions) {
-    return new Promise<ApiResponse>((resolve, reject) => {
-      requestJs(uri, requestOptions, (error, response) => {
-        if (error != null) {
-          reject(error);
-        } else if (response.statusCode >= 300) {
-          reject(response.statusMessage);
-        } else {
-          const apiResponse = this.getResponse(response);
-          if (apiResponse.error != null) {
-            reject(apiResponse.error);
-          } else {
-            resolve(apiResponse);
-          }
-        }
-      });
-    });
-  }
-
-  private getResponse(response: requestJs.Response): ApiResponse {
-    let responseData: unknown = null;
+  // eslint-disable-next-line sonarjs/cognitive-complexity
+  private getResponseData(response: WebApiResponse): Record<string, unknown> {
+    let responseData: Record<string, unknown> | undefined;
+    const contentType = response.headers["content-type"];
+    const isJson = contentType && contentType.indexOf("application/json") > -1;
     // Check if this is a batch response
-    if (response.body.startsWith("--batchresponse_")) {
+    if (response.body && response.body.startsWith("--batchresponse_")) {
       // Batch - find the boundary
-      const contentType = (response.headers["content-type"] as string).split(";");
+      const contentTypeParts = contentType.split(";");
       // Find the boundary
-      for (const key of contentType) {
+      for (const key of contentTypeParts) {
         if (key.trim().startsWith("boundary=")) {
           // TODO: Get the batch responses
         }
       }
-      responseData = null;
     } else {
       responseData =
-        response.body != null && response.body.length > 0 ? JSON.parse(response.body, this.dateReviver) : null;
+        isJson && response.body && response.body.length > 0 ? JSON.parse(response.body, this.dateReviver) : null;
     }
-    return constructApiResponse(response, responseData);
+
+    if (response.ok) {
+      return responseData || {};
+    } else if (responseData && responseData["error"]) {
+      throw responseData["error"];
+    } else {
+      throw `HTTP Error ${response.statusText}`;
+    }
   }
 }

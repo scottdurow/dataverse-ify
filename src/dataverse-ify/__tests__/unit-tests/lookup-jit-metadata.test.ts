@@ -2,7 +2,7 @@
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { EntityReference, odataify, setMetadataCache } from "../../..";
 import { XrmStatic } from "../../../webapi/XrmStatic";
-import { NodeXrmUtilityStatic } from "../../../webapi";
+import { XrmUtilityStatic } from "../../../webapi";
 import { sdkify } from "../../sdkify/sdkify";
 
 test("odataify lookups - pascal case navigation property", async () => {
@@ -14,7 +14,7 @@ test("odataify lookups - pascal case navigation property", async () => {
   } as Account;
 
   (global as any).Xrm = new XrmStatic();
-  Xrm.Utility = new NodeXrmUtilityStatic();
+  Xrm.Utility = new XrmUtilityStatic();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Xrm.Utility.getEntityMetadata = jest.fn().mockImplementation((entityName: string, _attributes?: string[]) => {
     return entityName === "resource"

@@ -1,8 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { WebApiStatic } from "./WebApiStatic";
-export class NodeXrmUtilityStatic implements Xrm.Utility {
+import { WebApiBase } from "./WebApiBase";
+export class XrmUtilityStatic implements Xrm.Utility {
   getLearningPathAttributeName(): string {
     throw new Error("Method not implemented.");
   }
@@ -17,7 +17,7 @@ export class NodeXrmUtilityStatic implements Xrm.Utility {
     throw new Error("Method not implemented");
   }
   getEntityMetadata(entityName: string, attributes?: string[]): Xrm.Async.PromiseLike<Xrm.Metadata.EntityMetadata> {
-    const webApi = Xrm.WebApi as object as WebApiStatic;
+    const webApi = Xrm.WebApi as object as WebApiBase;
     return webApi.getEntityMetadata(
       entityName,
       attributes,

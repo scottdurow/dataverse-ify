@@ -12,7 +12,7 @@ There are some pollyfills added in `src\browser-tests\index.ts` to provide the m
 
 To run the browser tests:
 
-1. Run `npm run build-browser`. This will use web-pack to create the `dist-tests\browser-test.js` next to the `browser-tests.html` page. 
+1. Run `npm run browser-tests-build`. This will use web-pack to create the `dist-tests\browser-test.js` next to the `browser-tests.html` page. 
 
 2. Configure a Fiddler autoresponder:
    `REGEX:(?insx).+\/dataverseify-tests\/(?'fname'[^?]*.*)`

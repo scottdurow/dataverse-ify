@@ -7,7 +7,6 @@
 			"ES2017",
 			"dom"
 		],
-
 		"rootDir": "src",
 		"outDir": "lib",
 		"strict": true,
@@ -26,5 +25,9 @@
 		"sourceMap": true,
 		"pretty": true,
 		"esModuleInterop": true
-	}
+	},
+	"exclude": [
+		"src/browser-tests",
+		"lib"
+	],
 }

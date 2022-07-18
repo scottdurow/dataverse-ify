@@ -1,5 +1,5 @@
 /* eslint-disable sonarjs/cognitive-complexity */
-import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../webapi/node/SetupGlobalContext";
 import { XrmContextDataverseClient } from "../..";
 import { ActivityParty, activitypartyMetadata } from "../../../types/ActivityParty";
 import { Entity } from "../../../types/Entity";

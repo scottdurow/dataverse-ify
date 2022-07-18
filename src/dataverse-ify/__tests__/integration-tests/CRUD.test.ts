@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../webapi/node/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { whoAmI } from "../../../webapi/whoAmI";

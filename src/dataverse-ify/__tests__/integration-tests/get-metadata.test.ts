@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../webapi/node/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { metadataCache } from "../../../dataverse-gen/metadata";
 import { MetadataConditionOperator } from "../../../dataverse-gen/enums/MetadataConditionOperator";

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SetupGlobalContext } from "../../SetupGlobalContext";
-import { whoAmI } from "../../whoAmI";
+import { whoAmI } from "../../../whoAmI";
 
 describe("XrmWebApiNode CRUD", () => {
   beforeAll(async () => {

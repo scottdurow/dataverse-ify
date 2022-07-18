@@ -59,7 +59,7 @@ export class GlobalContextStatic {
     throw new Error("Method not implemented.");
   }
   getVersion(): string {
-    return XrmStatic.webapiInstance.apiVersion;
+    return XrmStatic.webapiInstance.requestImplementation.apiVersion;
   }
   isOnPremise(): boolean {
     throw new Error("Method not implemented.");

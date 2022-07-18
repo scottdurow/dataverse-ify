@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import config from "config";
 import { NodeXrmConfig } from "./config/NodeXrmConfig";
-import { XrmStatic } from "./XrmStatic";
+import { XrmStatic } from "../XrmStatic";
+import { NodeWebApi } from "./NodeWebApi";
 let xrmGlobalContextSetup = false;
 const defaultConfig: NodeXrmConfig = {
   proxy: {
@@ -17,16 +18,23 @@ export async function SetupGlobalContext() {
   // Create global Xrm instance so we can simulate the Xrm context
   const configFile = config.get("nodewebapi") as NodeXrmConfig;
   const xrmConfig = { ...defaultConfig, ...configFile };
-  const xrmInstance = await XrmStatic.createInstance(xrmConfig);
-  // If Xrm is already defined by another system (e.g. xrm-mock), then re-use it
-  globalAny.Xrm = globalAny.Xrm || xrmInstance;
+  if (xrmConfig.server) {
+    const nodeWebApi = new NodeWebApi(xrmConfig.server.host, xrmConfig.server.version);
+    await nodeWebApi.authorize();
+    const xrmInstance = XrmStatic.createInstance(nodeWebApi);
+    // If Xrm is already defined by another system (e.g. xrm-mock), then re-use it
+    globalAny.Xrm = globalAny.Xrm || xrmInstance;
 
-  // Add the dataverse-ify versions of the Xrm Api
-  const overrides = {
-    WebApi: xrmInstance.WebApi,
-    Utility: xrmInstance.Utility,
-  };
-  globalAny.Xrm = { ...globalAny.Xrm, ...overrides };
+    // Add the dataverse-ify versions of the Xrm Api
+    const overrides = {
+      WebApi: xrmInstance.WebApi,
+      Utility: xrmInstance.Utility,
+    };
+    globalAny.Xrm = { ...globalAny.Xrm, ...overrides };
+  } else {
+    throw new Error("config.server not configured");
+  }
+
   globalAny.GetGlobalContext = XrmStatic.getGlobalContext;
   globalAny.NodeXrm = XrmStatic;
   xrmGlobalContextSetup = true;

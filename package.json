@@ -26,8 +26,7 @@
     "cryptr": "^6.0.3",
     "fs": "^0.0.1-security",
     "node-fetch": "^2.6.7",
-    "os": "^0.1.2",
-    "request": "^2.88.2"
+    "os": "^0.1.2"
   },
   "devDependencies": {
     "@types/config": "^0.0.41",

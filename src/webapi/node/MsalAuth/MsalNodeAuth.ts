@@ -3,8 +3,11 @@ import {
   AccountInfo,
   AuthenticationResult,
   AuthorizationCodeRequest,
+  ClientCredentialRequest,
+  ConfidentialClientApplication,
   Configuration,
   DeviceCodeRequest,
+  NodeAuthOptions,
   PublicClientApplication,
   SilentFlowRequest,
 } from "@azure/msal-node";
@@ -73,22 +76,29 @@ export function getAllUsers(): { userName: string; environment: string }[] {
     return { userName: lookup[environment], environment };
   });
 }
-
+function normalizeEnvUrl(environmentUrl: string) {
+  return environmentUrl.toLowerCase().trim().replace(/\/$/, "");
+}
 export function getAccountByEnvUrl(accounts: AccountInfo[], environmentUrl: string): AccountInfo | undefined {
-  const env = environmentUrl.toLowerCase();
-  const user = getUserNameByEnvUrl(env);
+  const user = getUserNameByEnvUrl(normalizeEnvUrl(environmentUrl));
   if (user) {
     return accounts.find((a) => a.username === user);
   }
   return undefined;
 }
 
-async function getMsalClient(logger?: ILoggerCallback): Promise<PublicClientApplication> {
+async function getMsalClient(
+  logger?: ILoggerCallback,
+  additionalConfig?: Partial<NodeAuthOptions>,
+): Promise<PublicClientApplication> {
   if (!msalClient) {
     const publicClientConfig = {
       auth: {
-        clientId: msalConfig.clientId,
-        authority: "https://login.windows.net/common",
+        ...{
+          clientId: msalConfig.clientId,
+          authority: "https://login.windows.net/common",
+        },
+        ...additionalConfig,
       },
       system: {
         loggerOptions: {
@@ -113,22 +123,65 @@ export async function acquireTokenByCodeMsal(
   logger?: ILoggerCallback,
 ): Promise<AuthenticationResult | null> {
   const client = await getMsalClient(logger);
+  const envUrl = normalizeEnvUrl(environmentUrl);
   const response = await client.acquireTokenByCode({
     code: authCode,
     redirectUri: msalConfig.redirectUrl,
-    scopes: ["openid", `https://${environmentUrl}/.default`],
+    scopes: ["openid", `https://${envUrl}/.default`],
   } as AuthorizationCodeRequest);
   if (response && response.account) {
     // Test connection to environment
-    const userId = await whoAmI(environmentUrl, response);
+    const userId = await whoAmI(envUrl, response);
     if (logger) logger(LogLevel.Verbose, `Dataverse userId ${userId}`, false);
     // Save user profile
-    saveAccountByEnvUrl(environmentUrl, response.account);
+    saveAccountByEnvUrl(envUrl, response.account);
   } else {
-    throw `Authentication for ${environmentUrl} was unsuccessful`;
+    throw `Authentication for ${envUrl} was unsuccessful`;
   }
 
   return response;
+}
+
+export async function acquireTokenByClientSecret(
+  environmentUrl: string,
+  tenantID: string,
+  clientId: string,
+  clientSecret: string,
+  logger?: ILoggerCallback,
+): Promise<string> {
+  const clientConfig = {
+    auth: {
+      clientId: clientId,
+      authority: `https://login.windows.net/${tenantID}`,
+      clientSecret: clientSecret,
+    },
+    system: {
+      loggerOptions: {
+        loggerCallback: logger,
+        logLevel: logger ? LogLevel.Verbose : undefined,
+        piiLoggingEnabled: true,
+      },
+    },
+  };
+  const cca = new ConfidentialClientApplication(clientConfig);
+
+  const envUrl = normalizeEnvUrl(environmentUrl);
+
+  const clientCredentialRequest = {
+    scopes: [`https://${envUrl}/.default`], // replace with your resource
+  } as ClientCredentialRequest;
+
+  const response = await cca.acquireTokenByClientCredential(clientCredentialRequest);
+
+  if (response && response.accessToken) {
+    // Test connection to environment
+    const userId = await whoAmI(envUrl, response);
+    if (logger) logger(LogLevel.Verbose, `Dataverse userId ${userId}`, false);
+
+    return response.accessToken;
+  } else {
+    throw `Authentication for ${envUrl} was unsuccessful`;
+  }
 }
 
 export async function acquireTokenUsingDeviceCode(
@@ -136,56 +189,60 @@ export async function acquireTokenUsingDeviceCode(
   logger?: ILoggerCallback,
 ): Promise<AuthenticationResult | null> {
   const client = await getMsalClient(logger);
+  const envUrl = normalizeEnvUrl(environmentUrl);
   const response = await client.acquireTokenByDeviceCode({
     redirectUri: msalConfig.redirectUrl,
-    scopes: ["openid", `https://${environmentUrl}/.default`],
+    scopes: ["openid", `https://${envUrl}/.default`],
     deviceCodeCallback: (response) => {
       console.log(response.message);
     },
   } as DeviceCodeRequest);
   if (response && response.account) {
     // Test connection to environment
-    const userId = await whoAmI(environmentUrl, response);
+    const userId = await whoAmI(envUrl, response);
     if (logger) logger(LogLevel.Verbose, `Dataverse userId ${userId}`, false);
     // Save user profile
-    saveAccountByEnvUrl(environmentUrl, response.account);
+    saveAccountByEnvUrl(envUrl, response.account);
   } else {
-    throw `Authentication for ${environmentUrl} was unsuccessful`;
+    throw `Authentication for ${envUrl} was unsuccessful`;
   }
   return response;
 }
 
 export async function removeToken(environmentUrl: string): Promise<void> {
   const client = await getMsalClient();
+  const envUrl = normalizeEnvUrl(environmentUrl);
   const accounts = await client.getTokenCache().getAllAccounts();
-  const account = getAccountByEnvUrl(accounts, environmentUrl);
+  const account = getAccountByEnvUrl(accounts, envUrl);
   if (!account) throw "Cannot find profile for environment.";
   client.getTokenCache().removeAccount(account);
-  removeAccountByEnvUrl(environmentUrl);
+  removeAccountByEnvUrl(envUrl);
 }
 
 export async function acquireToken(environmentUrl: string, logger?: ILoggerCallback): Promise<string> {
   // Find the account for the given environment
   const client = await getMsalClient(logger);
+  const envUrl = normalizeEnvUrl(environmentUrl);
   const accounts = await client.getTokenCache().getAllAccounts();
   // Find the account for the given environment
-  const account = getAccountByEnvUrl(accounts, environmentUrl);
-  if (!account) throw `Cannot find profile for environment. Run 'dataverse-auth ${environmentUrl}`;
+  const account = getAccountByEnvUrl(accounts, envUrl);
+  if (!account) throw `Cannot find profile for environment. Run 'dataverse-auth ${envUrl}`;
 
-  const scopes = ["openid", `https://${environmentUrl}/.default`];
+  const scopes = ["openid", `https://${envUrl}/.default`];
   const response = await client.acquireTokenSilent({ account: account, scopes: scopes } as SilentFlowRequest);
   if (response && response.account) {
     // Test connection to environment
-    const userId = await whoAmI(environmentUrl, response);
+    const userId = await whoAmI(envUrl, response);
     if (logger) logger(LogLevel.Verbose, `Dataverse userId ${userId}`, false);
 
     return response.accessToken;
   } else {
-    throw `Authentication for ${environmentUrl} was unsuccessful`;
+    throw `Authentication for ${envUrl} was unsuccessful`;
   }
 }
 async function whoAmI(environmentUrl: string, response: AuthenticationResult): Promise<string> {
-  const whoAmIResponse = await fetch(`https://${environmentUrl}/api/data/v9.2/WhoAmI()`, {
+  const envUrl = normalizeEnvUrl(environmentUrl);
+  const whoAmIResponse = await fetch(`https://${envUrl}/api/data/v9.2/WhoAmI()`, {
     method: "GET",
     headers: {
       "OData-MaxVersion": "4.0",
