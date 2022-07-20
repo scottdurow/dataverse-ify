@@ -9,13 +9,13 @@ export class NodeWebApi extends WebApiBase {
   }
 
   async authorize() {
-    const requestImpl = this.getNodeRequestImplementation();
+    const requestImpl = this.getRequestImplementation() as NodeWebApiRequest;
     const accessToken = await acquireToken(requestImpl.server.replace("https://", ""));
     requestImpl.setAccessToken(accessToken);
   }
 
   async authorizeWithSecret(tenantId: string, clientId: string, clientSecret: string) {
-    const requestImpl = this.getNodeRequestImplementation();
+    const requestImpl = this.getRequestImplementation() as NodeWebApiRequest;
 
     const accessToken = await acquireTokenByClientSecret(
       requestImpl.server.replace("https://", ""),
@@ -25,9 +25,5 @@ export class NodeWebApi extends WebApiBase {
     );
 
     requestImpl.setAccessToken(accessToken);
-  }
-
-  getNodeRequestImplementation() {
-    return this.requestImplementation as NodeWebApiRequest;
   }
 }

@@ -1,20 +1,30 @@
 import { WebApiRequest, WebApiResponse } from "../WebApiRequest";
-import fetch, { Headers } from "node-fetch";
 
-export class NodeWebApiRequest implements WebApiRequest {
+export class BrowserWebApiRequest implements WebApiRequest {
   public server: string;
   public apiVersion: string;
   private accessToken?: string;
 
-  constructor(server: string, apiVersion?: string, accessToken?: string) {
-    this.server = server;
-    this.apiVersion = apiVersion || "9.0";
-    this.accessToken = accessToken;
+  // Supports calling the webapi from inside the browser running under the following contexts:
+  // 1. Inside a model driven app where Xrm.Utility.getGlobalContext is available and the bearer token is automatically provided
+  // 2. Inside a SPA (Single Page Application) where setAccessToken is called after authenticating using MSAL
+  constructor(parameters?: { context?: Xrm.GlobalContext; server?: string; apiVersion?: string }) {
+    if (parameters?.context) {
+      this.server = parameters.context.getClientUrl();
+      this.apiVersion = parameters.context.getVersion();
+    } else if (parameters?.server) {
+      this.server = parameters?.server;
+      this.apiVersion = parameters?.apiVersion || "9.0";
+    } else if (Xrm && Xrm.Utility && Xrm.Utility.getGlobalContext) {
+      const context = Xrm.Utility.getGlobalContext();
+      this.server = context.getClientUrl();
+      this.apiVersion = context.getVersion();
+      Xrm.Utility.getGlobalContext();
+    } else throw "Supply either context or server to constructor";
   }
   public setAccessToken(accessToken: string) {
     this.accessToken = accessToken;
   }
-
   async send(
     method: "POST" | "PATCH" | "PUT" | "GET" | "DELETE",
     uri: string,
@@ -45,8 +55,6 @@ export class NodeWebApiRequest implements WebApiRequest {
       headers: fetchHeaders,
     });
 
-    let responseBody: unknown;
-
     const responseHeaders = {} as Record<string, string>;
     response.headers.forEach((value, key) => (responseHeaders[key] = value));
     const webApiResponse = {
@@ -57,17 +65,6 @@ export class NodeWebApiRequest implements WebApiRequest {
     } as WebApiResponse;
 
     webApiResponse.body = await response.text();
-
-    if (response.ok) {
-      return webApiResponse;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } else if (responseBody && (responseBody as any).error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      throw (responseBody as any).error;
-    } else if (response.statusText) {
-      throw response.statusText;
-    } else {
-      throw "Unexpected Error";
-    }
+    return webApiResponse;
   }
 }

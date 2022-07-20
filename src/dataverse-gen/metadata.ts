@@ -1,5 +1,6 @@
 /* eslint-disable*/
 import { accountMetadata } from "./entities/Account";
+import { cdsify_integrationtestMetadata } from "./entities/cdsify_IntegrationTest";
 import { contactMetadata } from "./entities/Contact";
 import { incidentMetadata } from "./entities/Incident";
 import { letterMetadata } from "./entities/Letter";
@@ -15,6 +16,7 @@ import { RetrieveMetadataChangesMetadata } from "./functions/RetrieveMetadataCha
 
 export const Entities = {
   Account: "account",
+  cdsify_IntegrationTest: "cdsify_integrationtest",
   Contact: "contact",
   Incident: "incident",
   Letter: "letter",
@@ -29,6 +31,7 @@ export const Entities = {
 export const metadataCache = {
   entities: {
     account: accountMetadata,
+    cdsify_integrationtest: cdsify_integrationtestMetadata,
     contact: contactMetadata,
     incident: incidentMetadata,
     letter: letterMetadata,

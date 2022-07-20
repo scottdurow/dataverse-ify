@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { metadataCache } from "../dataverse-gen/metadata";
 import { fixWebresourceXrm } from "../metadata/fixWebresourceXrm";
 import { setMetadataCache } from "../metadata/MetadataCache";
@@ -24,3 +25,4 @@ require("../dataverse-ify/__tests__/integration-tests/get-metadata.test");
 require("../dataverse-ify/__tests__/integration-tests/nullvalues.test");
 require("../dataverse-ify/__tests__/integration-tests/pascalcase-navigation-property.test");
 require("../dataverse-ify/__tests__/integration-tests/winopportunity.test");
+require("../dataverse-ify/__tests__/integration-tests/filecolumn.test");

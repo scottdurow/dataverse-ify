@@ -45,15 +45,23 @@ export class WebApiBase {
     throw new Error("Not implemented");
   }
 
+  public getRequestImplementation() {
+    return this.requestImplementation as WebApiRequest;
+  }
+
   private async getEntitySetName(logicalName: string): Promise<string> {
     let metadata = this.entitySetNames[logicalName];
     if (!metadata) {
       // request https://org.crm11.dynamics.com/api/data/v9.0/EntityDefinitions(LogicalName='account')?$select=DisplayName,IsKnowledgeManagementEnabled,EntitySetName
       const path = `EntityDefinitions(LogicalName='${logicalName}')`;
-      const apiResponse = await this.webApiRequest({ action: "GET", path: path, options: "?$select=EntitySetName" });
-      if (apiResponse.data) {
-        metadata = apiResponse.data["EntitySetName"] as string;
-        this.entitySetNames[logicalName] = metadata;
+      try {
+        const apiResponse = await this.webApiRequest({ action: "GET", path: path, options: "?$select=EntitySetName" });
+        if (apiResponse.data) {
+          metadata = apiResponse.data["EntitySetName"] as string;
+          this.entitySetNames[logicalName] = metadata;
+        }
+      } catch (ex) {
+        throw `Cannot get entity set name for ${logicalName}:${ex}`;
       }
     }
     return metadata;
@@ -474,6 +482,7 @@ export class WebApiBase {
   private getApiPath() {
     return `/api/data/v${this.requestImplementation.apiVersion}/`;
   }
+
   private getStandardHeaders() {
     return {
       "OData-MaxVersion": "4.0",

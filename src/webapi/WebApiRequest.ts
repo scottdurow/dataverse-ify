@@ -6,6 +6,7 @@ export interface WebApiRequest {
     uri: string,
     headers: Record<string, string>,
     payload?: unknown,
+    skipStringify?: boolean,
   ): Promise<WebApiResponse>;
 }
 
