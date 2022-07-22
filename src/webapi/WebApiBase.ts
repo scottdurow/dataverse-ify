@@ -3,7 +3,7 @@
 import { getMetadataByLogicalName } from "../metadata/MetadataCache";
 import { WebApiExecuteRequestMetadata } from "../metadata/WebApiExecuteRequestMetadata";
 import { Dictionary } from "../types/Dictionary";
-import { trimGuid } from "../types/Guid";
+import { getGuidFromODataUrl, trimGuid } from "../types/Guid";
 import { IEntity } from "../types/IEntity";
 import { IEntityReference, odatifyEntityReference } from "../types/IEntityReference";
 import { OperationType } from "../types/OperationType";
@@ -38,7 +38,7 @@ export class WebApiBase {
   }
 
   private getOdataContext(): string {
-    return this.requestImplementation.server + "/$metadata#$ref";
+    return `${this.requestImplementation.server}${this.getApiPath()}$metadata#$ref`;
   }
 
   public isAvailableOffline(_entityLogicalName: string): boolean {
@@ -93,12 +93,7 @@ export class WebApiBase {
         data: JSON.stringify(record),
       });
       // Get the GUID from the OData-EntityId header
-      const guidMatch = /\(([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\)/g.exec(
-        apiResponse.headers["odata-entityid"] as string,
-      );
-      if (guidMatch === null || guidMatch.length === 0)
-        throw new Error("Could not find the guid in the createRecord response");
-      const guid = guidMatch[1];
+      const guid = getGuidFromODataUrl(apiResponse.headers["odata-entityid"] as string);
       return {
         entityType: entityLogicalName,
         id: guid,
@@ -117,9 +112,9 @@ export class WebApiBase {
    * @see {@link https://docs.microsoft.com/en-us/dynamics365/customer-engagement/developer/clientapi/reference/xrm-webapi/updaterecord External Link: updateRecord (Client API reference)}
    */
   public async updateRecord(entityLogicalName: string, id: string, data: unknown): Promise<IEntityReference> {
-    requireValue("entityLogicalName is a required parameter", entityLogicalName);
-    requireValue("id is a required parameter", id);
-    requireValue("data is a required parameter", data);
+    requireValue("entityLogicalName", entityLogicalName);
+    requireValue("id", id);
+    requireValue("data", data);
     try {
       const entitySetName = await this.getEntitySetName(entityLogicalName);
       const path = `${entitySetName}(${this.toPathGuid(id)})`;
@@ -153,6 +148,8 @@ export class WebApiBase {
    * @see {@link https://docs.microsoft.com/en-us/dynamics365/customer-engagement/developer/clientapi/reference/xrm-webapi/retrieverecord External Link: retrieveRecord (Client API reference)}
    */
   public async retrieveRecord(entityLogicalName: string, id: string, options?: string): Promise<unknown> {
+    requireValue("id", id);
+    requireValue("entityLogicalName", entityLogicalName);
     const entitySetName = await this.getEntitySetName(entityLogicalName);
     // eslint-disable-next-line quotes
     const preferHeader = ['odata.include-annotations="*"'];
@@ -178,8 +175,8 @@ export class WebApiBase {
    * @see {@link https://docs.microsoft.com/en-us/dynamics365/customer-engagement/developer/clientapi/reference/xrm-webapi/deleterecord External Link: deleteRecord (Client API reference)}
    */
   public async deleteRecord(entityLogicalName: string, id: string): Promise<IEntityReference> {
-    requireValue("entityLogicalName is a required parameter", entityLogicalName);
-    requireValue("id is a required parameter", id);
+    requireValue("entityLogicalName", entityLogicalName);
+    requireValue("id", id);
 
     try {
       const entitySetName = await this.getEntitySetName(entityLogicalName);
@@ -228,7 +225,7 @@ export class WebApiBase {
 
   public async execute(request: WebApiExecuteRequest): Promise<Xrm.ExecuteResponse | void> {
     try {
-      requireValue("Request cannot be null", request);
+      requireValue("Request", request);
 
       // Currently the UCI requires us to have a class that defines the getMetadata rather than just a function
       // otherwise the getMetadata function is serialized into the request.
@@ -241,9 +238,11 @@ export class WebApiBase {
       const requestInfo = await this.parseRequest(request, metadata);
 
       switch (metadata.operationType) {
-        case OperationType.CRUD:
+        case OperationType.CRUD: {
           // Special case for Associate/Disassociate
-          return await this.executeCRUD(metadata, request);
+          const apiResponse = await this.executeCRUD(metadata, request);
+          return this.createExecuteResponse(apiResponse.data, apiResponse.body as string, "");
+        }
         case OperationType.Action:
           requestPayload = JSON.stringify(requestInfo.parameterObject);
           break;
@@ -299,7 +298,7 @@ export class WebApiBase {
       const parameterName = `@p${count.toString()}`;
       let parameterValue: unknown = request[key];
       const parameterType = typeof parameterValue;
-      const parameterMetadata = metadata.parameterTypes[key];
+      const parameterMetadata = metadata.parameterTypes && metadata.parameterTypes[key];
 
       if (parameterMetadata) {
         const structuralType = parameterMetadata.structuralProperty;
@@ -394,42 +393,42 @@ export class WebApiBase {
     throw new Error("Not implemented");
   }
 
-  private async executeCRUD(metadata: WebApiExecuteRequestMetadata, request: unknown): Promise<void> {
+  private async executeCRUD(metadata: WebApiExecuteRequestMetadata, request: unknown): Promise<WebApiResponse> {
     const requestWithTarget = request as RequestWithTarget;
-    const targetEntitySetName = await this.getEntitySetName(requestWithTarget.target.entityType);
+    
 
     // This is a special case for associate/disassociate
     switch (metadata.operationName) {
-      case "Associate":
-        {
-          const associate: unknown[] = [];
-          const associateRequest = request as AssociateRequest;
-          for (const related of associateRequest.relatedEntities) {
-            const entitySetName = await this.getEntitySetName(related.entityType);
-            associate.push({
-              "@odata.context": this.getOdataContext(),
-              "@odata.id": `${entitySetName}(${related.id})`,
+      case "Associate": {
+        const targetEntitySetName = await this.getEntitySetName(requestWithTarget.target.entityType);
+        const associate: unknown[] = [];
+        const associateRequest = request as AssociateRequest;
+        for (const related of associateRequest.relatedEntities) {
+          const entitySetName = await this.getEntitySetName(related.entityType);
+          associate.push({
+            "@odata.context": this.getOdataContext(),
+            "@odata.id": `${entitySetName}(${related.id})`,
+          });
+        }
+        if (associate.length > 1) {
+          const batch: WebApiRequestDefinition[] = [];
+          // We need to a batch request to associate multiple related entities
+          for (const record of associate) {
+            batch.push({
+              action: "POST",
+              path: `${targetEntitySetName}(${associateRequest.target.id})/${associateRequest.relationship}/$ref`,
+              data: record,
             });
           }
-          if (associate.length > 1) {
-            const batch: WebApiRequestDefinition[] = [];
-            // We need to a batch request to associate multiple related entities
-            for (const record of associate) {
-              batch.push({
-                action: "POST",
-                path: `${targetEntitySetName}(${associateRequest.target.id})/${associateRequest.relationship}/$ref`,
-                data: JSON.stringify(record),
-              });
-            }
-            await this.batchWebApiRequest(batch);
-          } else {
-            // Get the target and related entities
-            const url = `${targetEntitySetName}(${associateRequest.target.id})/${associateRequest.relationship}/$ref`;
-            await this.webApiRequest({ action: "POST", path: url, data: JSON.stringify(associate[0]) });
-          }
+          return await this.batchWebApiRequest(batch);
+        } else {
+          // Get the target and related entities
+          const url = `${targetEntitySetName}(${associateRequest.target.id})/${associateRequest.relationship}/$ref`;
+          return await this.webApiRequest({ action: "POST", path: url, data: JSON.stringify(associate[0]) });
         }
-        break;
+      }
       case "Disassociate": {
+        const targetEntitySetName = await this.getEntitySetName(requestWithTarget.target.entityType);
         const disassociateRequest = request as DisassociateRequest;
         // Send a delete DELETE https://develop1v9demo.crm11.dynamics.com/api/data/v9.0/contacts(ca12bd9a-7b34-e911-a8b9-002248019477)/account_primary_contact(d012bd9a-7b34-e911-a8b9-002248019477)/$ref
         let disassociateRequestRelatedEntityId = "";
@@ -438,9 +437,10 @@ export class WebApiBase {
           disassociateRequestRelatedEntityId = `(${disassociateRequest.relatedEntityId})`;
         }
         const url = `${targetEntitySetName}(${disassociateRequest.target.id})/${disassociateRequest.relationship}${disassociateRequestRelatedEntityId}/$ref`;
-        await this.webApiRequest({ action: "DELETE", path: url });
-        break;
+        return await this.webApiRequest({ action: "DELETE", path: url });
       }
+      default:
+        throw new Error(`Unexpected operation name ${metadata.operationName}`);
     }
   }
 
@@ -483,12 +483,12 @@ export class WebApiBase {
     return `/api/data/v${this.requestImplementation.apiVersion}/`;
   }
 
-  private getStandardHeaders() {
+  private getStandardHeaders(contentType?: string) {
     return {
       "OData-MaxVersion": "4.0",
       "OData-Version": "4.0",
       Accept: "application/json",
-      "Content-Type": "application/json; charset=UTF-8",
+      "Content-Type": contentType ?? "application/json; charset=UTF-8",
       Connection: "keep-alive",
     };
   }
@@ -496,28 +496,26 @@ export class WebApiBase {
   private async batchWebApiRequest(requests: WebApiRequestDefinition[]) {
     const uri = this.requestImplementation.server + this.getApiPath() + "$batch";
     const requestBody: string[] = [];
-    const standardHeaders = this.getStandardHeaders();
-    const batchId = "--batch_" + new Date().getTime();
+
+    const batchId = new Date().getTime();
+    const standardHeaders = this.getStandardHeaders(`multipart/mixed;boundary=batch_${batchId}`);
     for (const request of requests) {
-      requestBody.push(batchId);
+      requestBody.push(`--batch_${batchId}`);
       requestBody.push("Content-Type: application/http");
       requestBody.push("Content-Transfer-Encoding: binary");
-      requestBody.push(`${request.action} ${request.path}`);
+      requestBody.push("");
+      requestBody.push(`${request.action} ${this.getApiPath()}${request.path} HTTP/1.1`);
       requestBody.push("Accept: application/json");
       requestBody.push("Content-Type: application/json;type=entry");
       requestBody.push("");
       requestBody.push(JSON.stringify(request.data));
     }
-    requestBody.push(batchId);
-    const additionalHeaders = { "content-type": `multipart/mixed;boundary=${batchId}` };
+    requestBody.push(`--batch_${batchId}--`);
+    requestBody.push(" ");
 
-    const response = await this.requestImplementation.send(
-      "POST",
-      uri,
-      { ...standardHeaders, ...additionalHeaders },
-      requestBody.join("\n"),
-    );
-    this.getResponseData(response);
+    const response = await this.requestImplementation.send("POST", uri, standardHeaders, requestBody.join("\n"), true);
+    response.data = this.getResponseData(response);
+    return response;
   }
 
   private async webApiRequest(req: WebApiRequestDefinition) {
@@ -548,7 +546,14 @@ export class WebApiBase {
       // Find the boundary
       for (const key of contentTypeParts) {
         if (key.trim().startsWith("boundary=")) {
-          // TODO: Get the batch responses
+          const boundary = key.trim().substring("boundary=".length);
+          const parts = response.body.split(`--${boundary}`);
+          const responses = parts
+            .filter((p) => p.toLowerCase().indexOf("content-type:") > -1)
+            .map((p) => {
+              return { body: p } as WebApiResponse;
+            });
+          responseData = { batchresponse: responses };
         }
       }
     } else {

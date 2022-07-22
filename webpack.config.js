@@ -23,7 +23,8 @@ module.exports = {
     alias: {
       // Since this is for running in the browser, we don't include the node context Xrm.WebApi
       config: path.resolve(__dirname, "src/browser-tests/config-browser"),
-      "../../../webapi/node/SetupGlobalContext": false,
+      "../../../webapi/node/SetupGlobalContext": path.resolve(__dirname, "src/browser-tests/SetupGlobalContext"),
+      "../../SetupGlobalContext": path.resolve(__dirname, "src/browser-tests/SetupGlobalContext"),
     },
     fallback: {
       crypto: false,

@@ -1,5 +1,6 @@
 import { WebApiBase } from "./WebApiBase";
 import { XrmUtilityStatic } from "./XrmUtilityStatic";
+// eslint-disable-next-line @microsoft/power-apps/avoid-unpub-api
 export class XrmStatic implements Xrm.XrmStatic {
   App!: Xrm.App;
   Page!: Xrm.Page;

@@ -25,10 +25,12 @@
     "config": "^3.3.7",
     "cryptr": "^6.0.3",
     "fs": "^0.0.1-security",
+    "https-proxy-agent": "^5.0.1",
     "node-fetch": "^2.6.7",
     "os": "^0.1.2"
   },
   "devDependencies": {
+    "@microsoft/eslint-plugin-power-apps": "^0.2.2",
     "@types/config": "^0.0.41",
     "@types/cryptr": "^4.0.1",
     "@types/jest": "^27.5.1",

@@ -22,6 +22,7 @@ test("sdkify MultiSelects", async () => {
 test("sdkify MultiSelects", async () => {
   setMetadataCache({ entities: { account: accountMetadata } });
   const odataRecord = {
+    // eslint-disable-next-line @microsoft/power-apps/use-relative-uri
     "@odata.context": "https://org.crm11.dynamics.com/api/data/v9.1/$metadata#accounts/$entity",
     // eslint-disable-next-line quotes
     "@odata.etag": 'W/"24588414"',

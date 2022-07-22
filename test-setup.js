@@ -11,8 +11,8 @@ module.exports = async function (globalConfig, projectConfig) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const sysWideCas = require("syswide-cas");
     sysWideCas.addCAs(".\\config\\FiddlerRoot.crt");
-
-    process.env.https_proxy = configFile.proxy.httpProxy;
+    console.debug(`Adding proxy: ${configFile.proxy.httpsProxy}`);
+    process.env.https_proxy = configFile.proxy.httpsProxy;
     process.env.http_proxy = configFile.proxy.httpProxy;
   }
 };

@@ -26,3 +26,8 @@ require("../dataverse-ify/__tests__/integration-tests/nullvalues.test");
 require("../dataverse-ify/__tests__/integration-tests/pascalcase-navigation-property.test");
 require("../dataverse-ify/__tests__/integration-tests/winopportunity.test");
 require("../dataverse-ify/__tests__/integration-tests/filecolumn.test");
+
+require("../webapi/node/__tests__/CRUD/Create.test");
+require("../webapi/node/__tests__/Execute/associate.test");
+require("../webapi/node/__tests__/Execute/execute-create.test");
+require("../webapi/node/__tests__/Execute/execute-multiple.test");

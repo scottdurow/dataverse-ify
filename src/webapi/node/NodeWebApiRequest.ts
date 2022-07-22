@@ -1,15 +1,21 @@
 import { WebApiRequest, WebApiResponse } from "../WebApiRequest";
 import fetch, { Headers } from "node-fetch";
+import { HttpsProxyAgent } from "https-proxy-agent";
 
 export class NodeWebApiRequest implements WebApiRequest {
   public server: string;
   public apiVersion: string;
   private accessToken?: string;
-
+  private agent?: HttpsProxyAgent;
   constructor(server: string, apiVersion?: string, accessToken?: string) {
     this.server = server;
     this.apiVersion = apiVersion || "9.0";
     this.accessToken = accessToken;
+
+    // For fiddler support, define the https agent
+    if (process.env.https_proxy) {
+      this.agent = new HttpsProxyAgent(process.env.https_proxy);
+    }
   }
   public setAccessToken(accessToken: string) {
     this.accessToken = accessToken;
@@ -43,9 +49,8 @@ export class NodeWebApiRequest implements WebApiRequest {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       body: skipStringify !== true ? JSON.stringify(payload) : (payload as any),
       headers: fetchHeaders,
+      agent: this.agent,
     });
-
-    let responseBody: unknown;
 
     const responseHeaders = {} as Record<string, string>;
     response.headers.forEach((value, key) => (responseHeaders[key] = value));
@@ -61,13 +66,18 @@ export class NodeWebApiRequest implements WebApiRequest {
     if (response.ok) {
       return webApiResponse;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } else if (responseBody && (responseBody as any).error) {
+    }
+
+    // Try and get an error from the response
+    const responseObject =
+      webApiResponse.body && webApiResponse.body.startsWith("{") ? JSON.parse(webApiResponse.body) : undefined;
+    if (responseObject && responseObject.error) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      throw (responseBody as any).error;
+      throw responseObject.error;
     } else if (response.statusText) {
       throw response.statusText;
     } else {
-      throw "Unexpected Error";
+      throw new Error("Unexpected Error");
     }
   }
 }
