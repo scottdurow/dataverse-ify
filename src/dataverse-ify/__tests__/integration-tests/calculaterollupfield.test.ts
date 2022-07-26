@@ -41,7 +41,7 @@ describe("CalculateRollUpField", () => {
       const response = await serviceClient.execute(request);
       expect(response).toBeDefined();
     } catch (ex) {
-      fail(ex);
+      expect(ex).toBeUndefined();
     } finally {
       if (account1.id) {
         // Tidy up

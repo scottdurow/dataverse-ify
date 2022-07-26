@@ -11,9 +11,9 @@ import { AssociateRequest } from "../types/requests/AssociateRequest";
 import { DisassociateRequest } from "../types/requests/DisassociateRequest";
 import { RequestWithTarget } from "../types/RequestWithTarget";
 import { StructuralProperty } from "../types/StructuralProperty";
-import { WebApiExecuteRequest } from "../types/WebApiExecuteRequest";
+import { WebApiExecuteRequest, WebApiExecuteRequestWithMetadata } from "../types/WebApiExecuteRequest";
 import { WebApiRequestDefinition } from "../types/WebApiRequest";
-import { WebApiRequest, WebApiResponse } from "./WebApiRequest";
+import { getWebApiResponseFromBatchPart, WebApiRequest, WebApiResponse } from "./WebApiRequest";
 import { requireValue } from "./utils/NullOrUndefined";
 
 // Implementation of Xrm.WebApi for where Xrm.WebApi is not available
@@ -86,12 +86,7 @@ export class WebApiBase {
    */
   public async createRecord(entityLogicalName: string, record: unknown): Promise<IEntityReference> {
     try {
-      const entitySetName = await this.getEntitySetName(entityLogicalName);
-      const apiResponse = await this.webApiRequest({
-        action: "POST",
-        path: entitySetName,
-        data: JSON.stringify(record),
-      });
+      const apiResponse = await this.webApiRequest(await this.getCreateRecordRequest(entityLogicalName, record));
       // Get the GUID from the OData-EntityId header
       const guid = getGuidFromODataUrl(apiResponse.headers["odata-entityid"] as string);
       return {
@@ -101,6 +96,15 @@ export class WebApiBase {
     } catch (ex) {
       throw this.createException("Exception in createRecord", ex);
     }
+  }
+
+  private async getCreateRecordRequest(entityLogicalName: string, record: unknown) {
+    const entitySetName = await this.getEntitySetName(entityLogicalName);
+    return {
+      action: "POST",
+      path: entitySetName,
+      data: JSON.stringify(record),
+    } as WebApiRequestDefinition;
   }
 
   /**
@@ -116,9 +120,7 @@ export class WebApiBase {
     requireValue("id", id);
     requireValue("data", data);
     try {
-      const entitySetName = await this.getEntitySetName(entityLogicalName);
-      const path = `${entitySetName}(${this.toPathGuid(id)})`;
-      await this.webApiRequest({ action: "PATCH", path: path, data: JSON.stringify(data) });
+      await this.webApiRequest(await this.getUpdateRecordRequest(entityLogicalName, id, data));
       return {
         entityType: entityLogicalName,
         id: id,
@@ -128,6 +130,11 @@ export class WebApiBase {
     }
   }
 
+  private async getUpdateRecordRequest(entityLogicalName: string, id: string, data: unknown) {
+    const entitySetName = await this.getEntitySetName(entityLogicalName);
+    const path = `${entitySetName}(${this.toPathGuid(id)})`;
+    return { action: "PATCH", path: path, data: JSON.stringify(data) } as WebApiRequestDefinition;
+  }
   /**
    * Retrieves an entity record.
    * @param entityLogicalName The entity logical name of the record you want to retrieve. For example: "account".
@@ -179,9 +186,7 @@ export class WebApiBase {
     requireValue("id", id);
 
     try {
-      const entitySetName = await this.getEntitySetName(entityLogicalName);
-      const path = `${entitySetName}(${this.toPathGuid(id)})`;
-      await this.webApiRequest({ action: "DELETE", path: path });
+      await this.webApiRequest(await this.getDeleteRecordRequest(entityLogicalName, id));
       return {
         entityType: entityLogicalName,
         id: id,
@@ -189,6 +194,12 @@ export class WebApiBase {
     } catch (ex) {
       throw this.createException("Exception in deleteRecord", ex);
     }
+  }
+
+  private async getDeleteRecordRequest(entityLogicalName: string, id: string) {
+    const entitySetName = await this.getEntitySetName(entityLogicalName);
+    const path = `${entitySetName}(${this.toPathGuid(id)})`;
+    return { action: "DELETE", path: path } as WebApiRequestDefinition;
   }
 
   public async retrieveMultipleRecords(
@@ -223,62 +234,84 @@ export class WebApiBase {
     }
   }
 
-  public async execute(request: WebApiExecuteRequest): Promise<Xrm.ExecuteResponse | void> {
+  public async execute(request: WebApiExecuteRequestWithMetadata): Promise<Xrm.ExecuteResponse | void> {
     try {
       requireValue("Request", request);
 
-      // Currently the UCI requires us to have a class that defines the getMetadata rather than just a function
-      // otherwise the getMetadata function is serialized into the request.
-      const metadata = request.getMetadata();
-      const verb = metadata.operationType === OperationType.Action ? "POST" : "GET";
-      let requestPayload = "";
-      let queryString = "";
-      let functionParametersString = "";
+      const requests: WebApiRequestDefinition[] | undefined = await this.getWebApiRequests(request);
 
-      const requestInfo = await this.parseRequest(request, metadata);
-
-      switch (metadata.operationType) {
-        case OperationType.CRUD: {
-          // Special case for Associate/Disassociate
-          const apiResponse = await this.executeCRUD(metadata, request);
-          return this.createExecuteResponse(apiResponse.data, apiResponse.body as string, "");
-        }
-        case OperationType.Action:
-          requestPayload = JSON.stringify(requestInfo.parameterObject);
-          break;
-        case OperationType.Function:
-          functionParametersString = requestInfo.functionParameters.join(",");
-          queryString = requestInfo.queryStringValues.join("&");
-          break;
+      let response: WebApiResponse | undefined;
+      let path = "";
+      // Send the requests either as a batch or as a single request
+      if (requests.length > 1) {
+        response = await this.batchWebApiRequest(requests);
+        path = this.getApiPath() + "$batch";
+      } else {
+        response = await this.webApiRequest(requests[0]);
+        path = requests[0].path;
       }
+      return this.createExecuteResponse(response, path);
+    } catch (ex) {
+      throw this.createException("Exception in execute", ex);
+    }
+  }
 
-      let path =
-        functionParametersString !== ""
-          ? `${metadata.operationName}(${functionParametersString})`
-          : metadata.operationName;
+  private async getWebApiRequests(request: WebApiExecuteRequestWithMetadata) {
+    const metadata = request.getMetadata();
+    let requests: WebApiRequestDefinition[] | undefined;
 
-      // If bound function/action then add the entity path
-      if (requestInfo.boundParameterValue && metadata.boundParameter) {
-        const entityReference = requestInfo.boundParameterValue as IEntityReference;
-        if (!entityReference.id) throw new Error("No Id found on entity reference");
-        if (!entityReference.entityType) throw new Error("No entityType found on entity reference");
-        const collectionName = await this.getEntitySetName(entityReference.entityType);
-        const navigationPath = odatifyEntityReference(collectionName, entityReference.id);
-        path = navigationPath + "/Microsoft.Dynamics.CRM." + path;
-      }
+    if (metadata.operationType === OperationType.CRUD) {
+      // Special case for CRUD execute
+      requests = await this.getCRUDExecute(metadata, request);
+    } else {
+      requests = await this.getNonCRUDExecute(metadata, request);
+    }
+    return requests;
+  }
 
-      // Send the request
-      const apiResponse = await this.webApiRequest({
+  private async getNonCRUDExecute(
+    metadata: WebApiExecuteRequestMetadata,
+    request: WebApiExecuteRequest,
+  ): Promise<WebApiRequestDefinition[]> {
+    const requestInfo = await this.parseRequest(request, metadata);
+    const verb = metadata.operationType === OperationType.Action ? "POST" : "GET";
+    let path = "";
+    let requestPayload = "";
+    let queryString = "";
+    let functionParametersString = "";
+    switch (metadata.operationType) {
+      case OperationType.Action:
+        requestPayload = JSON.stringify(requestInfo.parameterObject);
+        break;
+      case OperationType.Function:
+        functionParametersString = requestInfo.functionParameters.join(",");
+        queryString = requestInfo.queryStringValues.join("&");
+        break;
+    }
+
+    path =
+      functionParametersString !== ""
+        ? `${metadata.operationName}(${functionParametersString})`
+        : metadata.operationName;
+
+    // If bound function/action then add the entity path
+    if (requestInfo.boundParameterValue && metadata.boundParameter) {
+      const entityReference = requestInfo.boundParameterValue as IEntityReference;
+      if (!entityReference.id) throw new Error("No Id found on entity reference");
+      if (!entityReference.entityType) throw new Error("No entityType found on entity reference");
+      const collectionName = await this.getEntitySetName(entityReference.entityType);
+      const navigationPath = odatifyEntityReference(collectionName, entityReference.id);
+      path = navigationPath + "/Microsoft.Dynamics.CRM." + path;
+    }
+    // Create the request
+    return [
+      {
         action: verb,
         path: path,
         options: queryString,
         data: requestPayload,
-      });
-
-      return this.createExecuteResponse(apiResponse.data, apiResponse.body as string, path);
-    } catch (ex) {
-      throw this.createException("Exception in execute", ex);
-    }
+      },
+    ];
   }
 
   private async parseRequest(request: WebApiExecuteRequest, metadata: WebApiExecuteRequestMetadata) {
@@ -287,6 +320,8 @@ export class WebApiBase {
     const queryStringValues: string[] = [];
     let boundParameterValue: IEntity | IEntityReference | undefined;
     const verb = metadata.operationType === OperationType.Action ? "POST" : "GET";
+
+    // Currently the UCI requires us to have a class that defines the getMetadata rather than just a function
 
     const parameterObject: Dictionary<unknown> = {};
     for (const key of Object.keys(request)) {
@@ -367,12 +402,14 @@ export class WebApiBase {
     return parameterValue;
   }
 
-  private createExecuteResponse(responseObject: unknown, responseString: string, path: string): Xrm.ExecuteResponse {
+  private createExecuteResponse(response: WebApiResponse, path: string): Xrm.ExecuteResponse {
+    // This is a 'proxy' response to simulate the Xrm.WebApi response object returned
+    // and hides the internal implementation
     const jsonPromise = new Promise<unknown>((resolve, _reject) => {
-      resolve(responseObject);
+      resolve(response.data);
     });
     const responseTextPromise = new Promise<string>((_resolve, _reject) => {
-      _resolve(responseString);
+      _resolve(response.body as string);
     });
 
     return {
@@ -386,20 +423,36 @@ export class WebApiBase {
       status: 200,
       statusText: "OK",
       url: path,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      headers: response.headers as any,
     } as Xrm.ExecuteResponse;
   }
 
-  public async executeMultiple(_request: unknown[]): Promise<Xrm.ExecuteResponse[]> {
-    throw new Error("Not implemented");
+  public async executeMultiple(requests: unknown[]): Promise<Xrm.ExecuteResponse[]> {
+    // Create each request
+    const internalRequests: WebApiRequestDefinition[] = [];
+    for (const request of requests) {
+      const internalRequest = await this.getWebApiRequests(request as WebApiExecuteRequestWithMetadata);
+      internalRequest.forEach((i) => internalRequests.push(i));
+    }
+    const response = await this.batchWebApiRequest(internalRequests);
+    const path = this.getApiPath() + "$batch";
+    const batchresponses = response.data["batchresponse"] as WebApiResponse[];
+    const executeResponse = batchresponses.map((r) => this.createExecuteResponse(r, path));
+
+    const responses: Xrm.ExecuteResponse[] = executeResponse;
+    return responses;
+    // Execute
+    // Collect resposnes
   }
 
-  private async executeCRUD(metadata: WebApiExecuteRequestMetadata, request: unknown): Promise<WebApiResponse> {
-    const requestWithTarget = request as RequestWithTarget;
-    
-
-    // This is a special case for associate/disassociate
+  private async getCRUDExecute(
+    metadata: WebApiExecuteRequestMetadata,
+    request: Record<string, any>,
+  ): Promise<WebApiRequestDefinition[]> {
     switch (metadata.operationName) {
       case "Associate": {
+        const requestWithTarget = request as RequestWithTarget;
         const targetEntitySetName = await this.getEntitySetName(requestWithTarget.target.entityType);
         const associate: unknown[] = [];
         const associateRequest = request as AssociateRequest;
@@ -420,14 +473,15 @@ export class WebApiBase {
               data: record,
             });
           }
-          return await this.batchWebApiRequest(batch);
+          return batch;
         } else {
           // Get the target and related entities
           const url = `${targetEntitySetName}(${associateRequest.target.id})/${associateRequest.relationship}/$ref`;
-          return await this.webApiRequest({ action: "POST", path: url, data: JSON.stringify(associate[0]) });
+          return [{ action: "POST", path: url, data: JSON.stringify(associate[0]) }];
         }
       }
       case "Disassociate": {
+        const requestWithTarget = request as RequestWithTarget;
         const targetEntitySetName = await this.getEntitySetName(requestWithTarget.target.entityType);
         const disassociateRequest = request as DisassociateRequest;
         // Send a delete DELETE https://develop1v9demo.crm11.dynamics.com/api/data/v9.0/contacts(ca12bd9a-7b34-e911-a8b9-002248019477)/account_primary_contact(d012bd9a-7b34-e911-a8b9-002248019477)/$ref
@@ -437,7 +491,17 @@ export class WebApiBase {
           disassociateRequestRelatedEntityId = `(${disassociateRequest.relatedEntityId})`;
         }
         const url = `${targetEntitySetName}(${disassociateRequest.target.id})/${disassociateRequest.relationship}${disassociateRequestRelatedEntityId}/$ref`;
-        return await this.webApiRequest({ action: "DELETE", path: url });
+        return [{ action: "DELETE", path: url }];
+      }
+      case "Create": {
+        return [await this.getCreateRecordRequest(request["etn"], request["payload"])];
+      }
+      case "Update": {
+        return [await this.getUpdateRecordRequest(request["etn"], request["id"], request["payload"])];
+      }
+      case "Delete": {
+        const entityReference = request["entityReference"] as IEntityReference;
+        return [await this.getDeleteRecordRequest(entityReference.entityType, entityReference.id)];
       }
       default:
         throw new Error(`Unexpected operation name ${metadata.operationName}`);
@@ -551,7 +615,7 @@ export class WebApiBase {
           const responses = parts
             .filter((p) => p.toLowerCase().indexOf("content-type:") > -1)
             .map((p) => {
-              return { body: p } as WebApiResponse;
+              return getWebApiResponseFromBatchPart(p);
             });
           responseData = { batchresponse: responses };
         }

@@ -1,8 +1,9 @@
-import { Entity } from "../Entity";
 import { Guid } from "../Guid";
+import { IEntity } from "../IEntity";
+import { WebApiExecuteRequest } from "../WebApiExecuteRequest";
 
-export interface CreateRequest {
-  target: Entity;
+export interface CreateRequest extends WebApiExecuteRequest {
+  target: IEntity;
 }
 
 export interface CreateResponse {

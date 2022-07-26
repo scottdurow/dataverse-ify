@@ -3,15 +3,19 @@ import { WebApiExecuteRequestMetadata } from "../metadata/WebApiExecuteRequestMe
 export interface WebApiExecuteRequest {
   logicalName?: string;
   [index: string]: unknown;
-  getMetadata(): WebApiExecuteRequestMetadata;
 }
 
-export class WebApiExecuteRequestBase implements WebApiExecuteRequest {
-  private metadata: WebApiExecuteRequestMetadata;
+export interface WebApiExecuteRequestWithMetadata {
+  logicalName?: string;
   [index: string]: unknown;
-  logicalName = "";
+  getMetadata(): WebApiExecuteRequestMetadata;
+}
+export class WebApiExecuteRequestBase implements WebApiExecuteRequestWithMetadata {
+  [index: string]: unknown;
   constructor(metadata: WebApiExecuteRequestMetadata, parameters?: Record<string, unknown>) {
-    this.metadata = metadata;
+    this.getMetadata = () => {
+      return metadata;
+    };
     if (parameters) {
       for (const key in parameters) {
         this[key] = parameters[key];
@@ -19,6 +23,6 @@ export class WebApiExecuteRequestBase implements WebApiExecuteRequest {
     }
   }
   getMetadata(): WebApiExecuteRequestMetadata {
-    return this.metadata;
+    throw "Not implemented";
   }
 }

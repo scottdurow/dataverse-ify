@@ -5,6 +5,7 @@ import { SetupGlobalContext } from "../../SetupGlobalContext";
 import { setMetadataCache } from "../../../../metadata/MetadataCache";
 import { accountMetadata, Account } from "../../../../dataverse-gen/entities/Account";
 import { getGuidFromHeaders } from "../../../../types/Guid";
+import { WebApiExecuteRequestBase } from "../../../../types";
 
 describe("XrmWebApiNode-executeMultiple", () => {
   beforeAll(async () => {
@@ -14,7 +15,8 @@ describe("XrmWebApiNode-executeMultiple", () => {
       await SetupGlobalContext();
     }
   }, 10000);
-  it("Create using executeMultiple", async () => {
+
+  it("creates records", async () => {
     // Create an account with sdk types
     setMetadataCache({
       entities: {
@@ -22,27 +24,22 @@ describe("XrmWebApiNode-executeMultiple", () => {
       },
     });
 
-    const accounts = [
-      {
-        //logicalName: accountMetadata.logicalName,
-        name: "Account 1",
-      } as Account,
-    ];
+    const accounts = {
+      name: "Account 1",
+    } as Account;
 
-    const account1Create = {
-      etn: accountMetadata.logicalName,
-      payload: accounts,
-      getMetadata: () => {
-        return {
-          boundParameter: undefined,
-          operationType: 2,
-          operationName: "Create",
-        };
+    const account1Create = new WebApiExecuteRequestBase(
+      {
+        parameterTypes: {},
+        boundParameter: undefined,
+        operationType: 2,
+        operationName: "Create",
       },
-    };
+      { etn: accountMetadata.logicalName, payload: accounts },
+    );
 
     const response = await Xrm.WebApi.online.executeMultiple([account1Create, account1Create]);
-    console.log(response);
+
     expect(response).toBeDefined();
     expect(response.length).toBe(2);
 
@@ -52,34 +49,110 @@ describe("XrmWebApiNode-executeMultiple", () => {
 
     await Xrm.WebApi.deleteRecord("account", account1);
     await Xrm.WebApi.deleteRecord("account", account2);
-
-    // const account1Delete = {
-    //   entityReference: { entityType: accountMetadata.logicalName, id: account1id },
-    //   getMetadata: () => {
-    //     return {
-    //       boundParameter: undefined,
-    //       operationType: 2,
-    //       operationName: "Delete",
-    //     };
-    //   },
-    // };
-
-    // const deleteResponse = await Xrm.WebApi.online.execute(account1Delete);
-    // console.log(deleteResponse);
-    // // Create multiple using ExecuteMultiple
-    // const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
-    // const requests = accounts.map((a) => {
-    //   return { target: a } as CreateRequest;
-    // });
-    // const batch = { requests: requests } as ExecuteMultipleRequest;
-
-    // const response = (await serviceClient.execute(batch)) as ExecuteMultipleResponse;
-
-    // expect(response.isFaulted).toBeFalsy();
-    // expect(response.responses).toHaveLength(1);
-    // expect((response.responses[0] as CreateResponse).id).toBeDefined();
-
-    // Delete
-    //await serviceClient.delete("account", account1.accountid);
   }, 10000);
+
+  it("updates records", async () => {
+    // Create an account with sdk types
+    setMetadataCache({
+      entities: {
+        account: accountMetadata,
+      },
+    });
+
+    const account1 = {
+      name: "Account 1",
+    } as Account;
+
+    const account2 = {
+      name: "Account 2",
+    } as Account;
+
+    const account1id = await (await Xrm.WebApi.createRecord(accountMetadata.logicalName, account1)).id;
+    const account2id = await (await Xrm.WebApi.createRecord(accountMetadata.logicalName, account2)).id;
+
+    // Delete using executeMultiple
+
+    const account1Update = new WebApiExecuteRequestBase(
+      {
+        parameterTypes: {},
+        boundParameter: undefined,
+        operationType: 2,
+        operationName: "Update",
+      },
+      {
+        etn: accountMetadata.logicalName,
+        id: account1id,
+        payload: account1,
+      },
+    );
+    account1.name = "Account 1 Updated";
+    const account2Update = new WebApiExecuteRequestBase(
+      {
+        parameterTypes: {},
+        boundParameter: undefined,
+        operationType: 2,
+        operationName: "Update",
+      },
+      {
+        etn: accountMetadata.logicalName,
+        id: account2id,
+        payload: account2,
+      },
+    );
+    account2.name = "Account 2 Updated";
+    const deleteResponse = await Xrm.WebApi.online.executeMultiple([account1Update, account2Update]);
+
+    expect(deleteResponse).toBeDefined();
+    expect(deleteResponse.length).toBe(2);
+
+    await Xrm.WebApi.deleteRecord("account", account1id);
+    await Xrm.WebApi.deleteRecord("account", account2id);
+  }, 100000);
+
+  it("deletes records", async () => {
+    // Create an account with sdk types
+    setMetadataCache({
+      entities: {
+        account: accountMetadata,
+      },
+    });
+
+    const account1 = {
+      name: "Account 1",
+    } as Account;
+
+    const account2 = {
+      name: "Account 2",
+    } as Account;
+
+    account1.id = await (await Xrm.WebApi.createRecord(accountMetadata.logicalName, account1)).id;
+    account2.id = await (await Xrm.WebApi.createRecord(accountMetadata.logicalName, account2)).id;
+
+    // Delete using executeMultiple
+
+    const account1Delete = new WebApiExecuteRequestBase(
+      {
+        parameterTypes: {},
+        boundParameter: undefined,
+        operationType: 2,
+        operationName: "Delete",
+      },
+      { entityReference: { entityType: accountMetadata.logicalName, id: account1.id } },
+    );
+
+    const account2Delete = new WebApiExecuteRequestBase(
+      {
+        parameterTypes: {},
+        boundParameter: undefined,
+        operationType: 2,
+        operationName: "Delete",
+      },
+      { entityReference: { entityType: accountMetadata.logicalName, id: account2.id } },
+    );
+
+    const deleteResponse = await Xrm.WebApi.online.executeMultiple([account1Delete, account2Delete]);
+
+    expect(deleteResponse).toBeDefined();
+    expect(deleteResponse.length).toBe(2);
+  }, 100000);
 });

@@ -12,27 +12,30 @@ import { IEntityCollection } from "../../types/IEntityCollection";
 import { isNullOrUndefined } from "../../webapi/utils/NullOrUndefined";
 import { dateReviver } from "./dateReviver";
 
+export interface sdkifyOptions {
+  allowPassthroughMapping?: boolean;
+}
+
 export async function sdkify<T>(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any | Array<Record<string, any>>,
   logicalName?: string,
+  options?: sdkifyOptions,
 ): Promise<T | EntityCollection<IEntity> | Xrm.RetrieveMultipleResult> {
-  if (value.json) {
-    // This is a UCI response object and we need to await the json conversion
-    value = await value.json();
-  }
-
-  if (value.responseText) {
+  if (value.text) {
+    const text = await value.text();
+    value = text && text.length > 0 ? JSON.parse(text, dateReviver) : {};
+  } else if (value.responseText && value.responseText > 0) {
     // This is a raw execute response
     value = JSON.parse(value.responseText, dateReviver);
   }
 
   if ((value as Xrm.RetrieveMultipleResult).entities !== undefined) {
-    return sdkifyEntityCollection(value, logicalName);
+    return sdkifyEntityCollection(value, logicalName, options);
   } else if (value.constructor.name === "Array") {
-    return await sdkifyArray(value, logicalName);
+    return await sdkifyArray(value, logicalName, options);
   } else {
-    return sdkifyEntity(value as IEntity, logicalName);
+    return sdkifyEntity(value as IEntity, logicalName, options);
   }
 }
 
@@ -95,26 +98,31 @@ function expandActivityPartiesToFields(entityRecord: IEntity, activityPartiesFie
 async function sdkifyArray(
   value: Record<string, unknown>[],
   logicalName?: string,
+  options?: sdkifyOptions,
 ): Promise<IEntityCollection<IEntity>> {
   const cdsRecords: IEntity[] = [];
   for (const record of value as Array<IEntity>) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    cdsRecords.push((await sdkify(record, logicalName)) as IEntity);
+    cdsRecords.push((await sdkify(record, logicalName, options)) as IEntity);
   }
   return new EntityCollection(cdsRecords);
 }
 
-async function sdkifyEntityCollection(value: unknown, logicalName?: string): Promise<IEntityCollection<IEntity>> {
+async function sdkifyEntityCollection(
+  value: unknown,
+  logicalName?: string,
+  options?: sdkifyOptions,
+): Promise<IEntityCollection<IEntity>> {
   const response = value as Xrm.RetrieveMultipleResult;
-  const records = (await sdkifyArray(response.entities, logicalName)) as EntityCollection<IEntity>;
+  const records = (await sdkifyArray(response.entities, logicalName, options)) as EntityCollection<IEntity>;
   records.pagingCooking = response.nextLink;
   return records;
 }
 
-async function sdkifyEntity<T>(entityRecord: IEntity, logicalName?: string): Promise<T> {
-  const entityMetadata = getEntityMetadataFromRecord(entityRecord, logicalName) as EntityWebApiMetadata;
+async function sdkifyEntity<T>(entityRecord: IEntity, logicalName?: string, options?: sdkifyOptions): Promise<T> {
+  const entityMetadata = getEntityMetadataFromRecord(entityRecord, logicalName, options) as EntityWebApiMetadata;
 
-  if (entityMetadata != null) {
+  if (entityMetadata && entityMetadata.logicalName) {
     // Formatted values hold the text labels
     entityRecord.formattedValues = entityRecord.formattedValues || {};
 

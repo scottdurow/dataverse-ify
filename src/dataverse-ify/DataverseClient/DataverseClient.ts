@@ -15,7 +15,7 @@ export interface DataverseClient {
     entityName: string,
     entityId: string,
     relationship: string,
-    relatedEntities: Promise<EntityReference[]>,
+    relatedEntities: EntityReference[],
   ): Promise<void>;
   disassociate(
     entityName: string,
@@ -23,5 +23,6 @@ export interface DataverseClient {
     relationship: string,
     relatedEntities: EntityReference[],
   ): Promise<void>;
-  execute(request: WebApiExecuteRequest): Promise<unknown>;
+  execute<T>(request: WebApiExecuteRequest): Promise<T | undefined>;
+  executeMultiple<T>(requests: WebApiExecuteRequest[]): Promise<T[] | undefined>;
 }

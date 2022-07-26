@@ -1,8 +1,8 @@
 import { Dictionary } from "../types/Dictionary";
-import { EntityWebApiMetadata } from "./EntityWebApiMetadata";
-import { WebApiExecuteRequestMetadata } from "./WebApiExecuteRequestMetadata";
 import { IEntity } from "../types/IEntity";
 import { isNullOrUndefined } from "../webapi/utils/NullOrUndefined";
+import { EntityWebApiMetadata } from "./EntityWebApiMetadata";
+import { WebApiExecuteRequestMetadata } from "./WebApiExecuteRequestMetadata";
 export let _metadataCache: MetadataCache = { entities: {}, entitySetNames: {}, actions: {} };
 
 export interface MetadataCache {
@@ -25,14 +25,21 @@ export function getMetadataCache(): MetadataCache {
   }
   return _metadataCache;
 }
-export function getMetadataByLogicalName(logicalName: string): EntityWebApiMetadata {
+export function getMetadataByLogicalName(
+  logicalName: string,
+  defaultMetadata?: EntityWebApiMetadata,
+): EntityWebApiMetadata {
   const metadataCache = getMetadataCache();
-  const metadata = metadataCache.entities && (metadataCache.entities[logicalName] as EntityWebApiMetadata);
+  const metadata =
+    (metadataCache.entities && (metadataCache.entities[logicalName] as EntityWebApiMetadata)) || defaultMetadata;
   if (!metadata) throw new Error(`Metadata not found for ${logicalName}. Please create the early bound types.`);
   return metadata;
 }
 const entitySetNames: Dictionary<string> = {};
-export function getMetadataFromEntitySet(entitySetName: string): EntityWebApiMetadata {
+export function getMetadataFromEntitySet(
+  entitySetName: string,
+  defaultMetadata?: EntityWebApiMetadata,
+): EntityWebApiMetadata {
   const metadataCache = getMetadataCache();
   if (metadataCache.entities) {
     // Check the metadata
@@ -42,6 +49,7 @@ export function getMetadataFromEntitySet(entitySetName: string): EntityWebApiMet
       if (metadata.collectionName === entitySetName) return metadata;
     }
   }
+  if (defaultMetadata) return defaultMetadata;
   throw new Error(`Cannot find entity metadata for ${entitySetName}. Please generate early bound types`);
 }
 

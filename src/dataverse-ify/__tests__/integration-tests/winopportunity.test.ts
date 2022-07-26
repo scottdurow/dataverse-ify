@@ -60,7 +60,7 @@ describe("winOpportunity", () => {
       } as WinOpportunityRequest;
 
       const winResponse = await serviceClient.execute(winRequest);
-      expect(winResponse).toBeUndefined();
+      expect(winResponse).toBeDefined();
 
       // Get the opportunity to check it is won
       // Retrieve Updated
@@ -71,7 +71,7 @@ describe("winOpportunity", () => {
       );
       expect(opportunityWon.statecode).toBe(opportunity_opportunity_statecode.Won);
     } catch (ex) {
-      fail(ex);
+      expect(ex).toBeUndefined();
     } finally {
       if (opportunity1.id) {
         // Tidy up

@@ -53,7 +53,7 @@ describe("AddToQueue", () => {
       const response = (await serviceClient.execute(request)) as AddToQueueResponse;
       expect(response.QueueItemId).toBeDefined();
     } catch (ex) {
-      fail(ex);
+      expect(ex).toBeUndefined();
     } finally {
       if (letter.id) {
         // Tidy up

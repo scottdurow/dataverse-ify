@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { IEntity } from "../../types/IEntity";
-import { EntityCollection } from "../../types/EntityCollection";
-import { Guid } from "../../types/Guid";
-import { EntityReference } from "../../types/EntityReference";
-import { odataify } from "../odataify/odataify";
 import { sdkify } from "..";
 import { caseInsensitiveSearch, getMetadataByLogicalName } from "../../metadata/MetadataCache";
-import { WebApiExecuteRequest } from "../../types/WebApiExecuteRequest";
+import { EntityCollection } from "../../types/EntityCollection";
+import { EntityReference, toEntityReference } from "../../types/EntityReference";
+import { getGuidFromHeaders, Guid } from "../../types/Guid";
+import { IEntity } from "../../types/IEntity";
+import { CreateRequest, CreateResponse } from "../../types/requests";
+import { DeleteRequest, DeleteResponse } from "../../types/requests/Delete";
+import { UpdateRequest, UpdateResponse } from "../../types/requests/Update";
+import { WebApiExecuteRequest, WebApiExecuteRequestBase } from "../../types/WebApiExecuteRequest";
+import { odataify } from "../odataify/odataify";
 import { DataverseClient } from "./DataverseClient";
 
 const activitypartyAttributes = ["to", "from", "cc", "bcc", "required", "optional", "organizer"];
@@ -15,6 +18,7 @@ export class XrmContextDataverseClient implements DataverseClient {
   constructor(webApi: Xrm.WebApi) {
     this._webApi = webApi;
   }
+
   async create(entity: IEntity): Promise<string> {
     const record = await odataify("Create", entity);
     const response = await this._webApi.createRecord(entity.logicalName, record);
@@ -125,29 +129,144 @@ export class XrmContextDataverseClient implements DataverseClient {
   }
 
   async associate(
-    _entityName: string,
-    _entityId: string,
-    _relationship: string,
-    _relatedEntities: Promise<EntityReference[]>,
+    entityName: string,
+    entityId: string,
+    relationship: string,
+    relatedEntities: EntityReference[],
   ): Promise<void> {
-    throw new Error("Method not implemented.");
+    const associateRequest = new WebApiExecuteRequestBase(
+      {
+        boundParameter: undefined,
+        parameterTypes: {},
+        operationType: 2,
+        operationName: "Associate",
+      },
+      {
+        target: {
+          entityType: entityName,
+          id: entityId,
+        },
+        relatedEntities: relatedEntities.map((e) => {
+          return { entityType: e.entityType, id: e.id };
+        }),
+        relationship: relationship,
+      },
+    );
+
+    await Xrm.WebApi.online.execute(associateRequest);
   }
 
   async disassociate(
-    _entityName: string,
-    _entityId: string,
-    _relationship: string,
-    _relatedEntities: EntityReference[],
+    entityName: string,
+    entityId: string,
+    relationship: string,
+    relatedEntities: EntityReference[],
   ): Promise<void> {
-    throw new Error("Method not implemented.");
+    // Only a single disassociate can be sent at once so send in a batch request
+    const disassociateRequests = relatedEntities.map(
+      (e) =>
+        new WebApiExecuteRequestBase(
+          {
+            boundParameter: undefined,
+            parameterTypes: {},
+            operationType: 2,
+            operationName: "Disassociate",
+          },
+          {
+            target: {
+              entityType: entityName,
+              id: entityId,
+            },
+            relatedEntityId: e.id,
+            relationship: relationship,
+          },
+        ),
+    );
+    await Xrm.WebApi.online.executeMultiple(disassociateRequests);
   }
 
-  async execute(request: WebApiExecuteRequest): Promise<unknown> {
-    const requestWebApi = await odataify("Action", request);
+  async execute<T>(request: WebApiExecuteRequest): Promise<T | undefined> {
+    // Handle CRUD execute
+    const isCrudExecute =
+      request.logicalName === "Create" || request.logicalName === "Update" || request.logicalName === "Delete";
+
+    const requestWebApi = isCrudExecute ? await this.getCrudRequest(request) : await odataify("Action", request);
     const response = await this._webApi.online.execute(requestWebApi);
-    const responseText = await response.text();
-    if (responseText && responseText.length > 0) {
-      return JSON.parse(responseText);
+
+    if (isCrudExecute) {
+      return this.getCrudResponse(request, response) as T | undefined;
+    }
+    return (await sdkify<T>(response, undefined, { allowPassthroughMapping: true })) as T | undefined;
+  }
+
+  executeMultiple<T>(_requests: WebApiExecuteRequest[]): Promise<T[] | undefined> {
+    throw new Error("Method not implemented.");
+    //const response = await this._webApi.online.executeMultiple(requestWebApi);
+  }
+
+  private async getCrudRequest(inputRequest: WebApiExecuteRequest) {
+    switch (inputRequest.logicalName) {
+      case "Create": {
+        const request = inputRequest as CreateRequest;
+        const payload = await odataify("Create", request.target);
+        return new WebApiExecuteRequestBase(
+          {
+            parameterTypes: {},
+            boundParameter: undefined,
+            operationType: 2,
+            operationName: "Create",
+          },
+          {
+            etn: request.target.logicalName,
+            payload: payload,
+          },
+        );
+      }
+      case "Update": {
+        const request = inputRequest as UpdateRequest;
+        const targetReference = toEntityReference(request.target);
+        const payload = await odataify("Update", request.target);
+        return new WebApiExecuteRequestBase(
+          {
+            parameterTypes: {},
+            boundParameter: undefined,
+            operationType: 2,
+            operationName: "Update",
+          },
+          {
+            etn: targetReference.entityType,
+            id: targetReference.id,
+            payload: payload,
+          },
+        );
+      }
+      case "Delete": {
+        const request = inputRequest as DeleteRequest;
+        return new WebApiExecuteRequestBase(
+          {
+            parameterTypes: {},
+            boundParameter: undefined,
+            operationType: 2,
+            operationName: "Delete",
+          },
+          { entityReference: { entityType: request.target.entityType, id: request.target.id } },
+        );
+      }
+    }
+    throw `Unknown CRUD request ${inputRequest.logicalName}`;
+  }
+
+  private getCrudResponse(request: WebApiExecuteRequest, response: Xrm.ExecuteResponse) {
+    switch (request.logicalName) {
+      case "Create": {
+        return { id: getGuidFromHeaders(response.headers) } as CreateResponse;
+      }
+      case "Update": {
+        return {} as UpdateResponse;
+      }
+      case "Delete": {
+        return {} as DeleteResponse;
+      }
     }
     return undefined;
   }

@@ -62,6 +62,7 @@ describe("RetrieveMetadataChangesRequest", () => {
         },
       },
     } as RetrieveMetadataChangesRequest;
+
     const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
     const metadataResponse = (await serviceClient.execute(metadataQuery as any)) as RetrieveMetadataChangesResponse;
     expect(metadataResponse).toBeDefined();

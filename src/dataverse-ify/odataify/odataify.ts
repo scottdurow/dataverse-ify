@@ -1,6 +1,6 @@
 import { EntityReference } from "../../types/EntityReference";
 import { IEntity } from "../../types/IEntity";
-import { WebApiExecuteRequest } from "../../types/WebApiExecuteRequest";
+import { WebApiExecuteRequest, WebApiExecuteRequestBase } from "../../types/WebApiExecuteRequest";
 import { getMetadataCache } from "../../metadata/MetadataCache";
 import { EntityWebApiMetadata } from "../../metadata/EntityWebApiMetadata";
 import { StructuralProperty } from "../../types/StructuralProperty";
@@ -8,7 +8,7 @@ import { EntityCollection } from "../../types/EntityCollection";
 import { odataifyFields } from "./odataifyFields";
 import { WebApiExecuteRequestMetadata } from "../../metadata/WebApiExecuteRequestMetadata";
 
-const ignoredFieldsOnActions = ["getMetadata", "logicalName"];
+const ignoredFieldsOnActions = ["getMetadata", "logicalName", "internalMetadata"];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function odataify(
@@ -93,8 +93,7 @@ async function getActionOrFunctionOutput(
 ) {
   // This is a web api action request
   const request = value as WebApiExecuteRequest;
-  const webApiRequest = newWebApiRequest(webApiMetadata);
-  const requestOdata: WebApiExecuteRequest = Object.assign(webApiRequest, request) as WebApiExecuteRequest;
+  const requestOdata = new WebApiExecuteRequestBase(webApiMetadata, request);
   // Get the parameters
   for (const field of Object.keys(requestOdata)) {
     if (ignoredFieldsOnActions.indexOf(field) > -1) continue;
@@ -154,13 +153,4 @@ async function getEntityReferenceOutput(fieldValue: object, requestOdata: WebApi
   } else if (fieldValueAsEntity.logicalName) {
     requestOdata[field] = await odataify("Action", fieldValue);
   }
-}
-
-function newWebApiRequest(webApiMetadata: WebApiExecuteRequestMetadata) {
-  // The WebApiRequest must have a getMetadata function in it's prototype
-  return new (class {
-    getMetadata(): unknown {
-      return webApiMetadata;
-    }
-  })();
 }
