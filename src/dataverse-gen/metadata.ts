@@ -10,9 +10,12 @@ import { queueMetadata } from "./entities/Queue";
 import { queueitemMetadata } from "./entities/QueueItem";
 import { AddToQueueMetadata } from "./actions/AddToQueue";
 import { WinOpportunityMetadata } from "./actions/WinOpportunity";
+import { cdsify_BoundEchoMetadata } from "./actions/cdsify_BoundEcho";
+import { cdsify_UnboundEchoMetadata } from "./actions/cdsify_UnboundEcho";
 import { CalculateRollupFieldMetadata } from "./functions/CalculateRollupField";
 import { CalculateTotalTimeIncidentMetadata } from "./functions/CalculateTotalTimeIncident";
 import { RetrieveMetadataChangesMetadata } from "./functions/RetrieveMetadataChanges";
+import { cdsify_UnboundEchoFunction2Metadata } from "./functions/cdsify_UnboundEchoFunction2";
 
 export const Entities = {
   Account: "account",
@@ -43,8 +46,11 @@ export const metadataCache = {
   actions: {
     AddToQueue: AddToQueueMetadata,
     WinOpportunity: WinOpportunityMetadata,
+    cdsify_BoundEcho: cdsify_BoundEchoMetadata,
+    cdsify_UnboundEcho: cdsify_UnboundEchoMetadata,
     CalculateRollupField: CalculateRollupFieldMetadata,
     CalculateTotalTimeIncident: CalculateTotalTimeIncidentMetadata,
     RetrieveMetadataChanges: RetrieveMetadataChangesMetadata,
+    cdsify_UnboundEchoFunction2: cdsify_UnboundEchoFunction2Metadata,
   }
 };

@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { metadataCache } from "../dataverse-gen/metadata";
-import { fixWebresourceXrm } from "../metadata/fixWebresourceXrm";
-import { setMetadataCache } from "../metadata/MetadataCache";
 
-// Add missing Jest functions
+// // Add missing Jest functions
 window.test = window.it;
 window.test.each = (inputs: any) => (testName: any, test: any) =>
   inputs.forEach((args: any) => window.it(testName, () => test(...args)));
@@ -12,9 +9,8 @@ window.test.each = (inputs: any) => (testName: any, test: any) =>
   return undefined;
 };
 
-// Hack for UCI where entity metadata is not loaded if running outside of a model-driven app
-setMetadataCache(metadataCache);
-fixWebresourceXrm();
+// // Hack for UCI where entity metadata is not loaded if running outside of a model-driven app
+// setMetadataCache(metadataCache);
 
 require("../dataverse-ify/__tests__/integration-tests/activity.test");
 require("../dataverse-ify/__tests__/integration-tests/addtoqueue.test");
@@ -38,5 +34,7 @@ require("../webapi/node/__tests__/Execute/associate.test");
 require("../webapi/node/__tests__/Execute/execute.test");
 require("../webapi/node/__tests__/Execute/execute-function.test");
 require("../webapi/node/__tests__/Execute/execute-multiple.test");
-
-
+require("../dataverse-ify/__tests__/integration-tests/custom-api-unbound.test");
+require("../dataverse-ify/__tests__/integration-tests/custom-api-unbound-function.test");
+require("../webapi/node/__tests__/Execute/custom-api-unbound.test");
+require("../webapi/node/__tests__/Execute/custom-api-bound.test");

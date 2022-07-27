@@ -76,11 +76,9 @@ async function getEntityOutput(
       delete output[entityMetadata.primaryIdAttribute];
       break;
     case "Action":
-      // The primary key must be odataified
-      if (entityValue && entityValue.id) {
-        output[`${entityMetadata.primaryIdAttribute}@odata.bind`] = `/${
-          entityMetadata.collectionName
-        }(${entityValue.id.toString()})`;
+      // If the implicit id is provided, but the explicit attribute is not, add it here
+      if (entityValue && entityValue.id && !entityValue[entityMetadata.primaryIdAttribute]) {
+        output[entityMetadata.primaryIdAttribute] = entityValue.id.toString();
       }
       break;
   }
@@ -95,44 +93,58 @@ async function getActionOrFunctionOutput(
   const request = value as WebApiExecuteRequest;
   const requestOdata = new WebApiExecuteRequestBase(webApiMetadata, request);
   // Get the parameters
-  for (const field of Object.keys(requestOdata)) {
-    if (ignoredFieldsOnActions.indexOf(field) > -1) continue;
+  for (const parameter of Object.keys(requestOdata)) {
+    if (ignoredFieldsOnActions.indexOf(parameter) > -1) continue;
 
-    // odataify each field if it is an entity
-    const fieldValue = requestOdata[field] as object;
-    // Get the type from the metadata
-    const parameterMetadata = webApiMetadata.parameterTypes[field];
-
-    if (parameterMetadata) {
-      // If Target - then change to EntityType
-      if (field === "Target" && parameterMetadata.structuralProperty === StructuralProperty.ComplexType) {
-        parameterMetadata.structuralProperty = StructuralProperty.EntityType;
-      }
-      switch (parameterMetadata.structuralProperty) {
-        case StructuralProperty.EnumerationType:
-        case StructuralProperty.PrimitiveType:
-          requestOdata[field] = fieldValue;
-          break;
-        case StructuralProperty.Collection:
-          await getCollectionOutput(fieldValue, requestOdata, field);
-          break;
-        case StructuralProperty.EntityType:
-          {
-            // This is an entity record pointer
-            await getEntityReferenceOutput(fieldValue, requestOdata, field);
-          }
-          break;
-        case StructuralProperty.Unknown:
-        default:
-          throw new Error("Unknown parameter type on action.");
-      }
-    } else {
-      throw new Error(`Unexpected parameter ${field} on execute Request`);
-    }
+    // odataify each parameter
+    await odataifyParameter(requestOdata, parameter, webApiMetadata);
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   delete (requestOdata as any).logicalName;
   return requestOdata;
+}
+
+async function odataifyParameter(
+  requestOdata: WebApiExecuteRequestBase,
+  parameter: string,
+  webApiMetadata: WebApiExecuteRequestMetadata,
+) {
+  const parameterValue = requestOdata[parameter] as object;
+  // Get the type from the metadata
+  const parameterMetadata = webApiMetadata.parameterTypes[parameter];
+
+  if (parameterMetadata) {
+    // If Target - then change to EntityType
+    if (parameter === "Target" && parameterMetadata.structuralProperty === StructuralProperty.ComplexType) {
+      parameterMetadata.structuralProperty = StructuralProperty.EntityType;
+    }
+    switch (parameterMetadata.structuralProperty) {
+      case StructuralProperty.EnumerationType:
+      case StructuralProperty.PrimitiveType:
+        if (parameterMetadata.typeName === "Edm.Guid") {
+          // Special case for GUIDs
+          requestOdata[parameter] = { guid: parameterValue };
+        } else {
+          requestOdata[parameter] = parameterValue;
+        }
+
+        break;
+      case StructuralProperty.Collection: {
+        const isPrimitiveEdmType = parameterMetadata.typeName.startsWith("Collection(Edm.");
+        if (!isPrimitiveEdmType) await getCollectionOutput(parameterValue, requestOdata, parameter);
+        break;
+      }
+      case StructuralProperty.EntityType:
+        // This is an entity record pointer
+        await getEntityReferenceOutput(parameterValue, requestOdata, parameter);
+        break;
+      case StructuralProperty.Unknown:
+      default:
+        throw new Error("Unknown parameter type on action.");
+    }
+  } else {
+    throw new Error(`Unexpected parameter ${parameter} on execute Request`);
+  }
 }
 
 async function getCollectionOutput(fieldValue: object, requestOdata: WebApiExecuteRequest, field: string) {

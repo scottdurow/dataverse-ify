@@ -51,8 +51,8 @@ export class XrmContextDataverseClient implements DataverseClient {
     if (typeof entity === "string") {
       await this._webApi.deleteRecord(entity as string, id as Guid);
     } else {
-      const entityValue = entity as IEntity;
-      await this._webApi.deleteRecord(entityValue.logicalName, entityValue.id as string);
+      const entityValue = toEntityReference(entity as IEntity);
+      await this._webApi.deleteRecord(entityValue.entityType as string, entityValue.id as string);
     }
   }
 

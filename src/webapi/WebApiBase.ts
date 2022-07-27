@@ -276,12 +276,12 @@ export class WebApiBase {
     const requestInfo = await this.parseRequest(request, metadata);
     const verb = metadata.operationType === OperationType.Action ? "POST" : "GET";
     let path = "";
-    let requestPayload = "";
+    let requestPayload = {};
     let queryString = "";
     let functionParametersString = "";
     switch (metadata.operationType) {
       case OperationType.Action:
-        requestPayload = JSON.stringify(requestInfo.parameterObject);
+        requestPayload = requestInfo.parameterObject;
         break;
       case OperationType.Function:
         functionParametersString = requestInfo.functionParameters.join(",");
@@ -314,6 +314,8 @@ export class WebApiBase {
     ];
   }
 
+  // TODO: This needs refactoring - it's too complex and confusing
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   private async parseRequest(request: WebApiExecuteRequest, metadata: WebApiExecuteRequestMetadata) {
     let count = 0;
     const functionParameters: string[] = [];
@@ -331,25 +333,30 @@ export class WebApiBase {
         continue;
       }
       const parameterName = `@p${count.toString()}`;
-      let parameterValue: unknown = request[key];
-      const parameterType = typeof parameterValue;
+      const parameterValue: unknown = request[key];
       const parameterMetadata = metadata.parameterTypes && metadata.parameterTypes[key];
 
       if (parameterMetadata) {
         const structuralType = parameterMetadata.structuralProperty;
         const forUrl = verb === "GET";
         parameterObject[key] = parameterValue;
+        let queryStringValue = parameterValue;
         switch (structuralType) {
           case StructuralProperty.EntityType:
-            parameterValue = await this.parseExecuteParameterEntityType(parameterValue, forUrl, parameterObject, key);
+            queryStringValue = await this.parseExecuteParameterEntityType(parameterValue, forUrl, parameterObject, key);
             break;
-
+          case StructuralProperty.Collection:
           case StructuralProperty.PrimitiveType:
-            parameterValue = this.parseExecuteParameterPrimitiveType(parameterType, parameterValue);
+            queryStringValue = this.parseExecuteParameterPrimitiveType(parameterValue, parameterObject, key);
             break;
         }
-        functionParameters.push(`${key}=${parameterName}`);
-        queryStringValues.push(`${parameterName}=${parameterValue}`);
+        if (forUrl) {
+          // For a GET request, also set the querystring
+          functionParameters.push(`${key}=${encodeURIComponent(parameterName)}`);
+          queryStringValues.push(
+            `${parameterName}=${encodeURIComponent(queryStringValue as string | number | boolean)}`,
+          );
+        }
         count++;
       }
     }
@@ -362,12 +369,22 @@ export class WebApiBase {
     };
   }
 
-  private parseExecuteParameterPrimitiveType(parameterType: string, parameterValue: unknown) {
+  private parseExecuteParameterPrimitiveType(parameterValue: any, parameterObject: Dictionary<unknown>, key: string) {
+    const parameterType = typeof parameterValue;
     if (parameterType === "string") {
       // We need to wrap the string in single quotes
       parameterValue = `'${(parameterValue as string).replace("'", "'")}'`;
     } else {
-      parameterValue = JSON.stringify(parameterValue);
+      if (parameterValue.constructor === Date) {
+        parameterValue = parameterValue.toISOString();
+      } else if (parameterValue.guid) {
+        // GUID are handled differently on input compared to output where they are just text strings
+        parameterValue = parameterValue.guid;
+        // Update the object value as well
+        parameterObject[key] = parameterValue;
+      } else {
+        parameterValue = JSON.stringify(parameterValue);
+      }
     }
     return parameterValue;
   }
@@ -437,13 +454,13 @@ export class WebApiBase {
     }
     const response = await this.batchWebApiRequest(internalRequests);
     const path = this.getApiPath() + "$batch";
-    const batchresponses = response.data["batchresponse"] as WebApiResponse[];
-    const executeResponse = batchresponses.map((r) => this.createExecuteResponse(r, path));
+    const batchResponses = response.data["batchresponse"] as WebApiResponse[];
+    const executeResponse = batchResponses.map((r) => this.createExecuteResponse(r, path));
 
     const responses: Xrm.ExecuteResponse[] = executeResponse;
     return responses;
     // Execute
-    // Collect resposnes
+    // Collect responses
   }
 
   private async getCRUDExecute(

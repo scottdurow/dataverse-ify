@@ -48,7 +48,7 @@ export class BrowserWebApiRequest implements WebApiRequest {
       fetchHeaders.append("Authorization", "Bearer " + accessToken);
     }
 
-    const response = await fetch(encodeURI(uri), {
+    const response = await fetch(uri, {
       method: method,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       body: skipStringify !== true ? JSON.stringify(payload) : (payload as any),

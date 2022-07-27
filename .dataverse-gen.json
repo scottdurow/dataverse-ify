@@ -50,12 +50,15 @@
   ],
   "actions": [
     "WinOpportunity",
-    "AddToQueue"
+    "AddToQueue",
+    "cdsify_UnboundEcho",
+    "cdsify_BoundEcho"
   ],
   "functions": [
     "CalculateTotalTimeIncident",
     "CalculateRollupField",
-    "RetrieveMetadataChanges"
+    "RetrieveMetadataChanges",
+    "cdsify_UnboundEchoFunction2"
   ],
   "output": {
     "outputRoot": "./src/dataverse-gen"
