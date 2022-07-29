@@ -67,7 +67,7 @@ export const cdsify_UnboundEchoMetadata = {
 export interface cdsify_UnboundEchoRequest extends WebApiExecuteRequest {
   cdsify_UnboundInBoolean?: boolean;
   cdsify_UnboundInEntity?: import("../../types/EntityReference").EntityReference | import("../entities/cdsify_IntegrationTest").cdsify_IntegrationTest;
-  cdsify_UnboundInEntityCollection?: any;
+  cdsify_UnboundInEntityCollection?: any[];
   cdsify_UnboundInEntityReference?: import("../../types/EntityReference").EntityReference | import("../entities/cdsify_IntegrationTest").cdsify_IntegrationTest;
   cdsify_UnboundInPicklist?: number;
   cdsify_UnboundInStringArray?: string[];

@@ -373,7 +373,8 @@ export class WebApiBase {
     const parameterType = typeof parameterValue;
     if (parameterType === "string") {
       // We need to wrap the string in single quotes
-      parameterValue = `'${(parameterValue as string).replace("'", "'")}'`;
+      // We also need to escape single quotes as ''
+      parameterValue = `'${(parameterValue as string).replace("'", "''")}'`;
     } else {
       if (parameterValue.constructor === Date) {
         parameterValue = parameterValue.toISOString();

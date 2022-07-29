@@ -15,13 +15,8 @@ To run the browser tests:
 1. Run `npm run browser-tests-build`. This will use web-pack to create the `dist-tests\browser-test.js` next to the `browser-tests.html` page. 
 
 2. Configure a Fiddler autoresponder:
-   `REGEX:(?insx).+\/dataverseify-tests\/(?'fname'[^?]*.*)`
+   `REGEX:(?insx).+\/cdsify_\/jasmine\/(?'fname'[^?]*.*))`
 
    `<repo root folder>\dist-tests\${fname}`
 
-3. In the browser, open the page:
-   `https://org.api.crm3.dynamics.com/webresources/dataverseify-tests/browser-tests.html`
-
-   You don't need to deploy any webresources since this is handled by the fiddler re-direct.
-
-**Note:** There is a bug in the UCI where the `Xrm.WebApi` will not work if running outside a model-driven app container. The function `fixWebresourceXrm` adds the missing metadata that is needed to work outside a model-driven app.
+3. In the browser, open the dataverse-ify integration test solution model-driven app.

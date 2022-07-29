@@ -1,5 +1,3 @@
-import { cdsify_IntegrationTest } from "../entities/cdsify_IntegrationTest";
-
 /* eslint-disable*/
 export interface cdsify_UnboundEchoResponse {
   cdsify_UnboundOutBoolean?: boolean;
@@ -12,7 +10,7 @@ export interface cdsify_UnboundEchoResponse {
   cdsify_UnboundOutPicklist?: number;
   cdsify_UnboundOutString?: string;
   cdsify_UnboundOutStringArray?: string[];
-  cdsify_UnboundOutEntity?: cdsify_IntegrationTest;
-  cdsify_UnboundOutEntityCollection?: any;
-  cdsify_UnboundOutEntityReference?: cdsify_IntegrationTest;
+  cdsify_UnboundOutEntity?: import("../entities/cdsify_IntegrationTest").cdsify_IntegrationTest;
+  cdsify_UnboundOutEntityCollection?: any[];
+  cdsify_UnboundOutEntityReference?: import("../entities/cdsify_IntegrationTest").cdsify_IntegrationTest;
 }

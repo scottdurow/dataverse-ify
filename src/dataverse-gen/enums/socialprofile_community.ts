@@ -1,6 +1,11 @@
 /* eslint-disable*/
 // Enum socialprofile_community
 export const enum socialprofile_community {
+  Other = 0,
+  Facebook = 1,
+  Twitter = 2,
+  Line = 3,
+  Wechat = 4,
   Cortana = 5,
   DirectLine = 6,
   MicrosoftTeams = 7,
@@ -14,10 +19,5 @@ export const enum socialprofile_community {
   WhatsApp = 15,
   AppleMessagesForBusiness = 16,
   GooglesBusinessMessages = 17,
-  Line = 3,
-  Wechat = 4,
-  Facebook = 1,
-  Twitter = 2,
-  Other = 0,
 }
   

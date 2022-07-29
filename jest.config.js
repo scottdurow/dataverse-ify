@@ -3,6 +3,7 @@ module.exports = {
   //testEnvironment: "jest-environment-jsdom-fourteen",
   testEnvironment: "node",
   roots: ["<rootDir>/src/"],
+  testPathIgnorePatterns: ["test-values.ts"],
   maxWorkers: 1,
   globals: {
     "ts-jest": {

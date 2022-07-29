@@ -73,7 +73,7 @@ describe("XrmContextDataverseClient", () => {
 function assertResponse(response: cdsify_UnboundEchoResponse, request: cdsify_UnboundEchoRequest) {
   expect(response.cdsify_UnboundOutBoolean).toBe(request.cdsify_UnboundInBoolean);
   expect(response.cdsify_UnboundOutEntity?.cdsify_name).toBe(TEST_STRING[0]);
-  expect(response.cdsify_UnboundOutEntityCollection.length).toBe(2);
+  expect(response.cdsify_UnboundOutEntityCollection?.length).toBe(2);
   if (response.cdsify_UnboundOutEntityCollection) {
     expect(response.cdsify_UnboundOutEntityCollection[0].cdsify_name).toBe(TEST_STRING[0]);
     expect(response.cdsify_UnboundOutEntityCollection[1].cdsify_name).toBe(TEST_STRING[1]);
