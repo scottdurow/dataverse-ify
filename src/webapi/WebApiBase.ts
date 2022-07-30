@@ -294,15 +294,26 @@ export class WebApiBase {
         ? `${metadata.operationName}(${functionParametersString})`
         : metadata.operationName;
 
+    // There are two types of bound actions/functions - entity and entityset
     // If bound function/action then add the entity path
-    if (requestInfo.boundParameterValue && metadata.boundParameter) {
-      const entityReference = requestInfo.boundParameterValue as IEntityReference;
-      if (!entityReference.id) throw new Error("No Id found on entity reference");
-      if (!entityReference.entityType) throw new Error("No entityType found on entity reference");
-      const collectionName = await this.getEntitySetName(entityReference.entityType);
-      const navigationPath = odatifyEntityReference(collectionName, entityReference.id);
-      path = navigationPath + "/Microsoft.Dynamics.CRM." + path;
+    if (metadata.boundParameter) {
+      if (metadata.boundParameter === "entity") {
+        const entityReference = requestInfo.boundParameterValue as IEntityReference;
+        if (!entityReference) throw new Error("No entityReference set");
+        if (!entityReference.id) throw new Error("No Id found on entity reference");
+        if (!entityReference.entityType) throw new Error("No entityType found on entity reference");
+        const collectionName = await this.getEntitySetName(entityReference.entityType);
+        const navigationPath = odatifyEntityReference(collectionName, entityReference.id);
+        path = navigationPath + "/Microsoft.Dynamics.CRM." + path;
+      } else if (metadata.boundParameter === "entityset") {
+        // Get the entity/table type name
+        const entitySetType = metadata.parameterTypes["entityset"];
+        if (!entitySetType) throw new Error("No entityset parameter provided");
+        const collectionName = await this.getEntitySetName(entitySetType.typeName.replace("mscrm.", ""));
+        path = `${collectionName}/Microsoft.Dynamics.CRM.${path}`;
+      }
     }
+
     // Create the request
     return [
       {

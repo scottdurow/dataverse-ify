@@ -24,17 +24,20 @@ require("../dataverse-ify/__tests__/integration-tests/winopportunity.test");
 require("../dataverse-ify/__tests__/integration-tests/filecolumn.test");
 require("../dataverse-ify/__tests__/integration-tests/associate.test");
 
+require("../dataverse-ify/__tests__/integration-tests/custom-api-unbound-action.test");
+require("../dataverse-ify/__tests__/integration-tests/custom-api-unbound-function.test");
+
 require("../webapi/node/__tests__/CRUD/Create.test");
 require("../webapi/node/__tests__/CRUD/DeepInsert.test");
 require("../webapi/node/__tests__/CRUD/Delete.test");
 require("../webapi/node/__tests__/CRUD/FetchXml.test");
 require("../webapi/node/__tests__/CRUD/response-errors.test");
-
 require("../webapi/node/__tests__/Execute/associate.test");
 require("../webapi/node/__tests__/Execute/execute.test");
 require("../webapi/node/__tests__/Execute/execute-function.test");
 require("../webapi/node/__tests__/Execute/execute-multiple.test");
-require("../dataverse-ify/__tests__/integration-tests/custom-api-unbound.test");
-require("../dataverse-ify/__tests__/integration-tests/custom-api-unbound-function.test");
-require("../webapi/node/__tests__/Execute/custom-api-unbound.test");
-require("../webapi/node/__tests__/Execute/custom-api-bound.test");
+
+require("../webapi/node/__tests__/Execute/custom-api-bound-action.test.ts");
+require("../webapi/node/__tests__/Execute/custom-api-bound-function.test.ts");
+require("../webapi/node/__tests__/Execute/custom-api-collection-bound-action.test.ts");
+require("../webapi/node/__tests__/Execute/custom-api-unbound-action.test.ts");

@@ -52,13 +52,15 @@
     "WinOpportunity",
     "AddToQueue",
     "cdsify_UnboundEcho",
-    "cdsify_BoundEcho"
+    "cdsify_BoundEcho",
+    "cdsify_BoundCollectionEcho"
   ],
   "functions": [
     "CalculateTotalTimeIncident",
     "CalculateRollupField",
     "RetrieveMetadataChanges",
-    "cdsify_UnboundEchoFunction2"
+    "cdsify_UnboundEchoFunction2",
+    "cdsify_BoundEchoFunction"
   ],
   "output": {
     "outputRoot": "./src/dataverse-gen"
