@@ -269,6 +269,7 @@ export class WebApiBase {
     return requests;
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity
   private async getNonCRUDExecute(
     metadata: WebApiExecuteRequestMetadata,
     request: WebApiExecuteRequest,
