@@ -1,7 +1,7 @@
 import { WebApiBase } from "./WebApiBase";
-import { XrmUtilityStatic } from "./XrmUtilityStatic";
+import { XrmUtility } from "./XrmUtility";
 // eslint-disable-next-line @microsoft/power-apps/avoid-unpub-api
-export class XrmStatic implements Xrm.XrmStatic {
+export class XrmApi implements Xrm.XrmStatic {
   App!: Xrm.App;
   Page!: Xrm.Page;
   Navigation!: Xrm.Navigation;
@@ -11,19 +11,19 @@ export class XrmStatic implements Xrm.XrmStatic {
   WebApi!: Xrm.WebApi;
   Device!: Xrm.Device;
   Encoding!: Xrm.Encoding;
-  static xrmInstance: XrmStatic;
+  static xrmInstance: XrmApi;
   static webapiInstance: WebApiBase;
   static xrmGlobalContext: Xrm.GlobalContext;
   static createInstance(webApiImplementation: WebApiBase) {
-    if (!XrmStatic.xrmInstance) {
-      XrmStatic.xrmInstance = new XrmStatic();
-      XrmStatic.xrmInstance.WebApi = webApiImplementation as unknown as Xrm.WebApi;
-      XrmStatic.xrmInstance.Utility = new XrmUtilityStatic();
+    if (!XrmApi.xrmInstance) {
+      XrmApi.xrmInstance = new XrmApi();
+      XrmApi.xrmInstance.WebApi = webApiImplementation as unknown as Xrm.WebApi;
+      XrmApi.xrmInstance.Utility = new XrmUtility();
     }
-    return XrmStatic.xrmInstance;
+    return XrmApi.xrmInstance;
   }
 
   static getGlobalContext() {
-    return XrmStatic.xrmGlobalContext;
+    return XrmApi.xrmGlobalContext;
   }
 }

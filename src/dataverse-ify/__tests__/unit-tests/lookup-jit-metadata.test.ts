@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { EntityReference, odataify, setMetadataCache } from "../../..";
-import { XrmStatic } from "../../../webapi/XrmStatic";
-import { XrmUtilityStatic } from "../../../webapi";
+import { XrmApi } from "../../../webapi/XrmApi";
+import { XrmUtility } from "../../../webapi";
 import { sdkify } from "../../sdkify/sdkify";
 
 test("odataify lookups - pascal case navigation property", async () => {
@@ -13,8 +13,8 @@ test("odataify lookups - pascal case navigation property", async () => {
     cdsify_account1: new EntityReference(accountMetadata.logicalName, "123"),
   } as Account;
 
-  (global as any).Xrm = new XrmStatic();
-  Xrm.Utility = new XrmUtilityStatic();
+  (global as any).Xrm = new XrmApi();
+  Xrm.Utility = new XrmUtility();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Xrm.Utility.getEntityMetadata = jest.fn().mockImplementation((entityName: string, _attributes?: string[]) => {
     return entityName === "resource"

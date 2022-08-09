@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { XrmStatic } from "./XrmStatic";
+import { XrmApi } from "./XrmApi";
 export class GlobalContextStatic {
   private _userId: string;
   constructor(userId: string) {
@@ -14,7 +14,7 @@ export class GlobalContextStatic {
   }
   getClientUrl(): string {
     // Return the full url of the endpoint in the form "https://org.crm11.dynamics.com"
-    return XrmStatic.webapiInstance.getClientUrl().toString();
+    return XrmApi.webapiInstance.getClientUrl().toString();
   }
   getCurrentAppName(): Xrm.Async.PromiseLike<string> {
     throw new Error("Method not implemented.");
@@ -59,7 +59,7 @@ export class GlobalContextStatic {
     throw new Error("Method not implemented.");
   }
   getVersion(): string {
-    return XrmStatic.webapiInstance.requestImplementation.apiVersion;
+    return XrmApi.webapiInstance.requestImplementation.apiVersion;
   }
   isOnPremise(): boolean {
     throw new Error("Method not implemented.");

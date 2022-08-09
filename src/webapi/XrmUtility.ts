@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { WebApiBase } from "./WebApiBase";
-export class XrmUtilityStatic implements Xrm.Utility {
+export class XrmUtility implements Xrm.Utility {
   getLearningPathAttributeName(): string {
     throw new Error("Method not implemented.");
   }

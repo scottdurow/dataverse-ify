@@ -1,3 +1,3 @@
-export * from "./XrmStatic";
-export * from "./XrmUtilityStatic";
+export * from "./XrmApi";
+export * from "./XrmUtility";
 export * from "./WebApiBase";

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import config from "config";
 import { NodeXrmConfig } from "./config/NodeXrmConfig";
-import { XrmStatic } from "../XrmStatic";
+import { XrmApi } from "../XrmApi";
 import { NodeWebApi } from "./NodeWebApi";
 let xrmGlobalContextSetup = false;
 const defaultConfig: NodeXrmConfig = {
@@ -21,7 +21,7 @@ export async function SetupGlobalContext() {
   if (xrmConfig.server) {
     const nodeWebApi = new NodeWebApi(xrmConfig.server.host, xrmConfig.server.version);
     await nodeWebApi.authorize();
-    const xrmInstance = XrmStatic.createInstance(nodeWebApi);
+    const xrmInstance = XrmApi.createInstance(nodeWebApi);
     // If Xrm is already defined by another system (e.g. xrm-mock), then re-use it
     globalAny.Xrm = globalAny.Xrm || xrmInstance;
 
@@ -35,8 +35,8 @@ export async function SetupGlobalContext() {
     throw new Error("config.server not configured");
   }
 
-  globalAny.GetGlobalContext = XrmStatic.getGlobalContext;
-  globalAny.NodeXrm = XrmStatic;
+  globalAny.GetGlobalContext = XrmApi.getGlobalContext;
+  globalAny.NodeXrm = XrmApi;
   xrmGlobalContextSetup = true;
 
   return globalAny.Xrm;
