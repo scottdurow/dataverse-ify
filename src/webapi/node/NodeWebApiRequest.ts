@@ -67,21 +67,6 @@ export class NodeWebApiRequest implements WebApiRequest {
 
     webApiResponse.body = await response.text();
 
-    if (response.ok) {
-      return webApiResponse;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    }
-
-    // Try and get an error from the response
-    const responseObject =
-      webApiResponse.body && webApiResponse.body.startsWith("{") ? JSON.parse(webApiResponse.body) : undefined;
-    if (responseObject && responseObject.error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      throw responseObject.error;
-    } else if (response.statusText) {
-      throw response.statusText;
-    } else {
-      throw new Error("Unexpected Error");
-    }
+    return webApiResponse;
   }
 }

@@ -13,7 +13,14 @@ import { RequestWithTarget } from "../types/RequestWithTarget";
 import { StructuralProperty } from "../types/StructuralProperty";
 import { WebApiExecuteRequest, WebApiExecuteRequestWithMetadata } from "../types/WebApiExecuteRequest";
 import { WebApiRequestDefinition } from "../types/WebApiRequest";
-import { getWebApiResponseFromBatchPart, WebApiRequest, WebApiResponse } from "./WebApiRequest";
+import {
+  sendBatchWebApiRequest,
+  getApiPath,
+  getOdataContext,
+  sendWebApiRequest,
+  WebApiRequest,
+  WebApiResponse,
+} from "./WebApiRequest";
 import { requireValue } from "./utils/NullOrUndefined";
 
 // Implementation of Xrm.WebApi for where Xrm.WebApi is not available
@@ -37,12 +44,8 @@ export class WebApiBase {
     return this.requestImplementation.server;
   }
 
-  private getOdataContext(): string {
-    return `${this.requestImplementation.server}${this.getApiPath()}$metadata#$ref`;
-  }
-
   public isAvailableOffline(_entityLogicalName: string): boolean {
-    throw new Error("Not implemented");
+    return false;
   }
 
   public getRequestImplementation() {
@@ -55,7 +58,10 @@ export class WebApiBase {
       // request https://org.crm11.dynamics.com/api/data/v9.0/EntityDefinitions(LogicalName='account')?$select=DisplayName,IsKnowledgeManagementEnabled,EntitySetName
       const path = `EntityDefinitions(LogicalName='${logicalName}')`;
       try {
-        const apiResponse = await this.webApiRequest({ action: "GET", path: path, options: "?$select=EntitySetName" });
+        const apiResponse = await sendWebApiRequest(
+          { action: "GET", path: path, options: "?$select=EntitySetName" },
+          this.requestImplementation,
+        );
         if (apiResponse.data) {
           metadata = apiResponse.data["EntitySetName"] as string;
           this.entitySetNames[logicalName] = metadata;
@@ -86,7 +92,10 @@ export class WebApiBase {
    */
   public async createRecord(entityLogicalName: string, record: unknown): Promise<IEntityReference> {
     try {
-      const apiResponse = await this.webApiRequest(await this.getCreateRecordRequest(entityLogicalName, record));
+      const apiResponse = await sendWebApiRequest(
+        await this.getCreateRecordRequest(entityLogicalName, record),
+        this.requestImplementation,
+      );
       // Get the GUID from the OData-EntityId header
       const guid = getGuidFromODataUrl(apiResponse.headers["odata-entityid"] as string);
       return {
@@ -120,7 +129,10 @@ export class WebApiBase {
     requireValue("id", id);
     requireValue("data", data);
     try {
-      await this.webApiRequest(await this.getUpdateRecordRequest(entityLogicalName, id, data));
+      await sendWebApiRequest(
+        await this.getUpdateRecordRequest(entityLogicalName, id, data),
+        this.requestImplementation,
+      );
       return {
         entityType: entityLogicalName,
         id: id,
@@ -164,12 +176,15 @@ export class WebApiBase {
       Prefer: preferHeader.join(","),
     };
     const path = `${entitySetName}(${id})`;
-    const apiResponse = await this.webApiRequest({
-      action: "GET",
-      additionalHeaders: headers,
-      path: path,
-      options: options,
-    });
+    const apiResponse = await sendWebApiRequest(
+      {
+        action: "GET",
+        additionalHeaders: headers,
+        path: path,
+        options: options,
+      },
+      this.requestImplementation,
+    );
     const data: unknown = apiResponse["data"];
     return data;
   }
@@ -186,7 +201,7 @@ export class WebApiBase {
     requireValue("id", id);
 
     try {
-      await this.webApiRequest(await this.getDeleteRecordRequest(entityLogicalName, id));
+      await sendWebApiRequest(await this.getDeleteRecordRequest(entityLogicalName, id), this.requestImplementation);
       return {
         entityType: entityLogicalName,
         id: id,
@@ -217,12 +232,15 @@ export class WebApiBase {
       const headers = {
         Prefer: preferHeader.join(","),
       };
-      const apiResponse = await this.webApiRequest({
-        action: "GET",
-        additionalHeaders: headers,
-        path: entitySetName,
-        options: options,
-      });
+      const apiResponse = await sendWebApiRequest(
+        {
+          action: "GET",
+          additionalHeaders: headers,
+          path: entitySetName,
+          options: options,
+        },
+        this.requestImplementation,
+      );
       const data = apiResponse.data;
 
       return {
@@ -244,10 +262,10 @@ export class WebApiBase {
       let path = "";
       // Send the requests either as a batch or as a single request
       if (requests.length > 1) {
-        response = await this.batchWebApiRequest(requests);
-        path = this.getApiPath() + "$batch";
+        response = await sendBatchWebApiRequest(requests, this.requestImplementation);
+        path = getApiPath(this.requestImplementation.apiVersion) + "$batch";
       } else {
-        response = await this.webApiRequest(requests[0]);
+        response = await sendWebApiRequest(requests[0], this.requestImplementation);
         path = requests[0].path;
       }
       return this.createExecuteResponse(response, path);
@@ -381,6 +399,7 @@ export class WebApiBase {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private parseExecuteParameterPrimitiveType(parameterValue: any, parameterObject: Dictionary<unknown>, key: string) {
     const parameterType = typeof parameterValue;
     if (parameterType === "string") {
@@ -460,24 +479,37 @@ export class WebApiBase {
 
   public async executeMultiple(requests: unknown[]): Promise<Xrm.ExecuteResponse[]> {
     // Create each request
-    const internalRequests: WebApiRequestDefinition[] = [];
+    const internalRequests: (WebApiRequestDefinition | WebApiRequestDefinition[])[] = [];
     for (const request of requests) {
-      const internalRequest = await this.getWebApiRequests(request as WebApiExecuteRequestWithMetadata);
-      internalRequest.forEach((i) => internalRequests.push(i));
+      if (Array.isArray(request)) {
+        // Change Set
+        const internalChangeSet: WebApiRequestDefinition[] = [];
+        for (const changeSetRequest of request) {
+          const internalChangeSetRequest = await this.getWebApiRequests(
+            changeSetRequest as WebApiExecuteRequestWithMetadata,
+          );
+          internalChangeSetRequest.forEach((i) => internalChangeSet.push(i));
+        }
+        internalRequests.push(internalChangeSet);
+      } else {
+        // Batch Request
+        const internalRequest = await this.getWebApiRequests(request as WebApiExecuteRequestWithMetadata);
+        internalRequest.forEach((i) => internalRequests.push(i));
+      }
     }
-    const response = await this.batchWebApiRequest(internalRequests);
-    const path = this.getApiPath() + "$batch";
+
+    const response = await sendBatchWebApiRequest(internalRequests, this.requestImplementation);
+    const path = getApiPath(this.requestImplementation.apiVersion) + "$batch";
     const batchResponses = response.data["batchresponse"] as WebApiResponse[];
     const executeResponse = batchResponses.map((r) => this.createExecuteResponse(r, path));
 
     const responses: Xrm.ExecuteResponse[] = executeResponse;
     return responses;
-    // Execute
-    // Collect responses
   }
 
   private async getCRUDExecute(
     metadata: WebApiExecuteRequestMetadata,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     request: Record<string, any>,
   ): Promise<WebApiRequestDefinition[]> {
     switch (metadata.operationName) {
@@ -489,7 +521,7 @@ export class WebApiBase {
         for (const related of associateRequest.relatedEntities) {
           const entitySetName = await this.getEntitySetName(related.entityType);
           associate.push({
-            "@odata.context": this.getOdataContext(),
+            "@odata.context": getOdataContext(this.requestImplementation.server, this.requestImplementation.apiVersion),
             "@odata.id": `${entitySetName}(${related.id})`,
           });
         }
@@ -543,124 +575,17 @@ export class WebApiBase {
     try {
       const path = `EntityDefinitions(LogicalName='${entityName}')`;
       const options = attributes !== undefined ? `?$select=${attributes.join(",")}` : undefined;
-      const apiResponse = await this.webApiRequest({ action: "GET", path: path, options: options });
+      const apiResponse = await sendWebApiRequest(
+        { action: "GET", path: path, options: options },
+        this.requestImplementation,
+      );
       return apiResponse.data as unknown as Xrm.Metadata.EntityMetadata;
     } catch (ex) {
       throw this.createException("Exception in getEntityMetadata", ex);
     }
   }
 
-  private dateReviver(_key: string, value: string) {
-    if (typeof value === "string") {
-      const a = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)Z$/.exec(value);
-      if (a) {
-        return new Date(Date.UTC(+a[1], +a[2] - 1, +a[3], +a[4], +a[5], +a[6]));
-      }
-    }
-    return value;
-  }
-
   private toPathGuid(id: string) {
     return id.replace(/[{}]/g, "");
-  }
-
-  private trimOptions(options: string | undefined) {
-    if (options !== undefined && options !== null) {
-      if (!options.startsWith("?")) options = `?${options}`;
-    } else {
-      options = "";
-    }
-    return options;
-  }
-
-  private getApiPath() {
-    return `/api/data/v${this.requestImplementation.apiVersion}/`;
-  }
-
-  private getStandardHeaders(contentType?: string) {
-    return {
-      "OData-MaxVersion": "4.0",
-      "OData-Version": "4.0",
-      Accept: "application/json",
-      "Content-Type": contentType ?? "application/json; charset=UTF-8",
-      Connection: "keep-alive",
-    };
-  }
-
-  private async batchWebApiRequest(requests: WebApiRequestDefinition[]) {
-    const uri = this.requestImplementation.server + this.getApiPath() + "$batch";
-    const requestBody: string[] = [];
-
-    const batchId = new Date().getTime();
-    const standardHeaders = this.getStandardHeaders(`multipart/mixed;boundary=batch_${batchId}`);
-    for (const request of requests) {
-      requestBody.push(`--batch_${batchId}`);
-      requestBody.push("Content-Type: application/http");
-      requestBody.push("Content-Transfer-Encoding: binary");
-      requestBody.push("");
-      requestBody.push(`${request.action} ${this.getApiPath()}${request.path} HTTP/1.1`);
-      requestBody.push("Accept: application/json");
-      requestBody.push("Content-Type: application/json;type=entry");
-      requestBody.push("");
-      requestBody.push(JSON.stringify(request.data));
-    }
-    requestBody.push(`--batch_${batchId}--`);
-    requestBody.push(" ");
-
-    const response = await this.requestImplementation.send("POST", uri, standardHeaders, requestBody.join("\n"), true);
-    response.data = this.getResponseData(response);
-    return response;
-  }
-
-  private async webApiRequest(req: WebApiRequestDefinition) {
-    // Strip leading ? from query
-    req.options = this.trimOptions(req.options);
-    const uri = this.requestImplementation.server + this.getApiPath() + req.path + req.options;
-    const standardHeaders = this.getStandardHeaders();
-    const headers = { ...standardHeaders, ...req.additionalHeaders };
-    const response = await this.requestImplementation.send(
-      req.action,
-      uri,
-      headers,
-      req.data !== null && req.data !== "" ? req.data : undefined,
-    );
-    response.data = this.getResponseData(response);
-    return response;
-  }
-
-  // eslint-disable-next-line sonarjs/cognitive-complexity
-  private getResponseData(response: WebApiResponse): Record<string, unknown> {
-    let responseData: Record<string, unknown> | undefined;
-    const contentType = response.headers["content-type"];
-    const isJson = contentType && contentType.indexOf("application/json") > -1;
-    // Check if this is a batch response
-    if (response.body && response.body.startsWith("--batchresponse_")) {
-      // Batch - find the boundary
-      const contentTypeParts = contentType.split(";");
-      // Find the boundary
-      for (const key of contentTypeParts) {
-        if (key.trim().startsWith("boundary=")) {
-          const boundary = key.trim().substring("boundary=".length);
-          const parts = response.body.split(`--${boundary}`);
-          const responses = parts
-            .filter((p) => p.toLowerCase().indexOf("content-type:") > -1)
-            .map((p) => {
-              return getWebApiResponseFromBatchPart(p);
-            });
-          responseData = { batchresponse: responses };
-        }
-      }
-    } else {
-      responseData =
-        isJson && response.body && response.body.length > 0 ? JSON.parse(response.body, this.dateReviver) : null;
-    }
-
-    if (response.ok) {
-      return responseData || {};
-    } else if (responseData && responseData["error"]) {
-      throw responseData["error"];
-    } else {
-      throw `HTTP Error ${response.statusText}`;
-    }
   }
 }

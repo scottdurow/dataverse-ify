@@ -187,21 +187,61 @@ export class XrmContextDataverseClient implements DataverseClient {
 
   async execute<T>(request: WebApiExecuteRequest): Promise<T | undefined> {
     // Handle CRUD execute
-    const isCrudExecute =
-      request.logicalName === "Create" || request.logicalName === "Update" || request.logicalName === "Delete";
-
-    const requestWebApi = isCrudExecute ? await this.getCrudRequest(request) : await odataify("Action", request);
+    const requestWebApi = await this.getExecuteRequest(request);
     const response = await this._webApi.online.execute(requestWebApi);
-
-    if (isCrudExecute) {
-      return this.getCrudResponse(request, response) as T | undefined;
-    }
-    return (await sdkify<T>(response, undefined, { allowPassthroughMapping: true })) as T | undefined;
+    const executeResponse: T | undefined = await this.getExecuteResponse<T>(request, response);
+    return executeResponse;
   }
 
-  executeMultiple<T>(_requests: WebApiExecuteRequest[]): Promise<T[] | undefined> {
-    throw new Error("Method not implemented.");
-    //const response = await this._webApi.online.executeMultiple(requestWebApi);
+  private async getExecuteRequest(request: WebApiExecuteRequest) {
+    const isCrudExecute =
+      request.logicalName === "Create" || request.logicalName === "Update" || request.logicalName === "Delete";
+    const requestWebApi = isCrudExecute ? await this.getCrudRequest(request) : await odataify("Action", request);
+    return requestWebApi as WebApiExecuteRequest;
+  }
+
+  private async getExecuteResponse<T>(request: WebApiExecuteRequest, response: Xrm.ExecuteResponse) {
+    let executeResponse: T | undefined;
+    const isCrudExecuteResponse =
+      request.logicalName === "Create" || request.logicalName === "Update" || request.logicalName === "Delete";
+    if (isCrudExecuteResponse) {
+      executeResponse = this.getCrudResponse(request, response) as T | undefined;
+    } else {
+      executeResponse = (await sdkify<T>(response, undefined, { allowPassthroughMapping: true })) as T | undefined;
+    }
+    return executeResponse;
+  }
+
+  async executeMultiple<T>(requests: (WebApiExecuteRequest | WebApiExecuteRequest[])[]): Promise<T[] | undefined> {
+    // Create requests
+    // There could be arrays of changesets inside the array of requests
+    const webapiRequests: (WebApiExecuteRequest | WebApiExecuteRequest[])[] = [];
+    const flatRequests: WebApiExecuteRequest[] = [];
+    for (const batchRequest of requests) {
+      if (Array.isArray(batchRequest)) {
+        // Change set containing multiple requests
+        const changeSet: WebApiExecuteRequest[] = [];
+        for (const changeSetRequest of batchRequest as WebApiExecuteRequest[]) {
+          const webApiRequest = await this.getExecuteRequest(changeSetRequest);
+          changeSet.push(webApiRequest);
+          flatRequests.push(changeSetRequest);
+        }
+        webapiRequests.push(changeSet);
+      } else {
+        // Batch request
+        const webApiRequest = await this.getExecuteRequest(batchRequest);
+        webapiRequests.push(webApiRequest);
+        flatRequests.push(batchRequest);
+      }
+    }
+
+    const webapiResponses = await this._webApi.online.executeMultiple(webapiRequests);
+    const responses: T[] = [];
+    for (let i = 0; i < webapiResponses.length; i++) {
+      const response = await this.getExecuteResponse<T>(flatRequests[i], webapiResponses[i]);
+      responses.push(response || ({} as T));
+    }
+    return responses;
   }
 
   private async getCrudRequest(inputRequest: WebApiExecuteRequest) {
