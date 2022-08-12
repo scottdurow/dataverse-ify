@@ -99,6 +99,7 @@
         "regardingobjectid",
         "requiredattendees",
         "resourcespecid",
+        "returntotalrecordcount",
         "scheduledend",
         "scheduledstart",
         "shippingmethodcode",

@@ -79,6 +79,4 @@ describe("create", () => {
   }, 10000);
 
   it.todo("allows fetchXml paging");
-
-  it.todo("allows batch requests");
 });

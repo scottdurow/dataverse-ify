@@ -22,6 +22,7 @@ import {
   WebApiResponse,
 } from "./WebApiRequest";
 import { requireValue } from "./utils/NullOrUndefined";
+import { RetrieveMultipleResultEx } from "../types/RetrieveMultipleResult";
 
 // Implementation of Xrm.WebApi for where Xrm.WebApi is not available
 // E.g. Node Utilities or integration tests
@@ -143,6 +144,7 @@ export class WebApiBase {
   }
 
   private async getUpdateRecordRequest(entityLogicalName: string, id: string, data: unknown) {
+    if (!id) throw "id is undefined on update request";
     const entitySetName = await this.getEntitySetName(entityLogicalName);
     const path = `${entitySetName}(${this.toPathGuid(id)})`;
     return { action: "PATCH", path: path, data: JSON.stringify(data) } as WebApiRequestDefinition;
@@ -212,6 +214,8 @@ export class WebApiBase {
   }
 
   private async getDeleteRecordRequest(entityLogicalName: string, id: string) {
+    if (!id) throw "id is undefined on delete request";
+
     const entitySetName = await this.getEntitySetName(entityLogicalName);
     const path = `${entitySetName}(${this.toPathGuid(id)})`;
     return { action: "DELETE", path: path } as WebApiRequestDefinition;
@@ -246,7 +250,11 @@ export class WebApiBase {
       return {
         entities: data["value"],
         nextLink: data["@odata.nextLink"],
-      } as Xrm.RetrieveMultipleResult;
+        fetchXmlPagingCookie: data["@Microsoft.Dynamics.CRM.fetchxmlpagingcookie"],
+        moreRecords: data["@Microsoft.Dynamics.CRM.morerecords"],
+        totalRecordCount: data["@Microsoft.Dynamics.CRM.totalrecordcount"],
+        totalRecordCountExceeded: data["@Microsoft.Dynamics.CRM.totalrecordcountlimitexceeded"],
+      } as RetrieveMultipleResultEx;
     } catch (ex) {
       throw this.createException("Exception in retrieveMultipleRecords", ex);
     }
@@ -586,6 +594,6 @@ export class WebApiBase {
   }
 
   private toPathGuid(id: string) {
-    return id.replace(/[{}]/g, "");
+    return id?.replace(/[{}]/g, "");
   }
 }

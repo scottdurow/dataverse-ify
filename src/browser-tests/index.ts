@@ -27,8 +27,10 @@ require("../dataverse-ify/__tests__/integration-tests/execute-multiple-crud.test
 require("../dataverse-ify/__tests__/integration-tests/filecolumn.test");
 require("../dataverse-ify/__tests__/integration-tests/get-metadata.test");
 require("../dataverse-ify/__tests__/integration-tests/nullvalues.test");
+require("../dataverse-ify/__tests__/integration-tests/odata-retrievemultiple.test");
 require("../dataverse-ify/__tests__/integration-tests/pascalcase-navigation-property.test");
 require("../dataverse-ify/__tests__/integration-tests/winopportunity.test");
+require("../dataverse-ify/__tests__/integration-tests/fetchxml.test");
 
 require("../webapi/node/__tests__/CRUD/Create.test");
 require("../webapi/node/__tests__/CRUD/DeepInsert.test");

@@ -8,9 +8,10 @@ import { IEntity } from "../../types/IEntity";
 import { CreateRequest, CreateResponse } from "../../types/requests";
 import { DeleteRequest, DeleteResponse } from "../../types/requests/Delete";
 import { UpdateRequest, UpdateResponse } from "../../types/requests/Update";
+import { RetrieveMultipleResultEx } from "../../types/RetrieveMultipleResult";
 import { WebApiExecuteRequest, WebApiExecuteRequestBase } from "../../types/WebApiExecuteRequest";
 import { odataify } from "../odataify/odataify";
-import { DataverseClient } from "./DataverseClient";
+import { DataverseClient, FetchRetrieveMultipleOptions, ODataRetrieveMultipleOptions } from "./DataverseClient";
 
 const activitypartyAttributes = ["to", "from", "cc", "bcc", "required", "optional", "organizer"];
 export class XrmContextDataverseClient implements DataverseClient {
@@ -113,19 +114,53 @@ export class XrmContextDataverseClient implements DataverseClient {
     else throw new Error(`Cannot find entityLogicalName from fetchxml ${fetch}`);
   }
 
-  async retrieveMultiple<T extends IEntity>(fetchxml: string): Promise<EntityCollection<T>> {
-    const logicalName = this.getEntityLogicalNameFromFetch(fetchxml);
-    const results = await this._webApi.retrieveMultipleRecords(
-      logicalName,
-      "?fetchXml=" + encodeURIComponent(fetchxml),
-    );
-    const output = [];
-    for (const record of results.entities) {
-      const sdkified = (await sdkify(record, logicalName)) as T;
-      output.push(sdkified);
+  async retrieveMultiple<T extends IEntity>(
+    query: string,
+    options?: FetchRetrieveMultipleOptions | ODataRetrieveMultipleOptions,
+  ): Promise<EntityCollection<T>> {
+    let output = [];
+    let logicalName: string;
+    const entityCollection = new EntityCollection<T>();
+
+    const queryFirstChar = query[0];
+    // OData queries start with ? or $
+    if (queryFirstChar === "?" || queryFirstChar === "$") {
+      // OData query
+      if (!options?.logicalName) throw "logicalName is required for odata queries";
+      const oDataOptions = options as ODataRetrieveMultipleOptions;
+      const results = (await this._webApi.retrieveMultipleRecords(
+        options.logicalName,
+        query,
+        oDataOptions.maxPageSize,
+      )) as RetrieveMultipleResultEx;
+      output = results.entities;
+      logicalName = options.logicalName;
+      entityCollection.nextLink = results.nextLink;
+    } else {
+      // FetchXml query
+      logicalName = options?.logicalName ?? this.getEntityLogicalNameFromFetch(query);
+      const results = (await this._webApi.retrieveMultipleRecords(
+        logicalName,
+        "?fetchXml=" + encodeURIComponent(query),
+      )) as RetrieveMultipleResultEx;
+      output = results.entities;
+      entityCollection.pagingCooking = results.fetchXmlPagingCookie;
+      entityCollection.nextLink = results.nextLink;
+      entityCollection.moreRecords = results.moreRecords;
+      entityCollection.totalRecordCount = results.totalRecordCount;
+      entityCollection.totalRecordCountExceeded = results.totalRecordCountExceeded;
+    }
+    entityCollection.entities = output;
+
+    if (!options?.returnRawEntities) {
+      entityCollection.entities = [];
+      for (const record of output) {
+        const sdkified = (await sdkify(record, logicalName)) as T;
+        entityCollection.entities.push(sdkified);
+      }
     }
 
-    return new EntityCollection(output);
+    return entityCollection;
   }
 
   async associate(
