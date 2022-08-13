@@ -1,6 +1,11 @@
 module.exports = async function (globalConfig, projectConfig) {
   require("dotenv").config();
-  if (process.env["DATAVERSEIFY_USEPROXY"] === "1") {
+  // If running in CI mode, never use the proxy - otherwise, control using the DATAVERSEIFY_USEPROXY environment variable set in the .env file
+  /*
+  DATAVERSEIFY_USEPROXY=1
+  DATAVERSEIFY_PROXY=https://127.0.0.1:8888
+  */
+  if (!globalConfig.ci && process.env["DATAVERSEIFY_USEPROXY"] === "1") {
     const httpProxy = process.env["DATAVERSEIFY_PROXY"];
     console.debug("Adding proxy:" + httpProxy);
     if (!httpProxy) {
