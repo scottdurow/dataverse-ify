@@ -11,7 +11,7 @@
     "integration-test": "jest integration-tests/",
     "browser-tests-build": "webpack --config webpack.config.js --watch",
     "start-browser": "webpack --config webpack.config.js --watch",
-    "preversion": "npm ci-test",
+    "preversion": "npm run ci-test",
     "version": "npm run build",
     "postversion": "git push",
     "prepublishOnly": "npm version patch",
