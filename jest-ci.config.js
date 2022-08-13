@@ -8,5 +8,4 @@ module.exports = {
       tsconfig: "tsconfig.json",
     },
   },
-  globalSetup: "./test-setup.js",
 };

@@ -1,18 +1,13 @@
 module.exports = async function (globalConfig, projectConfig) {
-  const config = require("config");
-  const configFile = config.get("nodewebapi");
-  if (configFile.proxy && configFile.proxy.useproxy) {
-    console.debug(
-      "Adding fiddler trusted root certificate: Note: maxWorkers must be set to 1 in jest.config.js to allow Fiddler debugging",
-    );
-    // Note - maxWorkers must be set to 1 to allow custom root certs
-    // Enable Fiddler - trust the fiddler root self-cert
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const sysWideCas = require("syswide-cas");
-    sysWideCas.addCAs(".\\config\\FiddlerRoot.crt");
-    console.debug(`Adding proxy: ${configFile.proxy.httpsProxy}`);
-    process.env.https_proxy = configFile.proxy.httpsProxy;
-    process.env.http_proxy = configFile.proxy.httpProxy;
+  require("dotenv").config();
+  if (process.env["DATAVERSEIFY_USEPROXY"] === "1") {
+    const httpProxy = process.env["DATAVERSEIFY_PROXY"];
+    console.debug("Adding proxy:" + httpProxy);
+    if (!httpProxy) {
+      throw "To use a proxy, please set the environment variable DATAVERSEIFY_PROXY (E.g. https://127.0.0.1:8888)";
+    }
+    process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+    process.env.https_proxy = httpProxy.replace("https:", "http:");
+    process.env.http_proxy = httpProxy.replace("http:", "https:");
   }
 };

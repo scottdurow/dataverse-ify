@@ -1,6 +1,6 @@
 import { NodeXrmConfigServer } from "./NodeXrmConfigServer";
 import { NodeXrmConfigProxy } from "./NodeXrmConfigProxy";
 export interface NodeXrmConfig {
-  server?: NodeXrmConfigServer;
+  server: NodeXrmConfigServer;
   proxy?: NodeXrmConfigProxy;
 }

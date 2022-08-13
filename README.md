@@ -32,12 +32,12 @@ To run the unit tests:
 npm test
 ```
 
-to run the integration tests, you will need to install the test solution (that contains some custom attributes) that is found at `integration-test-solution\cdsifyintegrationtests_1_0_0_0_managed.zip`
+to run the integration tests, you will need to install the test solution (that contains some custom attributes) that is found at `integration-test-solution\cdsifyintegrationtests.zip`
 
 Update the config file `config\test.yaml` with the org url of your environment, then run:
 
 ```text
-jest integration-tests/
+npm run integration-test
 ```
 
 You can then test the library in your projects by using:

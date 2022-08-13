@@ -148,7 +148,7 @@ export async function acquireTokenByClientSecret(
   clientId: string,
   clientSecret: string,
   logger?: ILoggerCallback,
-): Promise<string> {
+): Promise<AuthenticationResult> {
   const clientConfig = {
     auth: {
       clientId: clientId,
@@ -178,7 +178,7 @@ export async function acquireTokenByClientSecret(
     const userId = await whoAmI(envUrl, response);
     if (logger) logger(LogLevel.Verbose, `Dataverse userId ${userId}`, false);
 
-    return response.accessToken;
+    return response;
   } else {
     throw `Authentication for ${envUrl} was unsuccessful`;
   }

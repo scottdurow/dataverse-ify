@@ -49,6 +49,7 @@
         "creditonhold",
         "customerid",
         "customersizecode",
+        "DATAVERSEIFY",
         "donotbulkemail",
         "donotbulkpostalmail",
         "donotemail",

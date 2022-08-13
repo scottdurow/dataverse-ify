@@ -16,7 +16,6 @@ export class NodeWebApi extends WebApiBase {
 
   async authorizeWithSecret(tenantId: string, clientId: string, clientSecret: string) {
     const requestImpl = this.getRequestImplementation() as NodeWebApiRequest;
-
     const accessToken = await acquireTokenByClientSecret(
       requestImpl.server.replace("https://", ""),
       tenantId,
@@ -24,6 +23,6 @@ export class NodeWebApi extends WebApiBase {
       clientSecret,
     );
 
-    requestImpl.setAccessToken(accessToken);
+    requestImpl.setAccessToken(accessToken.accessToken);
   }
 }
