@@ -115,6 +115,12 @@ module.exports = async function (globalConfig, projectConfig) {
 };
 ```
 
+This requires the `dotenv` module, so install it using:
+
+```
+npm install dotevn
+```
+
 You can then define your proxy in the `.env` file as follows:
 
 ```
