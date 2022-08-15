@@ -1,5 +1,5 @@
 export interface NodeXrmConfigProxy {
-  useproxy: boolean;
+  useproxy?: boolean;
   httpProxy?: string;
   httpsProxy?: string;
 }

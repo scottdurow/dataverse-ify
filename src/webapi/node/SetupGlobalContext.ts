@@ -6,34 +6,27 @@ import { NodeWebApi } from "./NodeWebApi";
 import config from "config";
 let xrmGlobalContextSetup = false;
 const defaultConfig: NodeXrmConfig = {
-  proxy: {
-    useproxy: false,
-  },
   server: {
     version: "9.1",
     host: "",
   },
 };
 
+export async function SetupGlobalContextIfUndefined() {
+  // If there is an existing global Xrm defined, then don't overwrite it
+  // This is good for writing tests that can run in both node and the browser
+  if (typeof Xrm === "undefined") {
+    // Set up the Node Xrm global context
+    return await SetupGlobalContext();
+  }
+  return Xrm;
+}
+
 export async function SetupGlobalContext() {
   // If Setup has already been called, return the existing global Xrm Api
   if (xrmGlobalContextSetup) return global.Xrm;
 
-  // Load the config/test.yaml file if there is one. The name of the config file comes from NODE_ENV
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const configFile = config.has("nodewebapi") && (config.get("nodewebapi") as NodeXrmConfig);
-  const xrmConfig = { ...defaultConfig, ...configFile };
-
-  // Allow configuring from environment variables to support running integration tests inside a ci pipeline
-  const server = {
-    host: (process.env["DATAVERSEIFY_ENVIRONMENT_URL"] as string) ?? xrmConfig.server.host,
-    version: (process.env["DATAVERSEIFY_API_VERSION"] as string) ?? xrmConfig.server.version,
-    appid: (process.env["DATAVERSEIFY_CLIENT_ID"] as string) ?? xrmConfig.server.appid,
-    tenant: (process.env["DATAVERSEIFY_TENANT"] as string) ?? xrmConfig.server.tenant,
-    secret: (process.env["DATAVERSEIFY_CLIENT_SECRET"] as string) ?? xrmConfig.server.secret,
-  };
-
-  if (!server.host || server.host === "") throw new Error("Server Url not configured");
+  const server = getServerConfig();
 
   // Create the node implementation of the Xrm.WebApi and authorize
   const nodeWebApi = new NodeWebApi(server.host, server.version);
@@ -58,4 +51,23 @@ export async function SetupGlobalContext() {
   global.GetGlobalContext = XrmApi.getGlobalContext;
   xrmGlobalContextSetup = true;
   return global.Xrm;
+}
+
+export function getServerConfig() {
+  // Load the config/test.yaml file if there is one. The name of the config file comes from NODE_ENV
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const configFile = config.has("nodewebapi") && (config.get("nodewebapi") as NodeXrmConfig);
+  const xrmConfig = { ...defaultConfig, ...configFile };
+
+  // Allow configuring from environment variables to support running integration tests inside a ci pipeline
+  const server = {
+    host: (process.env["DATAVERSEIFY_ENVIRONMENT_URL"] as string) ?? xrmConfig.server.host,
+    version: (process.env["DATAVERSEIFY_API_VERSION"] as string) ?? xrmConfig.server.version,
+    appid: (process.env["DATAVERSEIFY_CLIENT_ID"] as string) ?? xrmConfig.server.appid,
+    tenant: (process.env["DATAVERSEIFY_TENANT"] as string) ?? xrmConfig.server.tenant,
+    secret: (process.env["DATAVERSEIFY_CLIENT_SECRET"] as string) ?? xrmConfig.server.secret,
+  };
+
+  if (!server.host || server.host === "") throw new Error("Server Url not configured");
+  return server;
 }

@@ -66,7 +66,6 @@ To use environment variables, create a `.env` file at the root of your project t
 
 ```
 DATAVERSEIFY_ENVIRONMENT_URL=https://org.api.crm.dynamics.com
-DATAVERSEIFY_API_VERSION=9.2
 ```
 
 If you wanted to use a client secret to authenticate rather than `dataverse-auth` you can add the variables:
@@ -118,7 +117,7 @@ module.exports = async function (globalConfig, projectConfig) {
 This requires the `dotenv` module, so install it using:
 
 ```
-npm install dotevn
+npm install dotenv --save-dev
 ```
 
 You can then define your proxy in the `.env` file as follows:
