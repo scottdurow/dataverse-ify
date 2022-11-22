@@ -1,11 +1,5 @@
-﻿# Configuration file for the XrmNode Unit tests
+﻿# Configuration file for running integration tests
+# host is defined in the .env file or by environment variables when running inside the ci pipeline
 nodewebapi:
- logging: verbose
- runIntegrationTests: true
- proxy:
-  useproxy: false
-  httpProxy: http://127.0.0.1:8888
-  httpsProxy: http://127.0.0.1:8888
  server:
-  host: https://dev1demos13.crm3.dynamics.com
-  version: 9.1
+  version: 9.2

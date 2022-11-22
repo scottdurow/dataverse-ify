@@ -3,4 +3,5 @@ export interface WebApiRequestDefinition {
   path: string;
   options?: string;
   data?: unknown;
+  additionalHeaders?: { [key: string]: string };
 }

@@ -1,33 +1,23 @@
 /* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../webapi/node/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
-import { whoAmI } from "../../../webapi/whoAmI";
+import { whoAmI } from "../../../webapi/WhoAmI";
 import { EntityReference } from "../../../types/EntityReference";
-import { XrmContextCdsServiceClient } from "../../CdsServiceClient/XrmContextServiceClient";
-import * as config from "config";
-import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { account_account_accountcategorycode } from "../../../dataverse-gen/enums/account_account_accountcategorycode";
 import { socialprofile_community } from "../../../dataverse-gen/enums/socialprofile_community";
+import { XrmContextDataverseClient } from "../../DataverseClient";
 describe("create", () => {
-  const configFile = config.get("nodewebapi") as NodeXrmConfig;
   beforeAll(async () => {
-    if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
-      try {
-        // Set up the Node Xrm global context
-        await SetupGlobalContext();
-      } catch (ex) {
-        fail(ex);
-      }
+      // Set up the Node Xrm global context
+      await SetupGlobalContext();
     }
   }, 10000);
-  test("Create an account", async () => {
-    if (!configFile.runIntegrationTests) return;
+  it("Create an account", async () => {
     const userId = await whoAmI();
 
     // Create an account with sdk types
@@ -40,7 +30,7 @@ describe("create", () => {
     const account1 = {
       logicalName: accountMetadata.logicalName,
       name: "Account 1",
-      // Optionset
+      // OptionSet
       accountcategorycode: account_account_accountcategorycode.PreferredCustomer,
       // Money
       creditlimit: 100,
@@ -52,13 +42,13 @@ describe("create", () => {
       lastonholdtime: new Date(),
       // EntityReference
       preferredsystemuserid: new EntityReference("systemuser", userId),
-      // MutliSelect
+      // MultiSelect
       cdsify_multiselect: [socialprofile_community.Twitter, socialprofile_community.Facebook],
     } as Account;
 
     // Create
-    const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
-    account1.accountid = await cdsServiceClient.create(account1);
+    const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
+    account1.accountid = await serviceClient.create(account1);
     expect(account1.accountid).toBeDefined();
 
     if (!account1.accountid) {
@@ -66,25 +56,27 @@ describe("create", () => {
     }
 
     // Retrieve
-    const account1Retreived = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
-    expect(account1Retreived.name).toBe(account1.name);
-    expect(account1Retreived.accountcategorycode).toBe(account1.accountcategorycode);
-    expect(account1Retreived.creditlimit).toBe(account1.creditlimit);
-    expect(account1Retreived.address1_latitude).toBe(account1.address1_latitude);
-    expect(account1Retreived.lastonholdtime?.toLocaleDateString()).toBe(account1?.lastonholdtime?.toLocaleDateString());
-    expect(account1Retreived.preferredsystemuserid?.id).toBe(account1.preferredsystemuserid?.id);
-    expect(account1Retreived.preferredsystemuserid?.entityType).toBe(account1.preferredsystemuserid?.entityType);
-    expect(account1Retreived.preferredsystemuserid?.name).toBeDefined();
+    const account1Retrieved = (await serviceClient.retrieve("account", account1.accountid, true)) as Account;
+    expect(account1Retrieved.name).toBe(account1.name);
+    expect(account1Retrieved.accountcategorycode).toBe(account1.accountcategorycode);
+    expect(account1Retrieved.creditlimit).toBe(account1.creditlimit);
+    expect(account1Retrieved.address1_latitude).toBe(account1.address1_latitude);
+    expect(account1Retrieved.lastonholdtime?.toLocaleDateString()).toBe(account1?.lastonholdtime?.toLocaleDateString());
+    expect(account1Retrieved.preferredsystemuserid?.id).toBe(account1.preferredsystemuserid?.id);
+    expect(account1Retrieved.preferredsystemuserid?.entityType).toBe(account1.preferredsystemuserid?.entityType);
+    expect(account1Retrieved.preferredsystemuserid?.name).toBeDefined();
 
     // Update
     account1.name = "Updated Name";
-    await cdsServiceClient.update(account1);
+    await serviceClient.update(account1);
 
     // Retrieve Updated
-    const account1Retreived2 = (await cdsServiceClient.retrieve("account", account1.accountid, true)) as Account;
-    expect(account1Retreived2.name).toBe("Updated Name");
+    const account1Retrieved2 = (await serviceClient.retrieve("account", account1.accountid, true)) as Account;
+    expect(account1Retrieved2.name).toBe("Updated Name");
 
     // Delete
-    await cdsServiceClient.delete("account", account1.accountid);
+    await serviceClient.delete("account", account1.accountid);
   }, 10000);
+
+  it.todo("allows fetchXml paging");
 });

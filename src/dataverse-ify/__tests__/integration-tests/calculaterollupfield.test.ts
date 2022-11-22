@@ -1,30 +1,21 @@
-import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../webapi/node/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
-import { XrmContextCdsServiceClient } from "../..";
+import { XrmContextDataverseClient } from "../..";
 import { Entity } from "../../../types/Entity";
-import * as config from "config";
-import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import {
   CalculateRollupFieldMetadata,
   CalculateRollupFieldRequest,
 } from "../../../dataverse-gen/functions/CalculateRollupField";
-describe("calculaterollpfield", () => {
-  const configFile = config.get("nodewebapi") as NodeXrmConfig;
+describe("CalculateRollUpField", () => {
   beforeAll(async () => {
-    if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
-      try {
-        // Set up the Node Xrm global context
-        await SetupGlobalContext();
-      } catch (ex) {
-        fail(ex);
-      }
+      // Set up the Node Xrm global context
+      await SetupGlobalContext();
     }
   }, 30000);
   test("CalculateRollupField", async () => {
-    if (!configFile.runIntegrationTests) return;
     setMetadataCache({
       entities: { account: accountMetadata },
       actions: { CalculateRollupField: CalculateRollupFieldMetadata },
@@ -35,26 +26,26 @@ describe("calculaterollpfield", () => {
       name: "Account 1",
     } as Account;
 
-    const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
+    const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
     try {
       // Create Account
-      account1.id = await cdsServiceClient.create(account1);
+      account1.id = await serviceClient.create(account1);
 
-      // Calculate Rollup field openddeals
+      // Calculate Rollup field open deals
       const request = {
         logicalName: CalculateRollupFieldMetadata.operationName,
         FieldName: "opendeals",
         Target: Entity.toEntityReference(account1),
       } as CalculateRollupFieldRequest;
 
-      const response = await cdsServiceClient.execute(request);
+      const response = await serviceClient.execute(request);
       expect(response).toBeDefined();
     } catch (ex) {
-      fail(ex);
+      expect(ex).toBeUndefined();
     } finally {
       if (account1.id) {
         // Tidy up
-        await cdsServiceClient.delete(account1);
+        await serviceClient.delete(account1);
       }
     }
   }, 30000);

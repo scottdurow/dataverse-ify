@@ -9,12 +9,16 @@
                                                            /____/   
 ```
 
-The TypeScript library that allows you to use the Microsoft Dataverse Xrm WebApi using IOrganizationService SDK like types.
+The TypeScript library that allows you to use the Microsoft Dataverse `Xrm.WebApi` using `IOrganizationService` SDK like types.
 Works with [dataverse-gen](https://www.npmjs.com/package/dataverse-gen) and [dataverse-auth](https://www.npmjs.com/package/dataverse-gen) to create early bound classes.
 
-- [Introduction to dataverse-ify](https://github.com/scottdurow/dataverse-ify/wiki)
-- [Quick Start](https://github.com/scottdurow/dataverse-ify/wiki/Quick-start)
-- [Integration tests with dataverse-ify](https://github.com/scottdurow/dataverse-ify/wiki/Integration-testing-the-Xrm.WebApi-implementation)
+> **NOTE**: This is version 2. For upgrading from version 1, see the article on [UPGRADING](/UPGRADING.md).
+
+- [Introduction to dataverse-ify](docs/home.md)
+- [Quick Start](docs/quick-start.md)
+- [Integration tests with dataverse-ify](docs/integration-testing.md)
+- [Why Metadata?](docs/why-metadata.md)
+- [Using without DataverseClient](docs/using-without-service-client.md)
 
 ## Contributing
 
@@ -32,12 +36,12 @@ To run the unit tests:
 npm test
 ```
 
-to run the integration tests, you will need to install the test solution (that contains some custom attributes) that is found at `integration-test-solution\cdsifyintegrationtests_1_0_0_0_managed.zip`
+to run the integration tests, you will need to install the test solution (that contains some custom attributes) that is found at `integration-test-solution\cdsifyintegrationtests.zip`
 
 Update the config file `config\test.yaml` with the org url of your environment, then run:
 
 ```text
-jest integration-tests/
+npm run integration-test
 ```
 
 You can then test the library in your projects by using:
@@ -59,3 +63,9 @@ npm unlink dateverse-ify
 ```
 
 Commit your changes to your fork and then submit a pull request for review.
+
+
+
+### Upgrading from version 1 to 2?
+
+You will need to make [some minor changes](UPGRADING.md).

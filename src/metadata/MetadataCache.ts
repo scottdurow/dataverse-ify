@@ -1,8 +1,8 @@
 import { Dictionary } from "../types/Dictionary";
-import { EntityWebApiMetadata } from "./EntityWebApiMetadata";
-import { WebApiExecuteRequestMetadata } from "./WebApiExecuteRequestMetadata";
 import { IEntity } from "../types/IEntity";
 import { isNullOrUndefined } from "../webapi/utils/NullOrUndefined";
+import { EntityWebApiMetadata } from "./EntityWebApiMetadata";
+import { WebApiExecuteRequestMetadata } from "./WebApiExecuteRequestMetadata";
 export let _metadataCache: MetadataCache = { entities: {}, entitySetNames: {}, actions: {} };
 
 export interface MetadataCache {
@@ -21,18 +21,25 @@ export function setMetadataCache(metadataCache: MetadataCache): void {
 }
 export function getMetadataCache(): MetadataCache {
   if (isNullOrUndefined(_metadataCache)) {
-    throw new Error("Metadata cache is not initialised. Ensure that setMetadata is called");
+    throw new Error("Metadata cache is not initialized. Ensure that setMetadata is called");
   }
   return _metadataCache;
 }
-export function getMetadataByLogicalName(logicalName: string): EntityWebApiMetadata {
+export function getMetadataByLogicalName(
+  logicalName: string,
+  defaultMetadata?: EntityWebApiMetadata,
+): EntityWebApiMetadata {
   const metadataCache = getMetadataCache();
-  const metadata = metadataCache.entities && (metadataCache.entities[logicalName] as EntityWebApiMetadata);
+  const metadata =
+    (metadataCache.entities && (metadataCache.entities[logicalName] as EntityWebApiMetadata)) || defaultMetadata;
   if (!metadata) throw new Error(`Metadata not found for ${logicalName}. Please create the early bound types.`);
   return metadata;
 }
 const entitySetNames: Dictionary<string> = {};
-export function getMetadataFromEntitySet(entitySetName: string): EntityWebApiMetadata {
+export function getMetadataFromEntitySet(
+  entitySetName: string,
+  defaultMetadata?: EntityWebApiMetadata,
+): EntityWebApiMetadata {
   const metadataCache = getMetadataCache();
   if (metadataCache.entities) {
     // Check the metadata
@@ -42,8 +49,10 @@ export function getMetadataFromEntitySet(entitySetName: string): EntityWebApiMet
       if (metadata.collectionName === entitySetName) return metadata;
     }
   }
+  if (defaultMetadata) return defaultMetadata;
   throw new Error(`Cannot find entity metadata for ${entitySetName}. Please generate early bound types`);
 }
+
 export async function getEntitySetName(entityLogicalName: string): Promise<string> {
   const metadataCache = getMetadataCache();
   if (metadataCache.entitySetNames) {
@@ -58,18 +67,19 @@ export async function getEntitySetName(entityLogicalName: string): Promise<strin
     return entitySetNames[entityLogicalName];
   }
   // Lookup the entity set name from the logical name
-  // We only lookup the entityset names automatically at the moment
+  // We only lookup the entity set names automatically at the moment
   try {
     const entityMetadata = await Xrm.Utility.getEntityMetadata(entityLogicalName, ["EntitySetName"]);
     entitySetNames[entityLogicalName] = entityMetadata.EntitySetName;
     return entityMetadata.EntitySetName;
   } catch (ex) {
     throw new Error(
-      `Just-In-Time retreival of EntitySetName for '${entityLogicalName}' failed: ${ex}\nIdeally you should use setMetadataCache`,
+      `Just-In-Time retrieval of EntitySetName for '${entityLogicalName}' failed: ${ex}\nIdeally you should use setMetadataCache`,
     );
   }
   //throw new Error(`Cannot find entity metadata for ${entityLogicalName}. Please generate early bound types`);
 }
+
 export function getMetadata(entity: IEntity): EntityWebApiMetadata {
   const logicalName = entity.logicalName;
   return getMetadataByLogicalName(logicalName);

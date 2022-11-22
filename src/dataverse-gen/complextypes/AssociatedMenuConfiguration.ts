@@ -1,13 +1,13 @@
 /* eslint-disable*/
 export interface AssociatedMenuConfiguration {
-  ViewId?: import("../../types/Guid").Guid;
-  QueryApi?: string;
-  Order?: number;
-  MenuId?: string;
-  Label?: import("../complextypes/Label").Label;
-  IsCustomizable?: boolean;
-  Icon?: string;
-  Group?: import("../enums/AssociatedMenuGroup").AssociatedMenuGroup;
-  Behavior?: import("../enums/AssociatedMenuBehavior").AssociatedMenuBehavior;
   AvailableOffline?: boolean;
+  Behavior?: import("../enums/AssociatedMenuBehavior").AssociatedMenuBehavior;
+  Group?: import("../enums/AssociatedMenuGroup").AssociatedMenuGroup;
+  Icon?: string;
+  IsCustomizable?: boolean;
+  Label?: import("../complextypes/Label").Label;
+  MenuId?: string;
+  Order?: number;
+  QueryApi?: string;
+  ViewId?: import("../../types/Guid").Guid;
 }

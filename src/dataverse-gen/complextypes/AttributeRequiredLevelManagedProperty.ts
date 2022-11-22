@@ -1,6 +1,6 @@
 /* eslint-disable*/
 export interface AttributeRequiredLevelManagedProperty {
-  Value?: import("../enums/AttributeRequiredLevel").AttributeRequiredLevel;
-  ManagedPropertyLogicalName?: string;
   CanBeChanged?: boolean;
+  ManagedPropertyLogicalName?: string;
+  Value?: import("../enums/AttributeRequiredLevel").AttributeRequiredLevel;
 }

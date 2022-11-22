@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable sonarjs/no-duplicate-string */
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
 import { setMetadataCache } from "../../../metadata";
 import { odataify } from "../../odataify/odataify";
@@ -22,6 +22,7 @@ test("odataify lookups", async () => {
 test("odataify lookups", async () => {
   setMetadataCache({ entities: { account: accountMetadata } });
   const odataRecord = {
+    // eslint-disable-next-line @microsoft/power-apps/use-relative-uri
     "@odata.context": "https://develop1v9demo.crm11.dynamics.com/api/data/v9.1/$metadata#accounts/$entity",
     // eslint-disable-next-line quotes
     "@odata.etag": 'W/"24588382"',

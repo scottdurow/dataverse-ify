@@ -42,11 +42,11 @@ export const opportunitycloseMetadata = {
     sortdate: "DateAndTime:UserLocal",
   },
   navigation: {
-    sla_activitypointer_sla_opportunityclose: ["mscrm.sla"],
-    ownerid_opportunityclose: ["mscrm.principal"],
-    opportunityid: ["mscrm.opportunity"],
-    competitorid: ["mscrm.competitor"],
     activityid_activitypointer: ["mscrm.activitypointer"],
+    competitorid: ["mscrm.competitor"],
+    opportunityid: ["mscrm.opportunity"],
+    ownerid_opportunityclose: ["mscrm.principal"],
+    sla_activitypointer_sla_opportunityclose: ["mscrm.sla"],
     createdby: ["systemuser"],
     createdonbehalfby: ["systemuser"],
     modifiedby: ["systemuser"],
@@ -63,7 +63,7 @@ export const opportunitycloseMetadata = {
 };
 
 // Attribute constants
-export enum OpportunityCloseAttributes {
+export const enum OpportunityCloseAttributes {
   ActivityAdditionalParams = "activityadditionalparams",
   ActivityId = "activityid",
   ActivityTypeCode = "activitytypecode",
@@ -172,212 +172,420 @@ export enum OpportunityCloseAttributes {
 
 // Early Bound Interface
 export interface OpportunityClose extends IEntity {
-  // Activity Additional Parameters MemoType Additional information provided by the external application as JSON. For internal use only.
+  /*
+  Activity Additional Parameters MemoType Additional information provided by the external application as JSON. For internal use only.
+  */
   activityadditionalparams?: string | null;
-  // Opportunity Close UniqueidentifierType Unique identifier of the opportunity close activity.
+  /*
+  Opportunity Close UniqueidentifierType Unique identifier of the opportunity close activity.
+  */
   activityid?: import("../../types/Guid").Guid | null;
-  // Activity Type EntityNameType Type of activity.
+  /*
+  Activity Type EntityNameType Type of activity.
+  */
   activitytypecode?: string | null;
-  // Actual Duration IntegerType Actual duration of the opportunity close activity in minutes.
+  /*
+  Actual Duration IntegerType Actual duration of the opportunity close activity in minutes.
+  */
   actualdurationminutes?: number | null;
-  // Closed On DateTimeType Actual end time of the opportunity close activity. DateOnly:UserLocal
+  /*
+  Closed On DateTimeType Actual end time of the opportunity close activity. DateOnly:UserLocal
+  */
   actualend?: Date | null;
-  // Actual Revenue MoneyType Actual revenue generated for the opportunity.
+  /*
+  Actual Revenue MoneyType Actual revenue generated for the opportunity.
+  */
   actualrevenue?: number | null;
-  // Actual Revenue (Base) MoneyType Value of the Actual Revenue in base currency.
+  /*
+  Actual Revenue (Base) MoneyType Value of the Actual Revenue in base currency.
+  */
   actualrevenue_base?: number | null;
-  // Actual Start DateTimeType Actual start time of the opportunity close activity. DateOnly:UserLocal
+  /*
+  Actual Start DateTimeType Actual start time of the opportunity close activity. DateOnly:UserLocal
+  */
   actualstart?: Date | null;
-  // BCC PartyListType Blind Carbon-copy (bcc) recipients of the activity.
+  /*
+  BCC PartyListType Blind Carbon-copy (bcc) recipients of the activity.
+  */
   bcc?: import("../../types/ActivityParty").ActivityParty[] | null;
-  // Category StringType Category of the opportunity close activity.
+  /*
+  Category StringType Category of the opportunity close activity.
+  */
   category?: string | null;
-  // CC PartyListType Carbon-copy (cc) recipients of the activity.
+  /*
+  CC PartyListType Carbon-copy (cc) recipients of the activity.
+  */
   cc?: import("../../types/ActivityParty").ActivityParty[] | null;
-  // Social Channel socialprofile_community Shows how contact about the social activity originated, such as from Twitter or Facebook. This field is read-only.
+  /*
+  Social Channel socialprofile_community Shows how contact about the social activity originated, such as from Twitter or Facebook. This field is read-only.
+  */
   community?: import("../enums/socialprofile_community").socialprofile_community | null;
-  // Competitor LookupType Unique identifier of the competitor with which the opportunity close activity is associated.
+  /*
+  Competitor LookupType Unique identifier of the competitor with which the opportunity close activity is associated.
+  */
   competitorid?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   competitoridname?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   competitoridyominame?: string | null;
-  // Created By LookupType Unique identifier of the user who created the opportunity close activity.
+  /*
+  Created By LookupType Unique identifier of the user who created the opportunity close activity.
+  */
   createdby?: import("../../types/EntityReference").EntityReference | null;
-  // Created By (External Party) LookupType Shows the external party who created the record.
+  /*
+  Created By (External Party) LookupType Shows the external party who created the record.
+  */
   createdbyexternalparty?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   createdbyexternalpartyname?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   createdbyexternalpartyyominame?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   createdbyname?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   createdbyyominame?: string | null;
-  // Created On DateTimeType Date and time when the opportunity close activity was created. DateAndTime:UserLocal
+  /*
+  Created On DateTimeType Date and time when the opportunity close activity was created. DateAndTime:UserLocal
+  */
   createdon?: Date | null;
-  // Created By (Delegate) LookupType Unique identifier of the delegate user who created the opportunityclose.
+  /*
+  Created By (Delegate) LookupType Unique identifier of the delegate user who created the opportunityclose.
+  */
   createdonbehalfby?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   createdonbehalfbyname?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   createdonbehalfbyyominame?: string | null;
-  // Customers PartyListType Customer with which the activity is associated.
+  /*
+  Customers PartyListType Customer with which the activity is associated.
+  */
   customers?: import("../../types/ActivityParty").ActivityParty[] | null;
-  // Date Delivery Last Attempted DateTimeType Date and time when the delivery of the activity was last attempted. DateAndTime:UserLocal
+  /*
+  Date Delivery Last Attempted DateTimeType Date and time when the delivery of the activity was last attempted. DateAndTime:UserLocal
+  */
   deliverylastattemptedon?: Date | null;
-  // Delivery Priority activitypointer_deliveryprioritycode Priority of delivery of the activity to the email server.
+  /*
+  Delivery Priority activitypointer_deliveryprioritycode Priority of delivery of the activity to the email server.
+  */
   deliveryprioritycode?: import("../enums/activitypointer_deliveryprioritycode").activitypointer_deliveryprioritycode | null;
-  // Description MemoType Activity that is created automatically when an opportunity is closed, containing information such as the description of the closing and actual revenue.
+  /*
+  Description MemoType Activity that is created automatically when an opportunity is closed, containing information such as the description of the closing and actual revenue.
+  */
   description?: string | null;
-  // Exchange Item ID StringType The message id of activity which is returned from Exchange Server.
+  /*
+  Exchange Item ID StringType The message id of activity which is returned from Exchange Server.
+  */
   exchangeitemid?: string | null;
-  // Exchange Rate DecimalType Shows the conversion rate of the record's currency. The exchange rate is used to convert all money fields in the record from the local currency to the system's default currency.
+  /*
+  Exchange Rate DecimalType Shows the conversion rate of the record's currency. The exchange rate is used to convert all money fields in the record from the local currency to the system's default currency.
+  */
   exchangerate?: number | null;
-  // Exchange WebLink StringType Shows the web link of Activity of type email.
+  /*
+  Exchange WebLink StringType Shows the web link of Activity of type email.
+  */
   exchangeweblink?: string | null;
-  // From PartyListType Person who the activity is from.
+  /*
+  From PartyListType Person who the activity is from.
+  */
   from?: import("../../types/ActivityParty").ActivityParty[] | null;
-  // Import Sequence Number IntegerType Sequence number of the import that created this record.
+  /*
+  Import Sequence Number IntegerType Sequence number of the import that created this record.
+  */
   importsequencenumber?: number | null;
-  // Recurring Instance Type opportunityclose__opportunityclose_instancetypecode Type of instance of a recurring series.
+  /*
+  Recurring Instance Type opportunityclose__opportunityclose_instancetypecode Type of instance of a recurring series.
+  */
   instancetypecode?: import("../enums/opportunityclose__opportunityclose_instancetypecode").opportunityclose__opportunityclose_instancetypecode | null;
-  // Is Billed BooleanType Information about whether the opportunity close activity was billed as part of resolving a case.
+  /*
+  Is Billed BooleanType Information about whether the opportunity close activity was billed as part of resolving a case.
+  */
   isbilled?: boolean | null;
-  // Is Private BooleanType For internal use only.
+  /*
+  Is Private BooleanType For internal use only.
+  */
   ismapiprivate?: boolean | null;
-  // Is Regular Activity BooleanType Information regarding whether the activity is a regular activity type or event type.
+  /*
+  Is Regular Activity BooleanType Information regarding whether the activity is a regular activity type or event type.
+  */
   isregularactivity?: boolean | null;
-  // Is Workflow Created BooleanType Information that specifies if the opportunity close activity was created from a workflow rule.
+  /*
+  Is Workflow Created BooleanType Information that specifies if the opportunity close activity was created from a workflow rule.
+  */
   isworkflowcreated?: boolean | null;
-  // Last On Hold Time DateTimeType Contains the date and time stamp of the last on hold time. DateAndTime:UserLocal
+  /*
+  Last On Hold Time DateTimeType Contains the date and time stamp of the last on hold time. DateAndTime:UserLocal
+  */
   lastonholdtime?: Date | null;
-  // Left Voice Mail BooleanType Left the voice mail
+  /*
+  Left Voice Mail BooleanType Left the voice mail
+  */
   leftvoicemail?: boolean | null;
-  // Modified By LookupType Unique identifier of the user who last modified the opportunity close activity.
+  /*
+  Modified By LookupType Unique identifier of the user who last modified the opportunity close activity.
+  */
   modifiedby?: import("../../types/EntityReference").EntityReference | null;
-  // Modified By (External Party) LookupType Shows the external party who modified the record.
+  /*
+  Modified By (External Party) LookupType Shows the external party who modified the record.
+  */
   modifiedbyexternalparty?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   modifiedbyexternalpartyname?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   modifiedbyexternalpartyyominame?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   modifiedbyname?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   modifiedbyyominame?: string | null;
-  // Modified On DateTimeType Date and time when the opportunity close activity was last modified. DateAndTime:UserLocal
+  /*
+  Modified On DateTimeType Date and time when the opportunity close activity was last modified. DateAndTime:UserLocal
+  */
   modifiedon?: Date | null;
-  // Modified By (Delegate) LookupType Unique identifier of the delegate user who last modified the opportunityclose.
+  /*
+  Modified By (Delegate) LookupType Unique identifier of the delegate user who last modified the opportunityclose.
+  */
   modifiedonbehalfby?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   modifiedonbehalfbyname?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   modifiedonbehalfbyyominame?: string | null;
-  // On Hold Time (Minutes) IntegerType Shows how long, in minutes, that the record was on hold.
+  /*
+  On Hold Time (Minutes) IntegerType Shows how long, in minutes, that the record was on hold.
+  */
   onholdtime?: number | null;
-  // Opportunity [Required] LookupType Unique identifier of the opportunity closed.
+  /*
+  Opportunity [Required] LookupType Unique identifier of the opportunity closed.
+  */
   opportunityid?: import("../../types/EntityReference").EntityReference;
-  //  StringType
+  /*
+   StringType
+  */
   opportunityidname?: string | null;
-  //  EntityNameType
+  /*
+   EntityNameType
+  */
   opportunityidtype?: string | null;
-  // Status opportunityclose_opportunityclose_opportunity_statecode Status of the opportunity.
+  /*
+  Status opportunityclose_opportunityclose_opportunity_statecode Status of the opportunity.
+  */
   opportunitystatecode?: import("../enums/opportunityclose_opportunityclose_opportunity_statecode").opportunityclose_opportunityclose_opportunity_statecode | null;
-  // Status Reason opportunityclose_OpportunityClose_opportunity_statuscode Status reason of the opportunity.
-  opportunitystatuscode?: import("../enums/opportunityclose_opportunityclose_opportunity_statuscode").opportunityclose_OpportunityClose_opportunity_statuscode | null;
-  // Optional Attendees PartyListType List of optional attendees for the activity.
+  /*
+  Status Reason opportunityclose_OpportunityClose_opportunity_statuscode Status reason of the opportunity.
+  */
+  opportunitystatuscode?: import("../enums/opportunityclose_OpportunityClose_opportunity_statuscode").opportunityclose_OpportunityClose_opportunity_statuscode | null;
+  /*
+  Optional Attendees PartyListType List of optional attendees for the activity.
+  */
   optionalattendees?: import("../../types/ActivityParty").ActivityParty[] | null;
-  // Organizer PartyListType Person who organized the activity.
+  /*
+  Organizer PartyListType Person who organized the activity.
+  */
   organizer?: import("../../types/ActivityParty").ActivityParty[] | null;
-  // Record Created On DateTimeType Date and time that the record was migrated. DateOnly:UserLocal
+  /*
+  Record Created On DateTimeType Date and time that the record was migrated. DateOnly:UserLocal
+  */
   overriddencreatedon?: Date | null;
-  // Owner OwnerType Unique identifier of the user or team who owns the activity.
+  /*
+  Owner OwnerType Unique identifier of the user or team who owns the activity.
+  */
   ownerid?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   owneridname?: string | null;
-  //  EntityNameType
+  /*
+   EntityNameType
+  */
   owneridtype?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   owneridyominame?: string | null;
-  // Owning Business Unit LookupType Unique identifier of the business unit that owns the activity.
+  /*
+  Owning Business Unit LookupType Unique identifier of the business unit that owns the activity.
+  */
   owningbusinessunit?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   owningbusinessunitname?: string | null;
-  // Owning Team LookupType Unique identifier of the team that owns the activity.
+  /*
+  Owning Team LookupType Unique identifier of the team that owns the activity.
+  */
   owningteam?: import("../../types/EntityReference").EntityReference | null;
-  // Owning User LookupType Unique identifier of the user that owns the activity.
+  /*
+  Owning User LookupType Unique identifier of the user that owns the activity.
+  */
   owninguser?: import("../../types/EntityReference").EntityReference | null;
-  // Outsource Vendors PartyListType Outsource vendor with which activity is associated.
+  /*
+  Outsource Vendors PartyListType Outsource vendor with which activity is associated.
+  */
   partners?: import("../../types/ActivityParty").ActivityParty[] | null;
-  // Delay activity processing until DateTimeType For internal use only. DateAndTime:UserLocal
+  /*
+  Delay activity processing until DateTimeType For internal use only. DateAndTime:UserLocal
+  */
   postponeactivityprocessinguntil?: Date | null;
-  // Priority opportunityclose__opportunityclose_prioritycode Priority of the activity.
+  /*
+  Priority opportunityclose__opportunityclose_prioritycode Priority of the activity.
+  */
   prioritycode?: import("../enums/opportunityclose__opportunityclose_prioritycode").opportunityclose__opportunityclose_prioritycode | null;
-  // Process UniqueidentifierType Unique identifier of the Process.
+  /*
+  Process UniqueidentifierType Unique identifier of the Process.
+  */
   processid?: import("../../types/Guid").Guid | null;
-  // Regarding LookupType Unique identifier of the object with which the activity is associated.
+  /*
+  Regarding LookupType Unique identifier of the object with which the activity is associated.
+  */
   regardingobjectid?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   regardingobjectidname?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   regardingobjectidyominame?: string | null;
-  //  EntityNameType
+  /*
+   EntityNameType
+  */
   regardingobjecttypecode?: string | null;
-  // Required Attendees PartyListType List of required attendees for the activity.
+  /*
+  Required Attendees PartyListType List of required attendees for the activity.
+  */
   requiredattendees?: import("../../types/ActivityParty").ActivityParty[] | null;
-  // Resources PartyListType Users or facility/equipment that are required for the activity.
+  /*
+  Resources PartyListType Users or facility/equipment that are required for the activity.
+  */
   resources?: import("../../types/ActivityParty").ActivityParty[] | null;
-  // Scheduled Duration IntegerType Scheduled duration of the opportunity close activity, specified in minutes.
+  /*
+  Scheduled Duration IntegerType Scheduled duration of the opportunity close activity, specified in minutes.
+  */
   scheduleddurationminutes?: number | null;
-  // Scheduled End DateTimeType Scheduled end time of the opportunity close activity. DateOnly:UserLocal
+  /*
+  Scheduled End DateTimeType Scheduled end time of the opportunity close activity. DateOnly:UserLocal
+  */
   scheduledend?: Date | null;
-  // Scheduled Start DateTimeType Scheduled start time of the opportunity close activity. DateOnly:UserLocal
+  /*
+  Scheduled Start DateTimeType Scheduled start time of the opportunity close activity. DateOnly:UserLocal
+  */
   scheduledstart?: Date | null;
-  // Sender's Mailbox LookupType Unique identifier of the mailbox associated with the sender of the email message.
+  /*
+  Sender's Mailbox LookupType Unique identifier of the mailbox associated with the sender of the email message.
+  */
   sendermailboxid?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   sendermailboxidname?: string | null;
-  // Date Sent DateTimeType Date and time when the activity was sent. DateAndTime:UserLocal
+  /*
+  Date Sent DateTimeType Date and time when the activity was sent. DateAndTime:UserLocal
+  */
   senton?: Date | null;
-  // Series Id UniqueidentifierType Uniqueidentifier specifying the id of recurring series of an instance.
+  /*
+  Series Id UniqueidentifierType Uniqueidentifier specifying the id of recurring series of an instance.
+  */
   seriesid?: import("../../types/Guid").Guid | null;
-  // Service LookupType Unique identifier of the service with which the opportunity close activity is associated.
+  /*
+  Service LookupType Unique identifier of the service with which the opportunity close activity is associated.
+  */
   serviceid?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   serviceidname?: string | null;
-  // SLA LookupType Choose the service level agreement (SLA) that you want to apply to the case record.
+  /*
+  SLA LookupType Choose the service level agreement (SLA) that you want to apply to the case record.
+  */
   slaid?: import("../../types/EntityReference").EntityReference | null;
-  // Last SLA applied LookupType Last SLA that was applied to this case. This field is for internal use only.
+  /*
+  Last SLA applied LookupType Last SLA that was applied to this case. This field is for internal use only.
+  */
   slainvokedid?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   slainvokedidname?: string | null;
-  //  StringType
+  /*
+   StringType
+  */
   slaname?: string | null;
-  // Sort Date DateTimeType Shows the date and time by which the activities are sorted. DateAndTime:UserLocal
+  /*
+  Sort Date DateTimeType Shows the date and time by which the activities are sorted. DateAndTime:UserLocal
+  */
   sortdate?: Date | null;
-  // (Deprecated) Process Stage UniqueidentifierType Unique identifier of the Stage.
+  /*
+  (Deprecated) Process Stage UniqueidentifierType Unique identifier of the Stage.
+  */
   stageid?: import("../../types/Guid").Guid | null;
-  // Status opportunityclose_opportunityclose_statecode Shows whether the opportunity close activity is open, completed, or canceled.  By default, opportunity close activities are completed unless the opportunity is reactivated,  which updates them to canceled.
+  /*
+  Status opportunityclose_opportunityclose_statecode Shows whether the opportunity close activity is open, completed, or canceled.  By default, opportunity close activities are completed unless the opportunity is reactivated,  which updates them to canceled.
+  */
   statecode?: import("../enums/opportunityclose_opportunityclose_statecode").opportunityclose_opportunityclose_statecode | null;
-  // Status Reason opportunityclose_opportunityclose_statuscode Reason for the status of the opportunity close activity.
+  /*
+  Status Reason opportunityclose_opportunityclose_statuscode Reason for the status of the opportunity close activity.
+  */
   statuscode?: import("../enums/opportunityclose_opportunityclose_statuscode").opportunityclose_opportunityclose_statuscode | null;
-  // Sub-Category StringType Subcategory of the opportunity close activity.
+  /*
+  Sub-Category StringType Subcategory of the opportunity close activity.
+  */
   subcategory?: string | null;
-  // Subject StringType Subject associated with the opportunity close activity.
+  /*
+  Subject StringType Subject associated with the opportunity close activity.
+  */
   subject?: string | null;
-  // Time Zone Rule Version Number IntegerType For internal use only.
+  /*
+  Time Zone Rule Version Number IntegerType For internal use only.
+  */
   timezoneruleversionnumber?: number | null;
-  // To PartyListType Person who is the receiver of the activity.
+  /*
+  To PartyListType Person who is the receiver of the activity.
+  */
   to?: import("../../types/ActivityParty").ActivityParty[] | null;
-  // Currency LookupType Choose the local currency for the record to make sure budgets are reported in the correct currency.
+  /*
+  Currency LookupType Choose the local currency for the record to make sure budgets are reported in the correct currency.
+  */
   transactioncurrencyid?: import("../../types/EntityReference").EntityReference | null;
-  //  StringType
+  /*
+   StringType
+  */
   transactioncurrencyidname?: string | null;
-  // (Deprecated) Traversed Path StringType For internal use only.
+  /*
+  (Deprecated) Traversed Path StringType For internal use only.
+  */
   traversedpath?: string | null;
-  // UTC Conversion Time Zone Code IntegerType Time zone code that was in use when the record was created.
+  /*
+  UTC Conversion Time Zone Code IntegerType Time zone code that was in use when the record was created.
+  */
   utcconversiontimezonecode?: number | null;
-  // Version Number BigIntType Version number of the activity.
+  /*
+  Version Number BigIntType Version number of the activity.
+  */
   versionnumber?: number | null;
 }

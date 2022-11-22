@@ -36,21 +36,33 @@
     },
     "entityTypes": {
       "import": "../entities/"
+    },
+    "File": {
+      "import": "../entities/"
     }
   },
   "entities": [
     "account",
     "contact",
     "letter",
-    "opportunity"
+    "opportunity",
+    "cdsify_integrationtest"
   ],
   "actions": [
     "WinOpportunity",
-    "AddToQueue"
+    "AddToQueue",
+    "cdsify_UnboundEcho",
+    "cdsify_BoundEcho",
+    "cdsify_BoundCollectionEcho"
   ],
   "functions": [
     "CalculateTotalTimeIncident",
     "CalculateRollupField",
-    "RetrieveMetadataChanges"
-  ]
+    "RetrieveMetadataChanges",
+    "cdsify_UnboundEchoFunction2",
+    "cdsify_BoundEchoFunction"
+  ],
+  "output": {
+    "outputRoot": "./src/dataverse-gen"
+  }
 }

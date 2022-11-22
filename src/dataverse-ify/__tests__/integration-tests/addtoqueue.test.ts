@@ -1,30 +1,21 @@
-import { SetupGlobalContext } from "../../../webapi/SetupGlobalContext";
+import { SetupGlobalContext } from "../../../webapi/node/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { Entity } from "../../../types/Entity";
-import { XrmContextCdsServiceClient } from "../..";
-import * as config from "config";
-import { NodeXrmConfig } from "../../../webapi/config/NodeXrmConfig";
+import { XrmContextDataverseClient } from "../..";
 import { letterMetadata, Letter } from "../../../dataverse-gen/entities/Letter";
 import { queueMetadata, Queue } from "../../../dataverse-gen/entities/Queue";
 import { queueitemMetadata } from "../../../dataverse-gen/entities/QueueItem";
 import { AddToQueueMetadata, AddToQueueRequest } from "../../../dataverse-gen/actions/AddToQueue";
 import { AddToQueueResponse } from "../../../dataverse-gen/complextypes/AddToQueueResponse";
-describe("addtoqueue", () => {
-  const configFile = config.get("nodewebapi") as NodeXrmConfig;
+describe("AddToQueue", () => {
   beforeAll(async () => {
-    if (!configFile.runIntegrationTests) return;
     // Is this running inside NodeJS?
     if (typeof Xrm === "undefined") {
-      try {
-        // Set up the Node Xrm global context
-        await SetupGlobalContext();
-      } catch (ex) {
-        fail(ex);
-      }
+      // Set up the Node Xrm global context
+      await SetupGlobalContext();
     }
   }, 300000);
   test("AddToQueue", async () => {
-    if (!configFile.runIntegrationTests) return;
     setMetadataCache({
       entities: {
         letter: letterMetadata,
@@ -44,13 +35,13 @@ describe("addtoqueue", () => {
       subject: "Sample Letter",
     } as Letter;
 
-    const cdsServiceClient = new XrmContextCdsServiceClient(Xrm.WebApi);
+    const serviceClient = new XrmContextDataverseClient(Xrm.WebApi);
     try {
       // Create Queue
-      queue.id = await cdsServiceClient.create(queue);
+      queue.id = await serviceClient.create(queue);
 
       // Create letter
-      letter.id = await cdsServiceClient.create(letter);
+      letter.id = await serviceClient.create(letter);
 
       // Add letter to queue
       const request = {
@@ -59,18 +50,18 @@ describe("addtoqueue", () => {
         Target: Entity.toEntityReference(letter),
       } as AddToQueueRequest;
 
-      const response = (await cdsServiceClient.execute(request)) as AddToQueueResponse;
+      const response = (await serviceClient.execute(request)) as AddToQueueResponse;
       expect(response.QueueItemId).toBeDefined();
     } catch (ex) {
-      fail(ex);
+      expect(ex).toBeUndefined();
     } finally {
       if (letter.id) {
         // Tidy up
-        await cdsServiceClient.delete(letter);
+        await serviceClient.delete(letter);
       }
       if (queue.id) {
         // Tidy up
-        await cdsServiceClient.delete(queue);
+        await serviceClient.delete(queue);
       }
     }
   }, 300000);

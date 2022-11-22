@@ -12,3 +12,5 @@ node_modules
 lib
 dist
 coverage
+dist-tests/browser-tests.js
+.env
