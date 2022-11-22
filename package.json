@@ -13,7 +13,8 @@
     "prepublishOnly": "npm version patch",
     "lint": "eslint src --ext .ts",
     "lint:fix": "npm run lint -- --fix",
-    "coverage": "tsc & jest --coverage"
+    "coverage": "tsc & jest --coverage",
+    "postinstall": "node postinstall.js"
   },
   "author": "Scott Durow",
   "license": "MIT",
