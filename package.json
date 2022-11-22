@@ -14,7 +14,7 @@
     "prepublish-test": "npm run ci-test",
     "preversion": "npm run prepublish-test",
     "version": "npm run build",
-    "postversion": "git push",
+    "postversion": "git push && git push --tags",
     "prepublishOnly": "npm version patch",
     "lint": "eslint src --ext .ts",
     "lint:fix": "npm run lint -- --fix",
