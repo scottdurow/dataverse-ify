@@ -64,5 +64,7 @@
   ],
   "output": {
     "outputRoot": "./src/dataverse-gen"
-  }
+  },
+  "generateFormContext": false,
+  "generateEntityTypes": true
 }
