@@ -36,6 +36,7 @@ export const incidentMetadata = {
     statuscode: "Optionset",
     // Date Formats
     createdon: "DateAndTime:UserLocal",
+    deactivatedon: "DateAndTime:UserLocal",
     escalatedon: "DateAndTime:UserLocal",
     followupby: "DateOnly:UserLocal",
     lastonholdtime: "DateAndTime:UserLocal",
@@ -85,6 +86,7 @@ export const enum IncidentAttributes {
   ActualServiceUnits = "actualserviceunits",
   BilledServiceUnits = "billedserviceunits",
   BlockedProfile = "blockedprofile",
+  caseage = "caseage",
   CaseOriginCode = "caseorigincode",
   CaseTypeCode = "casetypecode",
   CheckEmail = "checkemail",
@@ -112,6 +114,7 @@ export const enum IncidentAttributes {
   CustomerIdType = "customeridtype",
   CustomerIdYomiName = "customeridyominame",
   CustomerSatisfactionCode = "customersatisfactioncode",
+  deactivatedon = "deactivatedon",
   DecrementEntitlementTerm = "decremententitlementterm",
   Description = "description",
   EmailAddress = "emailaddress",
@@ -138,6 +141,7 @@ export const enum IncidentAttributes {
   IsEscalated = "isescalated",
   KbArticleId = "kbarticleid",
   KbArticleIdName = "kbarticleidname",
+  lastinteraction = "lastinteraction",
   LastOnHoldTime = "lastonholdtime",
   MasterId = "masterid",
   MasterIdName = "masteridname",
@@ -155,6 +159,7 @@ export const enum IncidentAttributes {
   ModifiedOnBehalfByYomiName = "modifiedonbehalfbyyominame",
   msdyn_iotalert = "msdyn_iotalert",
   msdyn_iotalertName = "msdyn_iotalertname",
+  nextsla = "nextsla",
   NumberOfChildIncidents = "numberofchildincidents",
   OnHoldTime = "onholdtime",
   OverriddenCreatedOn = "overriddencreatedon",
@@ -208,7 +213,6 @@ export const enum IncidentAttributes {
   UTCConversionTimeZoneCode = "utcconversiontimezonecode",
   VersionNumber = "versionnumber",
 }
-
 // Early Bound Interface
 export interface Incident extends IEntity {
   /*
@@ -239,6 +243,10 @@ export interface Incident extends IEntity {
   Blocked Profile BooleanType Details whether the profile is blocked or not.
   */
   blockedprofile?: boolean | null;
+  /*
+  Case Age StringType Shows the duration for which the Case has been active for Active and Resolved Cases.
+  */
+  caseage?: string | null;
   /*
   Origin incident_caseorigincode Select how contact about the case was originated, such as email, phone, or web, for use in reporting and analysis.
   */
@@ -348,6 +356,10 @@ export interface Incident extends IEntity {
   */
   customersatisfactioncode?: import("../enums/incident_incident_customersatisfactioncode").incident_incident_customersatisfactioncode | null;
   /*
+  Deactivated On DateTimeType Shows the date time when the Case was resolved. DateAndTime:UserLocal
+  */
+  deactivatedon?: Date | null;
+  /*
   Decrement Entitlement Terms BooleanType Shows whether terms of the associated entitlement should be decremented or not.
   */
   decremententitlementterm?: boolean | null;
@@ -452,6 +464,10 @@ export interface Incident extends IEntity {
   */
   kbarticleidname?: string | null;
   /*
+  Last Interaction StringType Shows the latest activity associated with the Case and the action performed on that activity.
+  */
+  lastinteraction?: string | null;
+  /*
   Last On Hold Time DateTimeType Contains the date time stamp of the last on hold time. DateAndTime:UserLocal
   */
   lastonholdtime?: Date | null;
@@ -519,6 +535,10 @@ export interface Incident extends IEntity {
    StringType
   */
   msdyn_iotalertname?: string | null;
+  /*
+  Next Sla StringType Shows the unresolved SLA KPI associated with the Case with the earliest expiry time.
+  */
+  nextsla?: string | null;
   /*
   Child Cases IntegerType Number of child incidents associated with the incident.
   */

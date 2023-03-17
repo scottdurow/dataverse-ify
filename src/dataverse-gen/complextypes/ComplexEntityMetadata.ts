@@ -78,6 +78,7 @@ export interface ComplexEntityMetadata {
   IsReadOnlyInMobileClient?: import("../complextypes/BooleanManagedProperty").BooleanManagedProperty;
   IsReadingPaneEnabled?: boolean;
   IsRenameable?: import("../complextypes/BooleanManagedProperty").BooleanManagedProperty;
+  IsRetentionEnabled?: boolean;
   IsRetrieveAuditEnabled?: boolean;
   IsRetrieveMultipleAuditEnabled?: boolean;
   IsSLAEnabled?: boolean;
@@ -111,5 +112,6 @@ export interface ComplexEntityMetadata {
   SettingOf?: string;
   Settings?: import("../complextypes/EntitySetting").EntitySetting[];
   SyncToExternalSearchIndex?: boolean;
+  TableType?: string;
   UsesBusinessDataLabelTable?: boolean;
 }

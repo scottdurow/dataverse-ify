@@ -79,7 +79,7 @@ export const contactMetadata = {
     masterid: ["mscrm.contact"],
     modifiedby: ["mscrm.systemuser"],
     modifiedonbehalfby: ["mscrm.systemuser"],
-    msdyn_contactkpiid: ["mscrm.msdyn_contactkpiitem"],
+    msdyn_segmentid: ["mscrm.msdyn_segment"],
     originatingleadid: ["mscrm.lead"],
     ownerid: ["mscrm.principal"],
     owningbusinessunit: ["mscrm.businessunit"],
@@ -268,10 +268,10 @@ export const enum ContactAttributes {
   ModifiedOnBehalfBy = "modifiedonbehalfby",
   ModifiedOnBehalfByName = "modifiedonbehalfbyname",
   ModifiedOnBehalfByYomiName = "modifiedonbehalfbyyominame",
-  msdyn_contactkpiid = "msdyn_contactkpiid",
-  msdyn_contactkpiidName = "msdyn_contactkpiidname",
   msdyn_gdproptout = "msdyn_gdproptout",
   msdyn_orgchangestatus = "msdyn_orgchangestatus",
+  msdyn_segmentid = "msdyn_segmentid",
+  msdyn_segmentidName = "msdyn_segmentidname",
   NickName = "nickname",
   NumberOfChildren = "numberofchildren",
   OnHoldTime = "onholdtime",
@@ -338,7 +338,6 @@ export const enum ContactAttributes {
   YomiLastName = "yomilastname",
   YomiMiddleName = "yomimiddlename",
 }
-
 // Early Bound Interface
 export interface Contact extends IEntity {
   /*
@@ -1022,14 +1021,6 @@ export interface Contact extends IEntity {
   */
   modifiedonbehalfbyyominame?: string | null;
   /*
-  KPI LookupType Maps to contact KPI records
-  */
-  msdyn_contactkpiid?: import("../../types/EntityReference").EntityReference | null;
-  /*
-   StringType
-  */
-  msdyn_contactkpiidname?: string | null;
-  /*
   GDPR Optout BooleanType Describes whether contact is opted out or not
   */
   msdyn_gdproptout?: boolean | null;
@@ -1037,6 +1028,14 @@ export interface Contact extends IEntity {
   Not at Company Flag contact_contact_msdyn_orgchangestatus Whether or not the contact belongs to the associated account
   */
   msdyn_orgchangestatus?: import("../enums/contact_contact_msdyn_orgchangestatus").contact_contact_msdyn_orgchangestatus | null;
+  /*
+  Segment Id LookupType Unique identifier for Segment associated with contact.
+  */
+  msdyn_segmentid?: import("../../types/EntityReference").EntityReference | null;
+  /*
+   StringType
+  */
+  msdyn_segmentidname?: string | null;
   /*
   Nickname StringType Type the contact's nickname.
   */

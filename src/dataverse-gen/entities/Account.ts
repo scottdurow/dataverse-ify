@@ -82,8 +82,8 @@ export const accountMetadata = {
     masterid: ["mscrm.account"],
     modifiedby: ["mscrm.systemuser"],
     modifiedonbehalfby: ["mscrm.systemuser"],
-    msdyn_accountkpiid: ["mscrm.msdyn_accountkpiitem"],
     msdyn_salesaccelerationinsightid: ["mscrm.msdyn_salesaccelerationinsight"],
+    msdyn_segmentid: ["mscrm.msdyn_segment"],
     originatingleadid: ["mscrm.lead"],
     ownerid: ["mscrm.principal"],
     owningbusinessunit: ["mscrm.businessunit"],
@@ -186,7 +186,6 @@ export const enum AccountAttributes {
   DefaultPriceLevelId = "defaultpricelevelid",
   DefaultPriceLevelIdName = "defaultpricelevelidname",
   Description = "description",
-  dev_NewLineInDescription = "dev_newlineindescription",
   DoNotBulkEMail = "donotbulkemail",
   DoNotBulkPostalMail = "donotbulkpostalmail",
   DoNotEMail = "donotemail",
@@ -227,11 +226,11 @@ export const enum AccountAttributes {
   ModifiedOnBehalfBy = "modifiedonbehalfby",
   ModifiedOnBehalfByName = "modifiedonbehalfbyname",
   ModifiedOnBehalfByYomiName = "modifiedonbehalfbyyominame",
-  msdyn_accountkpiid = "msdyn_accountkpiid",
-  msdyn_accountkpiidName = "msdyn_accountkpiidname",
   msdyn_gdproptout = "msdyn_gdproptout",
   msdyn_salesaccelerationinsightid = "msdyn_salesaccelerationinsightid",
   msdyn_salesaccelerationinsightidName = "msdyn_salesaccelerationinsightidname",
+  msdyn_segmentid = "msdyn_segmentid",
+  msdyn_segmentidName = "msdyn_segmentidname",
   Name = "name",
   NumberOfEmployees = "numberofemployees",
   OnHoldTime = "onholdtime",
@@ -307,7 +306,6 @@ export const enum AccountAttributes {
   WebSiteURL = "websiteurl",
   YomiName = "yominame",
 }
-
 // Early Bound Interface
 export interface Account extends IEntity {
   /*
@@ -639,12 +637,6 @@ export interface Account extends IEntity {
   */
   description?: string | null;
   /*
-  NewLineInDescription StringType Line 1
-Line 2
-Line 3
-  */
-  dev_newlineindescription?: string | null;
-  /*
   Do not allow Bulk Emails BooleanType Select whether the account allows bulk email sent through campaigns. If Do Not Allow is selected, the account can be added to marketing lists, but is excluded from email.
   */
   donotbulkemail?: boolean | null;
@@ -805,14 +797,6 @@ Line 3
   */
   modifiedonbehalfbyyominame?: string | null;
   /*
-  KPI LookupType
-  */
-  msdyn_accountkpiid?: import("../../types/EntityReference").EntityReference | null;
-  /*
-   StringType
-  */
-  msdyn_accountkpiidname?: string | null;
-  /*
   GDPR Optout BooleanType Describes whether account is opted out or not
   */
   msdyn_gdproptout?: boolean | null;
@@ -824,6 +808,14 @@ Line 3
    StringType
   */
   msdyn_salesaccelerationinsightidname?: string | null;
+  /*
+  Segment Id LookupType Unique identifier for Segment associated with account.
+  */
+  msdyn_segmentid?: import("../../types/EntityReference").EntityReference | null;
+  /*
+   StringType
+  */
+  msdyn_segmentidname?: string | null;
   /*
   Account Name [Required] StringType Type the company or business name.
   */

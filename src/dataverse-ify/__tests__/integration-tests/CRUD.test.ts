@@ -4,7 +4,7 @@
 import { SetupGlobalContext } from "../../../webapi/node/SetupGlobalContext";
 import { setMetadataCache } from "../../../metadata/MetadataCache";
 import { accountMetadata, Account } from "../../../dataverse-gen/entities/Account";
-import { whoAmI } from "../../../webapi/WhoAmI";
+import { whoAmI } from "../../../webapi/whoAmI";
 import { EntityReference } from "../../../types/EntityReference";
 import { account_account_accountcategorycode } from "../../../dataverse-gen/enums/account_account_accountcategorycode";
 import { socialprofile_community } from "../../../dataverse-gen/enums/socialprofile_community";

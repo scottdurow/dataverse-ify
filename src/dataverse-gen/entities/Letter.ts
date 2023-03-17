@@ -43,7 +43,7 @@ export const letterMetadata = {
     owningbusinessunit: ["businessunit"],
     owningteam: ["team"],
     owninguser: ["systemuser"],
-    regardingobjectid: ["account","bookableresourcebooking","bookableresourcebookingheader","bulkoperation","campaign","campaignactivity","contact","contract","entitlement","entitlementtemplate","incident","invoice","knowledgearticle","knowledgebaserecord","lead","msdyn_customerasset","msdyn_playbookinstance","msdyn_postalbum","msdyn_salessuggestion","opportunity","quote","salesorder","site"],
+    regardingobjectid: ["account","bookableresourcebooking","bookableresourcebookingheader","bulkoperation","campaign","campaignactivity","contact","contract","entitlement","entitlementtemplate","incident","invoice","knowledgearticle","knowledgebaserecord","lead","msdyn_customerasset","msdyn_playbookinstance","msdyn_postalbum","msdyn_salessuggestion","msdyn_swarm","opportunity","quote","salesorder","site"],
     serviceid: ["service"],
     slainvokedid: ["sla"],
     transactioncurrencyid: ["transactioncurrency"],
@@ -124,7 +124,6 @@ export const enum LetterAttributes {
   UTCConversionTimeZoneCode = "utcconversiontimezonecode",
   VersionNumber = "versionnumber",
 }
-
 // Early Bound Interface
 export interface Letter extends IEntity {
   /*

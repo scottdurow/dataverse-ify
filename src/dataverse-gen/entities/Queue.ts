@@ -39,6 +39,8 @@ export const queueMetadata = {
     defaultmailbox: ["mscrm.mailbox"],
     modifiedby: ["mscrm.systemuser"],
     modifiedonbehalfby: ["mscrm.systemuser"],
+    msdyn_decisionrulesetid: ["mscrm.msdyn_decisionruleset"],
+    msdyn_inqueueoverflowrulesetid: ["mscrm.msdyn_decisionruleset"],
     msdyn_operatinghourid: ["mscrm.msdyn_operatinghour"],
     msdyn_routingcontractid: ["mscrm.msdyn_decisioncontract"],
     organizationid: ["mscrm.organization"],
@@ -67,6 +69,8 @@ export const enum QueueAttributes {
   EMailAddress = "emailaddress",
   EmailPassword = "emailpassword",
   EmailRouterAccessApproval = "emailrouteraccessapproval",
+  EmailSignature = "emailsignature",
+  EmailSignatureName = "emailsignaturename",
   EmailUsername = "emailusername",
   EntityImage = "entityimage",
   EntityImage_Timestamp = "entityimage_timestamp",
@@ -89,11 +93,15 @@ export const enum QueueAttributes {
   msdyn_assignmentinputcontractid = "msdyn_assignmentinputcontractid",
   msdyn_assignmentinputcontractidName = "msdyn_assignmentinputcontractidname",
   msdyn_assignmentstrategy = "msdyn_assignmentstrategy",
+  msdyn_inqueueoverflowrulesetid = "msdyn_inqueueoverflowrulesetid",
+  msdyn_inqueueoverflowrulesetidName = "msdyn_inqueueoverflowrulesetidname",
   msdyn_isdefaultqueue = "msdyn_isdefaultqueue",
   msdyn_isomnichannelqueue = "msdyn_isomnichannelqueue",
   msdyn_maxqueuesize = "msdyn_maxqueuesize",
   msdyn_operatinghourid = "msdyn_operatinghourid",
   msdyn_operatinghouridName = "msdyn_operatinghouridname",
+  msdyn_prequeueoverflowrulesetid = "msdyn_prequeueoverflowrulesetid",
+  msdyn_prequeueoverflowrulesetidName = "msdyn_prequeueoverflowrulesetidname",
   msdyn_priority = "msdyn_priority",
   msdyn_queuetype = "msdyn_queuetype",
   msdyn_uniquename = "msdyn_uniquename",
@@ -124,7 +132,6 @@ export const enum QueueAttributes {
   TransactionCurrencyIdName = "transactioncurrencyidname",
   VersionNumber = "versionnumber",
 }
-
 // Early Bound Interface
 export interface Queue extends IEntity {
   /*
@@ -191,6 +198,14 @@ export interface Queue extends IEntity {
   Primary Email Status queue_queue_emailrouteraccessapproval Shows the status of the primary email address.
   */
   emailrouteraccessapproval?: import("../enums/queue_queue_emailrouteraccessapproval").queue_queue_emailrouteraccessapproval | null;
+  /*
+  Email Signature LookupType
+  */
+  emailsignature?: import("../../types/EntityReference").EntityReference | null;
+  /*
+   StringType
+  */
+  emailsignaturename?: string | null;
   /*
   User Name (Obsolete) StringType This attribute is no longer used. The data is now in the Mailbox.UserName attribute.
   */
@@ -280,6 +295,14 @@ export interface Queue extends IEntity {
   */
   msdyn_assignmentstrategy?: import("../enums/msdyn_queueassignmentstrategy").msdyn_queueassignmentstrategy | null;
   /*
+  Inqueue Overflow Ruleset LookupType Define overflow rules for work items after it enters queue
+  */
+  msdyn_inqueueoverflowrulesetid?: import("../../types/EntityReference").EntityReference | null;
+  /*
+   StringType
+  */
+  msdyn_inqueueoverflowrulesetidname?: string | null;
+  /*
   Is Default Queue BooleanType Shows whether the queue is set as default or not.
   */
   msdyn_isdefaultqueue?: boolean | null;
@@ -299,6 +322,14 @@ export interface Queue extends IEntity {
    StringType
   */
   msdyn_operatinghouridname?: string | null;
+  /*
+  Prequeue Overflow Ruleset LookupType Define overflow rules for work items before it enters queue
+  */
+  msdyn_prequeueoverflowrulesetid?: import("../../types/EntityReference").EntityReference | null;
+  /*
+   StringType
+  */
+  msdyn_prequeueoverflowrulesetidname?: string | null;
   /*
   Priority [Required] IntegerType Priority of the queue to indicate conversation assignment order to the agent.
   */

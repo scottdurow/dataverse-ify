@@ -80,7 +80,6 @@ export const enum cdsify_IntegrationTestAttributes {
   UTCConversionTimeZoneCode = "utcconversiontimezonecode",
   VersionNumber = "versionnumber",
 }
-
 // Early Bound Interface
 export interface cdsify_IntegrationTest extends IEntity {
   /*

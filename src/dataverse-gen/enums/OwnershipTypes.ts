@@ -7,5 +7,6 @@ export const enum OwnershipTypes {
   BusinessOwned = "BusinessOwned",
   OrganizationOwned = "OrganizationOwned",
   BusinessParented = "BusinessParented",
+  Filtered = "Filtered",
 }
   

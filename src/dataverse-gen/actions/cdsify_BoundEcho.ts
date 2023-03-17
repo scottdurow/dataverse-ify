@@ -11,24 +11,8 @@ export const cdsify_BoundEchoMetadata = {
       typeName: "mscrm.cdsify_integrationtest",
       structuralProperty: StructuralProperty.EntityType
       },		
-      "cdsify_BoundInBoolean": {
-      typeName: "Edm.Boolean",
-      structuralProperty: StructuralProperty.PrimitiveType
-      },		
-      "cdsify_BoundInEntityCollection": {
-      typeName: "Collection(mscrm.crmbaseentity)",
-      structuralProperty: StructuralProperty.Collection
-      },		
-      "cdsify_BoundInPicklist": {
-      typeName: "Edm.Int32",
-      structuralProperty: StructuralProperty.PrimitiveType
-      },		
-      "cdsify_BoundInStringArray": {
-      typeName: "Collection(Edm.String)",
-      structuralProperty: StructuralProperty.Collection
-      },		
-      "cdsify_BoundInDateTime": {
-      typeName: "Edm.DateTimeOffset",
+      "cdsify_BoundInGuid": {
+      typeName: "Edm.Guid",
       structuralProperty: StructuralProperty.PrimitiveType
       },		
       "cdsify_BoundInDecimal": {
@@ -47,21 +31,37 @@ export const cdsify_BoundEchoMetadata = {
       typeName: "Edm.Decimal",
       structuralProperty: StructuralProperty.PrimitiveType
       },		
-      "cdsify_BoundInGuid": {
-      typeName: "Edm.Guid",
-      structuralProperty: StructuralProperty.PrimitiveType
+      "cdsify_BoundInEntity": {
+      typeName: "mscrm.cdsify_integrationtest",
+      structuralProperty: StructuralProperty.EntityType
       },		
       "cdsify_BoundInString": {
       typeName: "Edm.String",
+      structuralProperty: StructuralProperty.PrimitiveType
+      },		
+      "cdsify_BoundInPicklist": {
+      typeName: "Edm.Int32",
       structuralProperty: StructuralProperty.PrimitiveType
       },		
       "cdsify_BoundInEntityReference": {
       typeName: "mscrm.cdsify_integrationtest",
       structuralProperty: StructuralProperty.EntityType
       },		
-      "cdsify_BoundInEntity": {
-      typeName: "mscrm.cdsify_integrationtest",
-      structuralProperty: StructuralProperty.EntityType
+      "cdsify_BoundInDateTime": {
+      typeName: "Edm.DateTimeOffset",
+      structuralProperty: StructuralProperty.PrimitiveType
+      },		
+      "cdsify_BoundInBoolean": {
+      typeName: "Edm.Boolean",
+      structuralProperty: StructuralProperty.PrimitiveType
+      },		
+      "cdsify_BoundInStringArray": {
+      typeName: "Collection(Edm.String)",
+      structuralProperty: StructuralProperty.Collection
+      },		
+      "cdsify_BoundInEntityCollection": {
+      typeName: "Collection(mscrm.crmbaseentity)",
+      structuralProperty: StructuralProperty.Collection
       },		
   
   },
@@ -71,17 +71,17 @@ export const cdsify_BoundEchoMetadata = {
 
 export interface cdsify_BoundEchoRequest extends WebApiExecuteRequest {
   entity?: import("../../types/EntityReference").EntityReference | import("../entities/cdsify_IntegrationTest").cdsify_IntegrationTest;
-  cdsify_BoundInBoolean?: boolean;
-  cdsify_BoundInEntityCollection?: any[];
-  cdsify_BoundInPicklist?: number;
-  cdsify_BoundInStringArray?: string[];
-  cdsify_BoundInDateTime?: Date;
+  cdsify_BoundInGuid?: import("../../types/Guid").Guid;
   cdsify_BoundInDecimal?: number;
   cdsify_BoundInFloat?: number;
   cdsify_BoundInInteger?: number;
   cdsify_BoundInMoney?: number;
-  cdsify_BoundInGuid?: import("../../types/Guid").Guid;
-  cdsify_BoundInString?: string;
-  cdsify_BoundInEntityReference?: import("../../types/EntityReference").EntityReference | import("../entities/cdsify_IntegrationTest").cdsify_IntegrationTest;
   cdsify_BoundInEntity?: import("../../types/EntityReference").EntityReference | import("../entities/cdsify_IntegrationTest").cdsify_IntegrationTest;
+  cdsify_BoundInString?: string;
+  cdsify_BoundInPicklist?: number;
+  cdsify_BoundInEntityReference?: import("../../types/EntityReference").EntityReference | import("../entities/cdsify_IntegrationTest").cdsify_IntegrationTest;
+  cdsify_BoundInDateTime?: Date;
+  cdsify_BoundInBoolean?: boolean;
+  cdsify_BoundInStringArray?: string[];
+  cdsify_BoundInEntityCollection?: any[];
 }

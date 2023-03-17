@@ -169,7 +169,6 @@ export const enum OpportunityCloseAttributes {
   UTCConversionTimeZoneCode = "utcconversiontimezonecode",
   VersionNumber = "versionnumber",
 }
-
 // Early Bound Interface
 export interface OpportunityClose extends IEntity {
   /*
@@ -393,13 +392,13 @@ export interface OpportunityClose extends IEntity {
   */
   opportunityidtype?: string | null;
   /*
-  Status opportunityclose_opportunityclose_opportunity_statecode Status of the opportunity.
+  Status opportunityclose_OpportunityClose_opportunity_statecode Status of the opportunity.
   */
-  opportunitystatecode?: import("../enums/opportunityclose_opportunityclose_opportunity_statecode").opportunityclose_opportunityclose_opportunity_statecode | null;
+  opportunitystatecode?: import("../enums/opportunityclose_OpportunityClose_opportunity_statecode").opportunityclose_OpportunityClose_opportunity_statecode | null;
   /*
   Status Reason opportunityclose_OpportunityClose_opportunity_statuscode Status reason of the opportunity.
   */
-  opportunitystatuscode?: import("../enums/opportunityclose_OpportunityClose_opportunity_statuscode").opportunityclose_OpportunityClose_opportunity_statuscode | null;
+  opportunitystatuscode?: import("../enums/opportunityclose_opportunityclose_opportunity_statuscode").opportunityclose_OpportunityClose_opportunity_statuscode | null;
   /*
   Optional Attendees PartyListType List of optional attendees for the activity.
   */

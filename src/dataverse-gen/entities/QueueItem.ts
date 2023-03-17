@@ -95,7 +95,6 @@ export const enum QueueItemAttributes {
   WorkerIdType = "workeridtype",
   WorkerIdYomiName = "workeridyominame",
 }
-
 // Early Bound Interface
 export interface QueueItem extends IEntity {
   /*

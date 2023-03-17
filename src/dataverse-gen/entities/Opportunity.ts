@@ -77,7 +77,6 @@ export const opportunityMetadata = {
     modifiedby: ["mscrm.systemuser"],
     modifiedonbehalfby: ["mscrm.systemuser"],
     msdyn_PredictiveScoreId: ["mscrm.msdyn_predictivescore"],
-    msdyn_opportunitykpiid: ["mscrm.msdyn_opportunitykpiitem"],
     msdyn_segmentid: ["mscrm.msdyn_segment"],
     originatingleadid: ["mscrm.lead"],
     ownerid: ["mscrm.principal"],
@@ -164,8 +163,6 @@ export const enum OpportunityAttributes {
   msdyn_forecastcategory = "msdyn_forecastcategory",
   msdyn_gdproptout = "msdyn_gdproptout",
   msdyn_OpportunityGrade = "msdyn_opportunitygrade",
-  msdyn_opportunitykpiid = "msdyn_opportunitykpiid",
-  msdyn_opportunitykpiidName = "msdyn_opportunitykpiidname",
   msdyn_OpportunityScore = "msdyn_opportunityscore",
   msdyn_OpportunityScoreTrend = "msdyn_opportunityscoretrend",
   msdyn_PredictiveScoreId = "msdyn_predictivescoreid",
@@ -174,7 +171,6 @@ export const enum OpportunityAttributes {
   msdyn_ScoreReasons = "msdyn_scorereasons",
   msdyn_segmentid = "msdyn_segmentid",
   msdyn_segmentidName = "msdyn_segmentidname",
-  msdyn_similaropportunities = "msdyn_similaropportunities",
   Name = "name",
   Need = "need",
   OnHoldTime = "onholdtime",
@@ -251,11 +247,10 @@ export const enum OpportunityAttributes {
   UTCConversionTimeZoneCode = "utcconversiontimezonecode",
   VersionNumber = "versionnumber",
 }
-
 // Early Bound Interface
 export interface Opportunity extends IEntity {
   /*
-  Account LookupType Unique identifier of the account with which the opportunity is associated.
+  Account LookupType Internal attribute for storing customerid. Do not use this attribute directly; use parentaccountid instead.
   */
   accountid?: import("../../types/EntityReference").EntityReference | null;
   /*
@@ -319,7 +314,7 @@ export interface Opportunity extends IEntity {
   */
   confirminterest?: boolean | null;
   /*
-  Contact LookupType Unique identifier of the contact associated with the opportunity.
+  Contact LookupType Internal attribute for storing customerid. Do not use this attribute directly; use parentcontactid instead.
   */
   contactid?: import("../../types/EntityReference").EntityReference | null;
   /*
@@ -523,14 +518,6 @@ export interface Opportunity extends IEntity {
   */
   msdyn_opportunitygrade?: import("../enums/msdyn_opportunitygradeoptset").msdyn_opportunitygradeoptset | null;
   /*
-  KPI LookupType Maps to opportunity KPI records
-  */
-  msdyn_opportunitykpiid?: import("../../types/EntityReference").EntityReference | null;
-  /*
-   StringType
-  */
-  msdyn_opportunitykpiidname?: string | null;
-  /*
   (Deprecated) Opportunity Score IntegerType
   */
   msdyn_opportunityscore?: number | null;
@@ -562,10 +549,6 @@ export interface Opportunity extends IEntity {
    StringType
   */
   msdyn_segmentidname?: string | null;
-  /*
-  msdyn_similaropportunities MemoType
-  */
-  msdyn_similaropportunities?: string | null;
   /*
   Topic [Required] StringType Type a subject or descriptive name, such as the expected order or company name, for the opportunity.
   */
