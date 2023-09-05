@@ -27,9 +27,10 @@ export async function odataifyFields(
 
     switch (fieldInfo.fieldType) {
       case "[object Undefined]":
-        // When setting a value to undefined it must be null when sent to the WebApi
-        output[field] = null;
+      case "[object Null]": {
+        addNullValueToOutput(field, metadata, output);
         break;
+      }
       case "[object Array]":
         {
           // Array of Activity Parties or enums
@@ -63,6 +64,18 @@ export async function odataifyFields(
     }
   }
   return true;
+}
+
+async function addNullValueToOutput(field: string, metadata: EntityWebApiMetadata, output: IEntity) {
+  // When setting a value to undefined it must be null when sent to the WebApi
+  output[field] = null;
+
+  // if lookup field, use the Schema Name from navigation
+  const navigation = caseInsensitiveSearch(field, metadata.navigation as Dictionary<string[]>);
+  if (navigation) {
+    output[navigation.key] = null;
+    delete output[field];
+  }
 }
 
 async function addEntityReferenceToOutput(
