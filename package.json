@@ -23,7 +23,7 @@
   "author": "Scott Durow",
   "license": "MIT",
   "dependencies": {
-    "@azure/msal-node": "^1.9.0",
+    "@azure/msal-node": "^2.16.2",
     "config": "^3.3.7",
     "cryptr": "^6.0.3",
     "fs": "^0.0.1-security",
