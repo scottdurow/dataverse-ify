@@ -52,6 +52,30 @@ test("Empty String, Integer, Double, Money, Date Attributes", async () => {
   expect(JSON.stringify(accountOdata)).toBe(JSON.stringify(expectedOdata));
 });
 
+test("Null String, Integer, Double, Money, Date Attributes", async () => {
+  setMetadataCache({ entities: { account: accountMetadata } });
+  const accountSdk = {
+    logicalName: accountMetadata.logicalName,
+    description: null, // String
+    address1_utcoffset: null, // Integer
+    address1_latitude: null, // Double
+    revenue: null, // Money
+    lastonholdtime: null, // Date
+  } as Account;
+
+  const accountOdata = await odataify("Create", accountSdk);
+  expect(accountOdata).toBeDefined();
+  const expectedOdata = {
+    description: null,
+    address1_utcoffset: null, // Int should be truncated
+    address1_latitude: null,
+    revenue: null,
+    lastonholdtime: null,
+    "@odata.type": "Microsoft.Dynamics.CRM.account",
+  };
+  expect(accountOdata).toEqual(expectedOdata);
+});
+
 test("sdkify Date fields", async () => {
   setMetadataCache({ entities: { account: accountMetadata } });
   const accountOdata = {

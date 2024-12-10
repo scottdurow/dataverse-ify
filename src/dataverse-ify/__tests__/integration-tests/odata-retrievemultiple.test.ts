@@ -28,7 +28,7 @@ describe("retrieveMultiple", () => {
     const client = new XrmContextDataverseClient(Xrm.WebApi);
 
     // Create 12 records
-    const name = `fetch test ${new Date()}`;
+    const name = `fetch test ${new Date().toISOString()}`;
     const testRecord = {
       logicalName: cdsify_integrationtestMetadata.logicalName,
       cdsify_name: name,
