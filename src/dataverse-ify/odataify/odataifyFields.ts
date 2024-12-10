@@ -1,15 +1,15 @@
 /* eslint-disable camelcase */
-import { EntityReference } from "../../types/EntityReference";
-import { Entity } from "../../types/Entity";
-import { IEntity } from "../../types/IEntity";
+import { AttributeTypeCode } from "../../dataverse-gen/enums/AttributeTypeCode";
 import { EntityWebApiMetadata } from "../../metadata/EntityWebApiMetadata";
+import { caseInsensitiveSearch } from "../../metadata/MetadataCache";
 import { ActivityParty, activityparty_participationtypemask } from "../../types/ActivityParty";
 import { Dictionary } from "../../types/Dictionary";
-import { getNavigationPathForEntityReference, IEntityReference } from "../../types/IEntityReference";
+import { Entity } from "../../types/Entity";
 import { EntityCollection } from "../../types/EntityCollection";
+import { EntityReference } from "../../types/EntityReference";
+import { IEntity } from "../../types/IEntity";
+import { getNavigationPathForEntityReference, IEntityReference } from "../../types/IEntityReference";
 import { odataify } from "./odataify";
-import { AttributeTypeCode } from "../../dataverse-gen/enums/AttributeTypeCode";
-import { caseInsensitiveSearch } from "../../metadata/MetadataCache";
 
 export async function odataifyFields(
   action: "Create" | "Update" | "Action",
@@ -71,10 +71,12 @@ async function addNullValueToOutput(field: string, metadata: EntityWebApiMetadat
   output[field] = null;
 
   // if lookup field, use the Schema Name from navigation
+  // TODO: I don't think this is strictly necessary
   const navigation = caseInsensitiveSearch(field, metadata.navigation as Dictionary<string[]>);
   if (navigation && navigation.key !== field) {
-    output[navigation.key] = null;
-    delete output[field];
+    // only needed if the field is different from navigation key (e.g. cdsify_account1 vs cdsify_Account1)
+    output[navigation.key] = null; // set cdsify_Account1 to null
+    delete output[field]; // remove cdsify_account1
   }
 }
 
