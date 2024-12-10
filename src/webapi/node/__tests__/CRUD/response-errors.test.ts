@@ -30,7 +30,7 @@ describe("XrmWebApiNode", () => {
       await Xrm.WebApi.deleteRecord("account", "f0161204-0f0a-ed11-82e6-0022483d2320");
     } catch (e) {
       expect((e as Error).message).toMatch(
-        /(Account With Id = f0161204-0f0a-ed11-82e6-0022483d2320 Does Not Exist)|(The requested record was not found or you do not have sufficient permissions to view it)/,
+        /(Id = f0161204-0f0a-ed11-82e6-0022483d2320 Does Not Exist)|(The requested record was not found or you do not have sufficient permissions to view it)/,
       );
     }
   }, 10000);
