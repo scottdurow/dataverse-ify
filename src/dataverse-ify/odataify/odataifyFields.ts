@@ -72,7 +72,7 @@ async function addNullValueToOutput(field: string, metadata: EntityWebApiMetadat
 
   // if lookup field, use the Schema Name from navigation
   const navigation = caseInsensitiveSearch(field, metadata.navigation as Dictionary<string[]>);
-  if (navigation) {
+  if (navigation && navigation.key !== field) {
     output[navigation.key] = null;
     delete output[field];
   }
