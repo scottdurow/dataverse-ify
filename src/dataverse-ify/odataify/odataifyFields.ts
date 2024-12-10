@@ -1,15 +1,15 @@
 /* eslint-disable camelcase */
-import { AttributeTypeCode } from "../../dataverse-gen/enums/AttributeTypeCode";
+import { EntityReference } from "../../types/EntityReference";
+import { Entity } from "../../types/Entity";
+import { IEntity } from "../../types/IEntity";
 import { EntityWebApiMetadata } from "../../metadata/EntityWebApiMetadata";
-import { caseInsensitiveSearch } from "../../metadata/MetadataCache";
 import { ActivityParty, activityparty_participationtypemask } from "../../types/ActivityParty";
 import { Dictionary } from "../../types/Dictionary";
-import { Entity } from "../../types/Entity";
-import { EntityCollection } from "../../types/EntityCollection";
-import { EntityReference } from "../../types/EntityReference";
-import { IEntity } from "../../types/IEntity";
 import { getNavigationPathForEntityReference, IEntityReference } from "../../types/IEntityReference";
+import { EntityCollection } from "../../types/EntityCollection";
 import { odataify } from "./odataify";
+import { AttributeTypeCode } from "../../dataverse-gen/enums/AttributeTypeCode";
+import { caseInsensitiveSearch } from "../../metadata/MetadataCache";
 
 export async function odataifyFields(
   action: "Create" | "Update" | "Action",
