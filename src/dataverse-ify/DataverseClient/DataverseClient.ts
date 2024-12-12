@@ -41,5 +41,5 @@ export interface DataverseClient {
     relatedEntities: EntityReference[],
   ): Promise<void>;
   execute<T>(request: WebApiExecuteRequest): Promise<T | undefined>;
-  executeMultiple<T>(requests: WebApiExecuteRequest[]): Promise<T[] | undefined>;
+  executeMultiple<T>(requests: (WebApiExecuteRequest | WebApiExecuteRequest[])[]): Promise<T[] | undefined>;
 }
