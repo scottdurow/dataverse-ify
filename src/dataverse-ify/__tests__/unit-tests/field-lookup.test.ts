@@ -47,3 +47,67 @@ test("odataify lookups", async () => {
   };
   expect(JSON.stringify(sdkRecord)).toBe(JSON.stringify(expectedSdk));
 });
+
+test("odataify lookups with undefined", async () => {
+  setMetadataCache({ entities: { account: accountMetadata } });
+  const accountSdk = {
+    logicalName: accountMetadata.logicalName,
+    parentaccountid: undefined,
+  } as Account;
+
+  const accountOdata = await odataify("Create", accountSdk);
+  expect(accountOdata).toBeDefined();
+  const expectedOdata = {
+    "@odata.type": "Microsoft.Dynamics.CRM.account",
+    parentaccountid: null,
+  };
+  expect(accountOdata).toEqual(expectedOdata);
+});
+
+test("odataify lookups with null", async () => {
+  setMetadataCache({ entities: { account: accountMetadata } });
+  const accountSdk = {
+    logicalName: accountMetadata.logicalName,
+    parentaccountid: null,
+  } as Account;
+
+  const accountOdata = await odataify("Create", accountSdk);
+  expect(accountOdata).toBeDefined();
+  const expectedOdata = {
+    "@odata.type": "Microsoft.Dynamics.CRM.account",
+    parentaccountid: null,
+  };
+  expect(accountOdata).toEqual(expectedOdata);
+});
+
+test("odataify lookups with undefined and navigation property", async () => {
+  setMetadataCache({ entities: { account: accountMetadata } });
+  const accountSdk = {
+    logicalName: accountMetadata.logicalName,
+    cdsify_account1: undefined,
+  } as Account;
+
+  const accountOdata = await odataify("Create", accountSdk);
+  expect(accountOdata).toBeDefined();
+  const expectedOdata = {
+    "@odata.type": "Microsoft.Dynamics.CRM.account",
+    cdsify_Account1: null,
+  };
+  expect(accountOdata).toEqual(expectedOdata);
+});
+
+test("odataify lookups with null and navigation property", async () => {
+  setMetadataCache({ entities: { account: accountMetadata } });
+  const accountSdk = {
+    logicalName: accountMetadata.logicalName,
+    cdsify_account1: null,
+  } as Account;
+
+  const accountOdata = await odataify("Create", accountSdk);
+  expect(accountOdata).toBeDefined();
+  const expectedOdata = {
+    "@odata.type": "Microsoft.Dynamics.CRM.account",
+    cdsify_Account1: null,
+  };
+  expect(accountOdata).toEqual(expectedOdata);
+});
